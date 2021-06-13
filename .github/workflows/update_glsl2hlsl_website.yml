@@ -1,0 +1,24 @@
+on:
+  repository_dispatch:
+    types: ["update-glsl2hlsl-website"]
+
+jobs:
+  update-website:
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Download Artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build.yml
+          branch: master
+          name: website
+          repo: pema99/glsl2hlsl
+          path: ./glsl2hlsl
+          
+      - name: Commit updated website
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "glsl2hlsl automatic update"
+          
