@@ -54,7 +54,14 @@
 /******/ 	var wasmImportObjects = {
 /******/ 		"../pkg/glsl2hlsl_wasm_bg.wasm": function() {
 /******/ 			return {
-/******/
+/******/ 				"./glsl2hlsl_wasm_bg.js": {
+/******/ 					"__wbg_downloadfile_759000e02a450362": function(p0i32,p1i32,p2i32,p3i32) {
+/******/ 						return installedModules["../pkg/glsl2hlsl_wasm_bg.js"].exports["__wbg_downloadfile_759000e02a450362"](p0i32,p1i32,p2i32,p3i32);
+/******/ 					},
+/******/ 					"__wbindgen_throw": function(p0i32,p1i32) {
+/******/ 						return installedModules["../pkg/glsl2hlsl_wasm_bg.js"].exports["__wbindgen_throw"](p0i32,p1i32);
+/******/ 					}
+/******/ 				}
 /******/ 			};
 /******/ 		},
 /******/ 	};
@@ -155,7 +162,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/glsl2hlsl_wasm_bg.wasm":"8a3f594efc318dc91a6e"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/glsl2hlsl_wasm_bg.wasm":"61e4149d1f39654029d4"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
