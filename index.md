@@ -19,6 +19,8 @@ Twitter: [@pemathedev](https://twitter.com/pemathedev)
 
 Discord: Pema99#9042
 
+VRChat: [pema99](https://vrchat.com/home/user/usr_d81127c8-e8cc-476b-b74d-0c17c0aeb6ff)
+
 # Currently working on
 - This website.
 - Extending the multicore C backend of the [Futhark](https://github.com/pema99/futhark) compiler to emit [ISPC](https://ispc.github.io/ispc.html) code.
