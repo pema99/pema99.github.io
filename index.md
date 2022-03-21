@@ -33,4 +33,4 @@ VRChat: [pema99](https://vrchat.com/home/user/usr_d81127c8-e8cc-476b-b74d-0c17c0
 - [Shader Knowledge](https://github.com/pema99/shader-knowledge), where I share VRChat specific shader trickery.
 - [glsl2hlsl](https://pema99.github.io/glsl2hlsl), a tool for converting ShaderToy shaders to working Unity shaders.
 - [Shaderception](https://github.com/pema99/Shaderception), a shader compiler and runtime that runs entirely within VRChat.
-
+- [A bunch of small stuff on ShaderToy](https://www.shadertoy.com/user/pema99)
