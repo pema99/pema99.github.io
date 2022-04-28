@@ -72,7 +72,7 @@ UdonSharp is similar in spirit to normal C#, but there are some very notable dif
 For these reasons, the compiler is written as a single 1300 line C# script, containing a single class, and which uses arrays as the sole data structure, primarily arrays of `object` or `string`. An amazing code style, I know.
 
 ## Immediate mode compilation
-Writing compilers is difficult work. Writing compilers in such a limited programming environment is not only difficult, but extremely tedious. To prevent myself from going insane and make it all easier to implement, I made a few fairly unorthodox design decisions. The main one being a property of the compilation pipeline which I shall refer to as immediate mode compilation.
+Writing compilers is difficult work. Writing compilers in such a limited programming environment is not only difficult, but extremely tedious. To prevent myself from going insane and make it all easier to implement, I made a few fairly unorthodox design decisions. The main one being a property of the compilation pipeline which I shall refer to as immediate mode compilation (if you have a better word for it, please let me know, I'm not aware of one).
 
 To understand what that is, let's talk briefly about architecting a compiler. If you've ever taken a course on the subject, you were probably taught that most compilers should consist *roughly* of the following distinct 'parts' aka. pipeline stages:
 1. Lexing/Tokenization
