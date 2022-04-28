@@ -41,6 +41,7 @@ if (steps == maxSteps) {
 }
 ```
 Which outputs this image:
+
 ![](https://i.imgur.com/k0lB0eV.gif)
 
 Those familiar with HLSL will immediately notice a few major differences. Roughly, they are:
@@ -380,6 +381,7 @@ Alternatively, here is a [tweet that shows it off](https://twitter.com/pemathede
 I'd like to thank my good friends who have submitted their own programs written in my botched together language to me.
 
 ![](https://i.imgur.com/PACd4gI.gif)
+
 By the far the most notable is by my great friend Fuopy, who wrote an entire playable Pong game played against a simple AI (depicted above). Not only is this quite a feat in domain-specific shading language, but I'm particularly impressed by how he managed to get this done _while_ I was still working on the compiler and fixing bugs along the way. Thanks for the great motivation, Fuopy. He posted a [tweet about it here](https://twitter.com/fuopy/status/1434277652538355713).
 
 Another person who contributed some very neat programs was M.O.O.N. They wrote some trippy image-based effects, and ported some neat shaders they had written previously to the language. Thanks for that.
