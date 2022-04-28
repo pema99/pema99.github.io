@@ -4,7 +4,7 @@ title: Shaderception - a deep dive
 ---
 
 # Intro
-A while back, I wrote a compiler for a shading language named [Shaderception](https://github.com/pema99/Shaderception). The compiler runs within the social VR platform VRChat, which poses some interesting and odd technical challenges. The result was a virtual world accessible through VRChat, which functions similar to [Shadertoy](https://www.shadertoy.com/) and lets users write and execute interactive shaders entirely from within the platform. The name comes from the fact that the runtime for the language is, itself, written in a fragment shader.
+A while back, I wrote a compiler for a shading language, named [Shaderception](https://github.com/pema99/Shaderception). The compiler runs within the social VR platform VRChat, which poses some interesting and odd technical challenges. The result was a virtual world accessible through VRChat, which functions similar to [Shadertoy](https://www.shadertoy.com/) and lets users write and execute interactive shaders entirely from within the platform. The name comes from the fact that the runtime for the language is, itself, written in a fragment shader.
 
 I've briefly written about the project [in the past](2022-04-17-nans.md), but have been meaning to write a more in-depth technical summary of the techniques I employed to make it all happen. The project consists of several distinct parts, each of which I'll describe separately. As a goal, I'll try to keep it fairly understandable even to people who don't know much about compilers. Apologies if I come off as condescending at times.
 
