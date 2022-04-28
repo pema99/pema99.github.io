@@ -154,7 +154,7 @@ let baz = bar(69) + 420;
 ```
 And then finally into:
 ```ocaml
-let baz = (x + 1337) + 420;
+let baz = (69 + 1337) + 420;
 ```
 As is evident from this example, all function calls have been removed, yay! And if there are no function calls, there is no need for a callstack or any other kind of data structure to keep track of calls. In reality, functions aren't inlined at the source level, but instead after the code is compiled.
 
