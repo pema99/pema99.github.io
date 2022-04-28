@@ -6,7 +6,7 @@ title: Shaderception - a deep dive
 # Intro
 A while back, I wrote a compiler for a shading language, named [Shaderception](https://github.com/pema99/Shaderception). The compiler runs within the social VR platform VRChat, which poses some interesting and odd technical challenges. The result was a virtual world accessible through VRChat, which functions similar to [Shadertoy](https://www.shadertoy.com/) and lets users write and execute interactive shaders entirely from within the platform. The name comes from the fact that the runtime for the language is, itself, written in a fragment shader.
 
-I've briefly written about the project [in the past](2022-04-17-nans.md), but have been meaning to write a more in-depth technical summary of the techniques I employed to make it all happen. The project consists of several distinct parts, each of which I'll describe separately. As a goal, I'll try to keep it fairly understandable even to people who don't know much about compilers. Apologies if I come off as condescending at times.
+I've briefly written about the project [in the past](https://pema.dev/2022/04/17/nans/), but have been meaning to write a more in-depth technical summary of the techniques I employed to make it all happen. The project consists of several distinct parts, each of which I'll describe separately. As a goal, I'll try to keep it fairly understandable even to people who don't know much about compilers. Apologies if I come off as condescending at times.
 
 # The language
 The language compiled by Shaderception, dubbed Shaderception language (I'm amazing at naming things), is fairly similar to HLSL with a few major differences. To motivate the rest of the post and show what we are working towards, here is an example program that calculates an image of the mandelbrot fractal:
@@ -324,7 +324,7 @@ Quite simple, really.
 ## Dynamic typing is cursed
 Shaderception language is dynamically typed. In hindsight, this was both a good and a bad decision. The good was that it massively simplified the compiler. The bad was that it made the virtual machine more complex, and complex shader code kind of has a tendency to fail for seemingly random, mysterious reasons. In addition to just being dynamically typed, further complexity is added by implicit conversions between vector types being supported, and by builtin functions being polymorphic.
 
-Every single value in the Shaderception is stored as `float4`. In order to determine the width of a vector, unused channels are set to `NaN` ([this is a horrible idea for the love of god don't do this](2022-04-17-nans.md)). Some examples:
+Every single value in the Shaderception is stored as `float4`. In order to determine the width of a vector, unused channels are set to `NaN` ([this is a horrible idea for the love of god don't do this](https://pema.dev/2022/04/17/nans/)). Some examples:
 
 ```glsl
 float4(1337.0, NaN, NaN, NaN) // This is a scalar
@@ -352,7 +352,7 @@ float foo(uint i) {
   return foo[i];
 }
 ```
-I wrote an [entire post](2022-04-17-nans.md) about similar issues, so won't go into further detail.
+I wrote an [entire post](https://pema.dev/2022/04/17/nans/) about similar issues, so won't go into further detail.
 
 ## How not to crash your GPU driver
 The initial implementation of the virtual machine caused quite a few graphics driver crashes. I did 2 things 2 miticate this.
