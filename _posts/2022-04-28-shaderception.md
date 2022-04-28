@@ -59,7 +59,7 @@ Some other notable points which aren't immediately obvious from the snippet:
 The language was explicitly designed to be easy to compile with a stupid simple compiler, and to be executable with a stupid simple runtime, while maintaining a similar feel to existing shading languages where it was practical.
 
 # The compiler
-VRChat has 2 main ways of running user code: Shaders and Udon. It's completely unreasonable to attempt to write a compiler in a shader, so the compiler itself uses Udon. Udon is a scripting system which consists of a simple bytecode instruction set, usually referred to as Udon assembly, and an accompanying node-based visual scripting tool. For people who prefer to write code instead of using node graphs, we have Merlin's fantastic [UdonSharp](https://github.com/vrchat-community/UdonSharp) compiler, which compiles a subset of Unity-flavored C# to Udon assembly. This is what I utilized to create compiler.
+VRChat has 2 main ways of running user code: Shaders and Udon. It's completely unreasonable to attempt to write a compiler in a shader, so the compiler itself uses Udon. Udon is a scripting system which consists of a simple instruction set, usually referred to as Udon assembly, and an accompanying node-based visual scripting tool. For people who prefer to write code instead of using node graphs, we have Merlin's fantastic [UdonSharp](https://github.com/vrchat-community/UdonSharp) compiler, which compiles a subset of Unity-flavored C# to Udon assembly. This is what I utilized to create compiler.
 
 ## On UdonSharp
 UdonSharp is similar in spirit to normal C#, but there are some very notable differences that make the former a very strange environment to write larger programs in. Among these differences are: 
