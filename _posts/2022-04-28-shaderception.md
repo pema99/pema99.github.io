@@ -156,7 +156,7 @@ And then finally into:
 ```ocaml
 let baz = (x + 1337) + 420;
 ```
-As is evident from this example, all function calls have been removed, yay! And if there are no function calls, there is no need for a callstack or any other kind of data structure to keep track of calls.
+As is evident from this example, all function calls have been removed, yay! And if there are no function calls, there is no need for a callstack or any other kind of data structure to keep track of calls. In reality, functions aren't inlined at the source level, but instead after the code is compiled.
 
 This does, however, come at a cost. Inlining massively bloats the size of the generated code. If you define a function and call it 10 times, suddenly the body of that function will appear 10 times in the generated code! This can be quite problematic for larger programs.
 
