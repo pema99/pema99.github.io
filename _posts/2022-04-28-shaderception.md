@@ -355,7 +355,7 @@ float bar(uint i) {
 I wrote an [entire post](https://pema.dev/2022/04/17/nans/) about similar issues, so won't go into further detail.
 
 ## How not to crash your GPU driver
-The initial implementation of the virtual machine caused quite a few graphics driver crashes. I did 2 things 2 miticate this.
+The initial implementation of the virtual machine caused quite a few graphics driver crashes. I did 2 things 2 mitigate this.
 
 The first was a jump counter that is incremented every time a jump instruction is performed. If this ever reaches some arbitrarily set maximum value, the program simply terminates. This prevents programs that manage to loop infinitely from causing timeouts and crashes.
 
