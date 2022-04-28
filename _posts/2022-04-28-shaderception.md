@@ -65,7 +65,7 @@ VRChat has 2 main ways of running user code: Shaders and Udon. It's completely u
 UdonSharp is similar in spirit to normal C#, but there are some very notable differences that make the former a very strange environment to write larger programs in. Among these differences are: 
 
 - The speed. UdonSharp code is extremely slow, usually several thousand times slower than the equivalent C#. This is no fault of the UdonSharp compiler - the underlying scripting system is just slow as a consequence of its design. What slows Udon are calls to external .NET methods, which have large overhead. This is such a big deal that asymptotic complexity becomes largely irrelevant, and the only factor that really matters for optimization is minimizing the amount of extern calls.
-- There are no generics, which means no `List<T>` or `Dictionary<T>`.
+- There are no generics, which means no `List<T>` or `Dictionary<K, V>`.
 - Splitting a program into multiple files is tedious, as each UdonSharp program must map to a _behavior_, which forces some restrictions on how the class is written. Inheritance becomes less powerful, and there is no simple way to define a quick plain-old-data struct or class for use within the program. Also, each behavior brings overhead.
 - Many types and methods existing in regular .NET or in Unity's APIs are not exposed to the Udon scripting system. This is done intentionally to sandbox user scripts, but often means that the idiomatic .NET solution to a problem simply isn't possible.
 
