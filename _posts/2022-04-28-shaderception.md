@@ -346,8 +346,8 @@ Play stupid games, win stupid prizes. This is the thought that should immediatel
 For example, dynamically indexing a vector that contains a `NaN` in one channel like so:
 
 ```glsl
-// assume foo is (0.0, NaN, 0.0, 0.0)
-float foo(uint i) {
+// assume foo is a vector (0.0, NaN, 0.0, 0.0)
+float bar(uint i) {
   // this returns NaN regardless of 'i'
   return foo[i];
 }
