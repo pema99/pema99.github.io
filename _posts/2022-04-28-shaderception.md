@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Shaderception: A deep dive
+title: Shaderception - A deep dive
 ---
 
 # Intro
