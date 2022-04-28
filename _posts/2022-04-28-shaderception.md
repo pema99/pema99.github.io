@@ -216,7 +216,7 @@ We would transform it to:
 Assigning the variables `FOO` and `BAR` to position `0` and `1` in the variable store respectively. If you go over 256 variables, you get undefined behavior. Everybody loves undefined behavior. In a _real_ compiler, going over the max register count would result in a 'spill', in which spilled variables are stored in memory instead of a register.
 
 ## Producing a binary
-All the 'program binaries' and generated code I have shown so far have been in mnemonic form. The very final step of the compilation process is to convert this into a more practical, binary format. Of course, we don't actually store the string `"JUMP"` for every jump instruction, that would be insane. Thus, every instruction maps to a distinct operation code, or opcode for short. This is a straight forward matter of traversing the generated code in mnemonic forms and putting opcodes into a list which becomes the program binary.
+All the program binaries and generated code I have shown so far have been in mnemonic form. The very final step of the compilation process is to convert this into a more practical, binary format. Of course, we don't actually store the string `"JUMP"` for every jump instruction, that would be insane. Thus, every instruction maps to a distinct operation code, or opcode for short. This is a straight forward matter of traversing the generated code in mnemonic forms and putting opcodes into a list which becomes the program binary.
 
 # The virtual machine
 So far, I've only described the process of compiling a source program to a binary format. Without a machine to run that binary, the compiler is largely useless. Most languages use one of three approaches to make the programs their compilers produce executable:
