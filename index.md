@@ -5,7 +5,7 @@ title: Hey there!
 
 I'm Pema. I write code - sometimes. I'm particularly interested in graphics,
 virtual reality, programming language development, functional programming and
-pure mathematics. I'm currently working on Lighting at Unity.
+pure mathematics. I'm currently working at Unity, on the light transport team.
 Check out [my stuff](https://github.com/pema99), if you want, and feel free to reach
 out on any socials.
 
