@@ -173,7 +173,7 @@ No language is complete without a way to perform input and output. In shadercept
 When describing the various pipeline stages of the compiler I made a slight distortion of the truth. In fact, more work is done after the initial round of code generation, namely label linking and register allocation. 
 > Note: Both of these are slight misuse of technical terms, they are just simply names I've chosen to describe what is being done.
 
-While generating code, we have been placing labels throughout that were used as the target of various jump instructions. But how do we know which memory address to jump to concretely when all we have is the name of the label? Label linking addresses, by traversing the generated code, and keeping track of the offsets of labels in the generated program binary as it goes. Every time a jump instruction is encountered, the target of the jump is replaced with the concrete offset in the binary. Label instructions are also removed in this process
+While generating code, we have been placing labels throughout that were used as the target of various jump instructions. But how do we know which memory address to jump to concretely when all we have is the name of the label? Label linking addresses this, by traversing the generated code, and keeping track of the offsets of labels in the generated program binary as it goes. Every time a jump instruction is encountered, the target of the jump is replaced with the concrete offset in the binary. Label instructions are also removed in this process
 
 Given a (pseudo) program binary that looks roughly like so:
 ```
