@@ -9,7 +9,7 @@ I've long been obsessed with everything related to programming language design a
 ## Selling point: Effortless, functional GPGPU 
 > Disclaimer: My opinion of Futhark is probably a bit biased, since I recently had the pleasure of [contributing to the compiler](https://github.com/diku-dk/futhark/pull/1677).
 
-Programming for the GPU is a notoriously difficult and laborious discipline. Modern GPU's are strange beasts, very unlike CPU's. Writing efficient GPGPU (General Purpose GPU) code is a daunting task, often requiring a breadth of knowledge about the target architecture. (SOMETHING ABOUT OPENCL)
+Programming for the GPU is a notoriously difficult and laborious discipline. Modern GPU's are strange beasts, very unlike CPU's. Writing efficient GPGPU (General Purpose GPU) code is a daunting task, often requiring a breadth of knowledge about the target architecture.
 
 [Futhark](https://futhark-lang.org/) is a purely functional, data-parallel language which attempts to make programming for the GPU much more accessible, and to unburden to programmer of much of the mental overhead usually implied by the paradigm. 
 
