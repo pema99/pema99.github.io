@@ -42,21 +42,25 @@ If you've ever had the displeasure of writing non-trivial CUDA or OpenCL code by
 Futhark conforms to the language paradigm typically known as [array programming](https://en.wikipedia.org/wiki/Array_programming), roughly meaning that arrays are the primary object of focus, and the language is built to make operating on said arrays convenient and efficient. **All parallelism** in the language is expressed by a small handful of "array combinators", which are higher-order functions, which take arrays and functions as input. If you've ever written in another functional language, or heck, even JavaScript, you may already be familiar with these:
 
 ```lua
--- Map takes as input a single-argument-function and an array, and returns
--- the result of applying that function to each element of the array.
+-- Map takes as input a single-argument-function and an array, and
+-- returns the result of applying that function to each element of
+-- the array.
 -- This example multiplies each element by 2.
 map (*2) [1, 2, 3, 4] == [2, 4, 6, 8]
 
--- Reduce (aka. fold) takes as input a function implementing an associative
--- binary operation, a neutral element, and an array, and returns the 
--- result of placing the binary operator between each pair of elements in
--- the array. This 'reduces' the array to a single value.
+-- Reduce (aka. fold) takes as input a function implementing an
+-- associative binary operation, a neutral element, and an array,
+-- and returns the result of placing the binary operator between
+-- each pair of elements in the array. This 'reduces' the array
+-- to a single value.
 -- This example thus calculates the sum of the passed array.
 reduce (+) 0 [1, 2, 3, 4] == 10
 
--- Scan is exactly like reduce, except that it returns an array of each of
--- the intermediate values. This is sometimes known as a prefix sum. 
--- This example returns an array with the values [1, 1+2, 1+2+3, 1+2+3+4].
+-- Scan is exactly like reduce, except that it returns an array
+-- of each of the intermediate values. This is sometimes known
+-- as a prefix sum. 
+-- This example returns an array with the values
+-- [1, 1+2, 1+2+3, 1+2+3+4].
 scan (+) 0 [1, 2, 3, 4] == [1, 3, 6, 10]
 ```
 
@@ -65,8 +69,8 @@ The Futhark compiler knows how to generate efficient, parallel GPU code implemen
 Of course, _just_ using combinators such as these isn't enough to make more complex programs run fast. For this reason, the Futhark compiler is aggressively optimizing. In addition to the usual optimizations such as inlining and constant folding, the Futhark compiler implements some wacky domain-specific optimizations such as [fusion](https://futhark-book.readthedocs.io/en/latest/fusion.html) and [moderate flattening](https://futhark-book.readthedocs.io/en/latest/regular-flattening.html), which rearrange, transform, and sometimes eliminate array combinators so as to generate more efficient code. The result is that the code generated for any non-trivial Futhark program tends to look _absolutely_ nothing like the code it was generated from.
 
 ```lua
--- The simplest form of "fusion" just turns 2 nested map's into a single
--- map with the operators passed to each composed:
+-- The simplest form of "fusion" just turns 2 nested map's into a
+-- single map with the operators passed to each composed:
 map (+1) (map (*2) [1, 2, 3]) == map (\x -> (x * 2) + 1) [1, 2, 3]
 ```
 
@@ -142,11 +146,11 @@ Unfortunately, monads have some issues. They are notoriously intimidating to lea
 In Koka, each function type consists of 3 parts: The argument types, the result type, and the _effect_ type. Below are a few examples from the documentation.
 
 ```fsharp
-fun sqr    : (int) -> total int      // total: mathematical total function    
-fun divide : (int,int) -> exn int    // exn: may raise an exception
-fun turing : (tape) -> div int       // div: may not terminate  
-fun print  : (string) -> console ()  // console: may write to the console  
-fun rand   : () -> ndet int          // ndet: non-deterministic  
+fun sqr    : (int) -> total int     // total: mathematically total
+fun divide : (int,int) -> exn int   // exn: may raise an exception
+fun turing : (tape) -> div int      // div: may not terminate
+fun print  : (string) -> console () // console: may write to stdout
+fun rand   : () -> ndet int         // ndet: non-deterministic
 ```
 If we look at the `divide` function, we see that the 2 argument types are both integers, the result type is an integer, and the effect type is `exn`, denoting computations that may produce exceptions. Importantly, the effect type can be inferred, so you do not need to manually annotate it. The language can simply figure out for you which kind of side effects are being used in the function body.
 
@@ -366,7 +370,8 @@ Saving the file, UCM tells us some more info:
 
 ```
 I found and typechecked these definitions in /unison/scratch.u.
-  If you do an `add` or `update`, here's how your codebase would change:
+  If you do an `add` or `update`,
+  here's how your codebase would change:
   
     ⍟ These new definitions are ok to `add`:
     
@@ -396,7 +401,8 @@ We can call our new functions using _watch expressions_:
 Putting these lines at the bottom of our file and saving it causes UCM to tell us:
 
 ```
-  Now evaluating any watch expressions (lines starting with `>`)... Ctrl+C cancels.
+  Now evaluating any watch expressions
+  (lines starting with `>`)... Ctrl+C cancels.
 
     8 | > foo 10
           ⧩
@@ -422,9 +428,11 @@ foo n = n ++ ", World"
 Saving the file, UCM informs us:
 
 ```
-  If you do an `add` or `update`, here's how your codebase would change:
+  If you do an `add` or `update`,
+  here's how your codebase would change:
   
-    ⍟ These names already exist. You can `update` them to your new definition:
+    ⍟ These names already exist.
+       You can `update` them to your new definition:
     
       foo : Text -> Text
 ```
@@ -468,13 +476,15 @@ test> my_test =
 Saving the file, we see:
 
 ```
-If you do an `add` or `update`, here's how your codebase would change:
+If you do an `add` or `update`,
+here's how your codebase would change:
   
     ⍟ These new definitions are ok to `add`:
     
       my_test : [Result]
   
-  Now evaluating any watch expressions (lines starting with `>`)... Ctrl+C cancels.
+  Now evaluating any watch expressions
+  (lines starting with `>`)... Ctrl+C cancels.
 
 
     2 |     check (foo "Hello" == "Hello, World")
