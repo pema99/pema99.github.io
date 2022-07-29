@@ -4,7 +4,7 @@ title: 6 interesting languages and their selling points
 ---
 
 # Foreword
-I've long been obsessed with everything related to programming language design and implementation. I make an effort to seek out and try languages with novel features. In this post, I'd like to briefly present and attempt to sell you on some lesser known, but very interesting languages I've come across. I won't go very in depth with either of them, but instead try to demonstrate why you might want to use them. This is not only an excuse for you to try out some new tools, but also an excuse for me to properly learn to use them. The languages aren't in any particular order, so feel free to jump straight to whatever intrigues you using the links below.
+I've long been obsessed with everything related to programming language design and implementation. I make an effort to seek out and try languages with novel features. In this post, I'd like to briefly present and attempt to sell you on some lesser-known, but very interesting languages I've come across. I won't go very in-depth with either of them, but instead, try to demonstrate why you might want to use them. This is not only an excuse for you to try out some new tools but also an excuse for me to properly learn to use them. The languages aren't in any particular order, so feel free to jump straight to whatever intrigues you using the links below.
 
 - [Futhark - Effortless, functional GPGPU](#futhark)
 - [ISPC - A programming model focused on vectorization](#ispc)
@@ -15,11 +15,11 @@ I've long been obsessed with everything related to programming language design a
 
 # Futhark
 ## Selling point: Effortless, functional GPGPU 
-> Disclaimer: My opinion of Futhark is probably a bit biased, since I recently had the pleasure of [contributing to the compiler](https://github.com/diku-dk/futhark/pull/1677).
+> Disclaimer: My opinion of Futhark is probably a bit biased since I recently had the pleasure of [contributing to the compiler](https://github.com/diku-dk/futhark/pull/1677).
 
-Programming for the GPU is a notoriously difficult and laborious discipline. Modern GPUs are strange beasts, very unlike CPU's. Writing efficient GPGPU (General Purpose GPU) code is a daunting task, often requiring a breadth of knowledge about the target architecture.
+Programming for the GPU is a notoriously difficult and laborious discipline. Modern GPUs are strange beasts, very unlike CPUs. Writing efficient GPGPU (General Purpose GPU) code is a daunting task, often requiring a breadth of knowledge about the target architecture.
 
-[Futhark](https://futhark-lang.org/) is a purely functional, data-parallel language which attempts to make programming for the GPU much more accessible, and to unburden the programmer of much of the mental overhead usually implied by the paradigm. 
+[Futhark](https://futhark-lang.org/) is a purely functional, data-parallel language that attempts to make programming for the GPU much more accessible and to unburden the programmer of much of the mental overhead usually implied by the paradigm. 
 
 In the case of Futhark, I think the best way to introduce the language is simply to show some code. Below is a Futhark program containing a single function, `vector_length`, which given an array of floats representing an `n`-dimensional vector, returns the length (euclidean norm) of that vector. It does this by first squaring each element, then summing all the elements up, and finally taking the square root of the sum.
 
@@ -39,7 +39,7 @@ Running this piece of code on the GPU, in all its parallel glory, is as simple a
 
 If you've ever had the displeasure of writing non-trivial CUDA or OpenCL code by hand, you'll immediately notice that this code is basically the antithesis of how GPGPU usually looks. Futhark isn't magic, though, and won't automatically make your code go sanic fast. You have to play its game to see the gains.
 
-Futhark conforms the language paradigm typically known as [array programming](https://en.wikipedia.org/wiki/Array_programming), roughly meaning that arrays are the primary object of focus, and the language is built to make operating on said arrays convenient and efficient. **All parallelism** in the language is expressed by a small handful of "array combinators", which are higher order functions, which take arrays and functions as input. If you've ever written in another functional language, or heck, even JavaScript, you may already be familiar with these:
+Futhark conforms to the language paradigm typically known as [array programming](https://en.wikipedia.org/wiki/Array_programming), roughly meaning that arrays are the primary object of focus, and the language is built to make operating on said arrays convenient and efficient. **All parallelism** in the language is expressed by a small handful of "array combinators", which are higher-order functions, which take arrays and functions as input. If you've ever written in another functional language, or heck, even JavaScript, you may already be familiar with these:
 
 ```lua
 -- Map takes as input a single-argument-function and an array, and returns
@@ -59,7 +59,8 @@ reduce (+) 0 [1, 2, 3, 4] == 10
 -- This example returns an array with the values [1, 1+2, 1+2+3, 1+2+3+4].
 scan (+) 0 [1, 2, 3, 4] == [1, 3, 6, 10]
 ```
-The Futhark compiler knows how to generate efficient, parallel GPU code implementing these combinators. Since all parallelism is derived from these, if your program does not use them, it will not be parallel, and probably quite slow - **Futhark does not use parallelizing compiler**. This isn't quite as limiting as it may sound, and the Futhark standard library contains a wide variety of functions which internally make use of these combinators. In fact, it is quite difficult to do anything useful in the language _without_ making use of them.
+
+The Futhark compiler knows how to generate efficient, parallel GPU code implementing these combinators. Since all parallelism is derived from these, if your program does not use them, it will not be parallel, and probably quite slow - **Futhark does not use parallelizing compiler**. This isn't quite as limiting as it may sound, and the Futhark standard library contains a wide variety of functions that internally make use of these combinators. In fact, it is quite difficult to do anything useful in the language _without_ making use of them.
 
 Of course, _just_ using combinators such as these isn't enough to make more complex programs run fast. For this reason, the Futhark compiler is aggressively optimizing. In addition to the usual optimizations such as inlining and constant folding, the Futhark compiler implements some wacky domain-specific optimizations such as [fusion](https://futhark-book.readthedocs.io/en/latest/fusion.html) and [moderate flattening](https://futhark-book.readthedocs.io/en/latest/regular-flattening.html), which rearrange, transform, and sometimes eliminate array combinators so as to generate more efficient code. The result is that the code generated for any non-trivial Futhark program tends to look _absolutely_ nothing like the code it was generated from.
 
@@ -69,7 +70,7 @@ Of course, _just_ using combinators such as these isn't enough to make more comp
 map (+1) (map (*2) [1, 2, 3]) == map (\x -> (x * 2) + 1) [1, 2, 3]
 ```
 
-Lastly, it is worth pointing out that Futhark is truly _purely_ functional language, unlike other so-called pure languages, such as Haskell, which claim to have no side effects, yet provide escape hatches out of the purity. After all, there is no such thing as IO in the absence of effects. Consequently, Futhark does not support IO. Instead, the language is built to be embedded into, and called from, a host language. The compiler can emit either Python or C code which uses CUDA or OpenCL internally. It is then your job to call into this generated code.
+Lastly, it is worth pointing out that Futhark is truly _purely_ functional language, unlike other so-called pure languages, such as Haskell, which claim to have no side effects, yet provide escape hatches out of the purity. After all, there is no such thing as IO in the absence of effects. Consequently, Futhark does not support IO. Instead, the language is built to be embedded into, and called from, a host language. The compiler can emit either Python or C code that uses CUDA or OpenCL internally. It is then your job to call into this generated code.
 
 If you ever find yourself wanting to do some performant number-crunching, and your problem can be expressed elegantly in a functional language, definitely give Futhark a shot.
 
@@ -80,11 +81,11 @@ If you ever find yourself wanting to do some performant number-crunching, and yo
 
 Moore's Law is well known among programmers. Once upon a time, he postulated that the number of transistors in a CPU would double about every 2 years. For a long time, this conjecture seemed very reasonable, but as time passed, it veered further and further from reality. At some point, you simply can't pack transistors any closer to each other without hitting a wall imposed by the laws of physics.
 
-In our never ending quest for better performance, multicore CPUs were invented somewhere along the way; if we can't make a single processor any faster, why not just make more processors, and solve many problem instances at once. Programming languages were adapted to allow making use of this setup, usually via multithreading. Later still, vector instructions were introduced with instruction sets like [SSE](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) and [AVX](https://en.wikipedia.org/wiki/AVX), which allowed processing multiple pieces of data once on a single core, in a paradigm dubbed SIMD (Single-Instruction-Multiple-Data).
+In our never-ending quest for better performance, multicore CPUs were invented somewhere along the way; if we can't make a single processor any faster, why not just make more processors, and solve many problem instances at once? Programming languages were adapted to allow making use of this setup, usually via multithreading. Later still, vector instructions were introduced with instruction sets like [SSE](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) and [AVX](https://en.wikipedia.org/wiki/AVX), which allowed processing multiple pieces of data once on a single core, in a paradigm dubbed SIMD (Single-Instruction-Multiple-Data).
 
-Unfortunately, modern languages still make such vector instructions tedious and cumbersome to use, as most languages were never built around or fundamentally changed to afford ergonomic use of SIMD. The options are essentially to invoke individual vector instructions manually via vector intrinsics, which are quite painful to use and annoyingly tied to a single instruction set, or to rely on the [autovectorizing capabilities](https://gcc.gnu.org/projects/tree-ssa/vectorization.html) of most modern compilers, which are brittle and difficult to reason with ([Autovectorization is not a paradigm](https://pharr.org/matt/blog/2018/04/18/ispc-origins)). I've met a plethora of programmers who neglect SIMD entirely for these reasons, which is a shame, since it is basically free performance.
+Unfortunately, modern languages still make such vector instructions tedious and cumbersome to use, as most languages were never built around or fundamentally changed to afford the ergonomic use of SIMD. The options are essentially to invoke individual vector instructions manually via vector intrinsics, which are pretty painful to use and annoyingly tied to a single instruction set, or to rely on the [autovectorizing capabilities](https://gcc.gnu.org/projects/tree-ssa/vectorization.html) of most modern compilers, which are brittle and difficult to reason with ([Autovectorization is not a paradigm](https://pharr.org/matt/blog/2018/04/18/ispc-origins)). I've met a plethora of programmers who neglect SIMD entirely for these reasons, which is a shame since it is basically free performance.
 
-Enough history. The [ISPC](https://ispc.github.io/) language is an attempt to design a language specifically tailored for easy and ergonomic use of vector instructions with predictable performance. It does this by implementing a programming model dubbed SPMD (Single-Program-Multiple-Data). As the name implies, the programmer code which describes the actions to perform on a single piece of data, and the program is then implicitly run on multiple pieces of data. If you've ever written a shader in your life, this will probably feel familiar.
+Enough history. The [ISPC](https://ispc.github.io/) language is an attempt to design a language specifically tailored for easy and ergonomic use of vector instructions with predictable performance. It does this by implementing a programming model dubbed SPMD (Single-Program-Multiple-Data). As the name implies, the programmer writes code that describes the actions to perform on a single piece of data, and the program is then implicitly run on multiple pieces of data. If you've ever written a shader in your life, this will probably feel familiar.
 
 ```c
 int sumArray(int arr[], int size) {
@@ -95,7 +96,8 @@ int sumArray(int arr[], int size) {
     return accum;
 }
 ```
-Consider the above C program, which sequentially sums the elements of an array. For the sake of explanation, let's assume that our C compiler cannot automatically vectorize this code (although in reality it can, since the code is so simple). In ISPC, an idiomatic analogous program may look like this:
+
+Consider the above C program, which sequentially sums the elements of an array. For the sake of explanation, let's assume that our C compiler cannot automatically vectorize this code (although in reality, it probably can, since the code is so simple). In ISPC, an idiomatic analogous program may look like this:
 
 ```c
 uniform int sumArray(uniform int arr[], uniform int size) {
@@ -109,11 +111,11 @@ uniform int sumArray(uniform int arr[], uniform int size) {
 
 Although similar, the ISPC program will make use of vector instructions, and thus be several times faster. The first major differences are the `uniform` and `varying` qualifiers. ISPC supports 2 kinds of data, as annotated by these. Conceptually, ISPC code is executed by several "program instances" simultaneously, which are sort of analogous to threads. `uniform` indicates that a piece of data is shared between all program instances, while `varying` data may differ between each program instance.
 
-Unlike threads, these conceptual program instances are always synchronized, and correspond directly to scalars within a vector register. If we, for example, increment a `varying` variable using the `+=` operator, this will automagically use a vectorized addition instruction, adding to each program instance's variable simultaneously. As you might be able to guess by now, `varying` values are stored in vector registers.
+Unlike threads, these conceptual program instances are always synchronized and correspond directly to scalars within a vector register. If we, for example, increment a `varying` variable using the `+=` operator, this will automagically use a vectorized addition instruction, adding to each program instance's variable simultaneously. As you might be able to guess by now, `varying` values are stored in vector registers.
 
-The next difference, the `foreach` construct, is a special kind of loop which automatically distributes iteration across the various program instances. Thus, the loop index `i` is `varying` value. In the first iteration of the loop, `i` will have a value of 0 for the first program instance, 1 for the second, 2 for the third, etc. If we, for example, assume 8 total program instances, in the next iteration `i` will be 8 for the first program instance, 9 for the second, 10 for the third, etc. If our total array size is 16, and the number of program instances is 8, this would mean the loop runs for 2 iterations, processing 8 elements simultaneously in each of the 2.
+The next difference, the `foreach` construct, is a special kind of loop that automatically distributes iteration across the various program instances. Thus, the loop index `i` is `varying` value. In the first iteration of the loop, `i` will have a value of 0 for the first program instance, 1 for the second, 2 for the third, etc. If we, for example, assume 8 total program instances, in the next iteration `i` will be 8 for the first program instance, 9 for the second, 10 for the third, etc. If our total array size is 16, and the number of program instances is 8, this would mean the loop runs for 2 iterations, processing 8 elements simultaneously in each of the 2.
 
-With all of that out of the way, let me give a brief explanation of what the program in the previous snippet does. First, we initialize a varying accumulator to all 0's. Then, we loop over the array in a vectorized fashion. In each iteration, we load a vector of values from the array, and add it component-wise to the accumulator. After the loop, the accumulator will contain a sum per program instance. We then sum up each program instance's contribution using the builtin function `reduce_add`, which takes as input a varying value, and returns a single uniform value. This is the final sum.
+With all of that out of the way, let me give a brief explanation of what the program in the previous snippet does. First, we initialize a varying accumulator to all 0's. Then, we loop over the array in a vectorized fashion. In each iteration, we load a vector of values from the array, and add it component-wise to the accumulator. After the loop, the accumulator will contain a sum per program instance. We then sum up each program instance's contribution using the built-in function `reduce_add`, which takes as input a varying value, and returns a single uniform value. This is the final sum.
 
 With relatively few changes to the original C program, we have produced a vectorized ISPC program, which is very readable - no intrinsics nonsense to be seen. This is a general theme for the language. Many C programs can be sped up immensely by lazily rewriting them in ISPC, replacing some `for`'s with `foreach`.
 
@@ -123,17 +125,17 @@ With relatively few changes to the original C program, we have produced a vector
 > ./exe
 ```
 
-Like Futhark, ISPC isn't intended for use as a standalone language. Instead, given an ISPC source file, the compiler emits a C/C++ header and an object file, which can then be linked into some existing C code, as shown with the commands above. This setup makes the language extremely easy to integrate into existing C/C++ codebases - in fact, [it is used in Unreal Engine!](https://gdcvault.com/play/1026686/Intel-ISPC-in-Unreal-Engine)
+Like [Futhark](#futhark), ISPC isn't intended for use as a standalone language. Instead, given an ISPC source file, the compiler emits a C/C++ header and an object file, which can then be linked into some existing C code, as shown with the commands above. This setup makes the language extremely easy to integrate into existing C/C++ codebases - in fact, [it is used in Unreal Engine!](https://gdcvault.com/play/1026686/Intel-ISPC-in-Unreal-Engine)
 
 # Koka
 ## Selling point: Algebraic effects
 In functional programming, we often talk about "(side) effects" and our desire to keep them under control. The definition of a side effect will vary a bit depending on who you ask, but I'll give it a try. A pure function is [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency), which means that any call to the function can be replaced directly with its result, without changing the behavior of the program. If we call `foo(5)`, and that evaluates to `10`, then _any and all_ occurrences of `foo(5)` can be replaced with `10`. If the function does anything to break this property - by exhibiting side effects - it is no longer pure. Common examples of side effects are reading/writing to a filesystem or console, mutating global state, use of random number generation, etc.
 
-In the absence of side effects, the behavior of code becomes simpler to reason with, and entire classes of bugs can be eliminated. As such, many functional languages implement some kind of strategy for tracking and/or limiting side effects. A common approach is to use [monads](https://pema.dev/2022/03/03/monoid/) as seen in Haskell, PureScript, Scala etc. Without going into much detail, they can be thought of as a design pattern for easily composing effectful computations, using only pure functions. They are nice since they don't necessarily have to be designed into the language, but can be implemented in any language with an expressive enough type system, such as F#, OCaml and TypeScript, neither of which are purely functional.
+In the absence of side effects, the behavior of code becomes simpler to reason with, and entire classes of bugs can be eliminated. As such, many functional languages implement some kind of strategy for tracking and/or limiting side effects. A common approach is to use [monads](https://pema.dev/2022/03/03/monoid/) as seen in Haskell, PureScript, Scala, etc. Without going into much detail, they can be thought of as a design pattern for easily composing effectful computations, using only pure functions. They are nice since they don't necessarily have to be designed into the language, but can be implemented in any language with an expressive enough type system, such as F#, OCaml, and TypeScript, neither of which are purely functional.
 
-Unfortunately monads have some issues. They are notoriously intimidating to learn about for first-timers, and they can be tricky and tedious to combine. If you, for example, had a monad representing operations that perform IO, and a monad representing operations which may fail, and you wish to represent an operation which may fail _and_ perform IO, you are often forced to either write tedious boilerplate code, or use [monad transformers](https://en.wikibooks.org/wiki/Haskell/Monad_transformers) to "stack the monads on top of eachother", which imo. can lead to some rather inelegant code.
+Unfortunately, monads have some issues. They are notoriously intimidating to learn about for first-timers, and they can be tricky and tedious to combine. If you, for example, had a monad representing operations that perform IO, and a monad representing operations that may fail, and you wish to represent an operation that may fail _and_ perform IO, you are often forced to either write tedious boilerplate code or use [monad transformers](https://en.wikibooks.org/wiki/Haskell/Monad_transformers) to "stack the monads on top of each other", which imo. can lead to some rather inelegant code.
 
-[Koka](https://koka-lang.github.io/koka/doc/book.html) is a research language which takes a completely different approach to effect handling, embedding effects directly into the type system, and implementing a type of control flow typically know as [algebraic effects](https://overreacted.io/algebraic-effects-for-the-rest-of-us/).
+[Koka](https://koka-lang.github.io/koka/doc/book.html) is a research language that takes a completely different approach to effect handling, embedding effects directly into the type system, and implementing a type of control flow typically known as [algebraic effects](https://overreacted.io/algebraic-effects-for-the-rest-of-us/).
 
 > I must interject here. Koka has a lot more cool features going for it than just algebraic effects. Stuff like Perceus refcounting, local mutability, and an insanely cool approach to syntax sugar. I'm focusing on algebraic effects since they are what I find most innovative about the language.
 
@@ -155,7 +157,7 @@ Unlike monads, effect types can very easily be combined laterally. You can view 
 fun foo() : <div, exn> int
 ```
 
-In addition to the effect types built into the language, the programmer may define their own effect types. For example, lets define an effect type that represents the ability to write messages to a log:
+In addition to the effect types built into the language, the programmer may define their own effect types. For example, let's define an effect type that represents the ability to write messages to a log:
 
 ```fs
 effect log
@@ -164,7 +166,8 @@ effect log
 
 The name of this effect is `log`, and it enables exactly one operation - writing to a log via the `write` function. We make this function return a boolean to indicate success or failure.
 
-Now, let's write a simple program which does some integer arithmetic to demonstrate our new effect:
+Now, let's write a simple program that does some integer arithmetic to demonstrate our new effect:
+
 ```fs
 fun divide(a: int, b: int)
   a / b
@@ -228,7 +231,7 @@ Dividing 8 by 2
 4
 ```
 
-If the body of our function used more effects than just `log`, we could add their implementations under our implementation of `write`. What's interesting about this code is that we can trivially swap the implementation of `write` used at the callsite without having to change any other code. In other words, the code making use of the effect (`add`, `divide`) knows _nothing_ about how that effect is implemented. For example, lets swap our simple implementation with one that builds up a string instead of immediately printing, and which returns `False` on empty log entries:
+If the body of our function used more effects than just `log`, we could add their implementations under our implementation of `write`. What's interesting about this code is that we can trivially swap the implementation of `write` used at the call site without having to change any other code. In other words, the code making use of the effect (`add`, `divide`) knows _nothing_ about how that effect is implemented. For example, let's swap our simple implementation with one that builds up a string instead of immediately printing, and which returns `False` on empty log entries:
 
 ```fs
 fun main()
@@ -255,9 +258,9 @@ Adding 3 by 5
 Dividing 8 by 2
 ```
 
-As we can see, the implementation of effects used by a piece of code is _truely_ up to the caller of said code. The effectful code is generic, not bound to any specific underlying implementation. This is part what makes algebraic effects so interesting and powerful. We can use them to establish a sort of 2-way "conversation" between caller and callee. Algebraic effects are in my opinion much simpler to understand and use than monads, and the 2 are provably equally expressive. Algebraic effects are very flexible, and can be used to implement basically any kind of side-effect or custom control flow, including but not limited to async/await, exceptions, global mutable state, IO, coroutines, etc.
+As we can see, the implementation of effects used by a piece of code is _truly_ up to the caller of said code. The effectful code is generic, not bound to any specific underlying implementation. This is part of what makes algebraic effects so interesting and powerful. We can use them to establish a sort of 2-way "conversation" between caller and callee. Algebraic effects are in my opinion much simpler to understand and use than monads, and the 2 are provably equally expressive. Algebraic effects are very flexible and can be used to implement basically any kind of side-effect or custom control flow, including but not limited to async/await, exceptions, global mutable state, IO, coroutines, etc.
 
-As a final example, let's return the our program above and implement our own error handling system - currently, we can divide by 0, after all! First, we define a new effect type:
+As a final example, let's return to our program above and implement our own error handling system - currently, we can divide by 0, after all! First, we define a new effect type:
 
 ```fs
 effect error<a>
@@ -275,7 +278,7 @@ fun divide(a: int, b: int)
     a / b
 ```
 
-Divide will now have the type `(int, int) -> <error,log> int` we can even use the Koka REPL to verify this:
+`divide` will now have the type `(int, int) -> <error,log> int` we can even use the Koka REPL to verify this:
 
 ```
 > :t divide
@@ -313,7 +316,7 @@ Which finally produces the output:
 Error: Don't divide by 0, dummy
 ```
 
-The use of `ctl` means that, by default, control flow never resumes at the callee. We can change that by calling the builtin `resume` operation.
+The use of `ctl` means that, by default, control flow never resumes at the callee. We can change that by calling the built-in `resume` operation.
 
 ```fs
 fun main()
@@ -335,15 +338,15 @@ Error: Don't divide by 0, dummy
 42
 ```
 
-I hope by now I've managed to convince you that algebraic effects are cool. I hope we see the feature in more languages in the future. They are currently a fairly common topic in programming language research, but haven't quite yet made it to the mainstream. Functional programming is, imo, not about eliminating side effects, but rather about structuring them in a reasonable, which lets us easily reason with the behavior of program, avoiding nasty surprises from _unexpected_ side effects. Algebraic effects are one cool way to achieve this.
+I hope by now I've managed to convince you that algebraic effects are cool. I hope we see the feature in more languages in the future. They are currently a fairly common topic in programming language research but haven't quite yet made it to the mainstream. Functional programming is, imo, not about eliminating side effects, but rather about structuring them in a reasonable, which lets us easily reason with the behavior of a program, avoiding nasty surprises from _unexpected_ side effects. Algebraic effects are one cool way to achieve this.
 
 As I alluded to in the intro of this section, Koka has a lot more going for it than just algebraic effects. I highly recommend you check out the language if you are interested in cutting-edge features that push the current boundaries of functional languages.
 
 # Unison
 ## Selling point: A language without source code
-I must admit, the sentence I've written as the selling point of this language isn't quite accurate. The [Unison](https://www.unison-lang.org/) language does, in fact, have source code - it just isn't what you store in your codebase. At first glance, Unison is a purely functional language in the ML family, with features that are reminiscent of many other, more well known languages. What Unison does differently than any other language I've encountered is to "content-address" code.
+I must admit, the sentence I've written as the selling point of this language isn't quite accurate. The [Unison](https://www.unison-lang.org/) language does, in fact, have source code - it just isn't what you store in your codebase. At first glance, Unison is a purely functional language in the ML family, with features that are reminiscent of many other, more well-known languages. What Unison does differently than any other language I've encountered is to "content-address" code.
 
-To quote the Unison devs, "Each Unison definition is identified by a hash of its syntax tree". A Unison codebase is not stored on disk as mutable text files containing source code, but as a dense database of definitions addressable by these hashes. The idea seems a bit wacky at first, but yields several nice benefits over other languages, some of which I'll describe shortly.
+To quote the Unison devs, "Each Unison definition is identified by a hash of its syntax tree". A Unison codebase is not stored on disk as mutable text files containing source code but as a dense database of definitions addressable by these hashes. The idea seems a bit wacky at first, but yields several nice benefits over other languages, some of which I'll describe shortly.
 
 The language is a bit tricky to demonstrate, as the programmer's workflow relies quite heavily on an interactive command line tool called "UCM", short for Unison Codebase Manager. New Unison code is typically written in ephemeral "scratch files", which UCM will automatically watch for changes. Booting up UCM brings us to a blank command prompt. If we create a new file with a `.u` extension in the current directory, UCM notifies us:
 
@@ -351,7 +354,7 @@ The language is a bit tricky to demonstrate, as the programmer's workflow relies
   I loaded /unison/scratch.u and didn't find anything.
 ```
 
-Now we can start typing some code. Here's a simple recursive fibonacci function:
+Now we can start typing some code. Here's a simple recursive Fibonacci function:
 
 ```fs
 foo n =
@@ -372,7 +375,7 @@ I found and typechecked these definitions in /unison/scratch.u.
 .>
 ```
 
-We can enter `update` to add this definition to our database of code. Let's write another function which checks if the n'th fibonacci number is even. The scratch file now looks like this:
+We can enter `update` to add this definition to our database of code. Let's write another function that checks if the n'th Fibonacci number is even. The scratch file now looks like this:
 
 ```
 foo n =
@@ -390,7 +393,7 @@ We can call our new functions using _watch expressions_:
 > fib_is_even 10
 ```
 
-Putting these lines at the bottom of our file and saving causes UCM to tell us:
+Putting these lines at the bottom of our file and saving it causes UCM to tell us:
 
 ```
   Now evaluating any watch expressions (lines starting with `>`)... Ctrl+C cancels.
@@ -404,9 +407,9 @@ Putting these lines at the bottom of our file and saving causes UCM to tell us:
           false
 ```
 
-Let's add `fib_is_even` to the codebase as well, like we did for `foo`. At this point, we can actually delete all the functions from the file with no issues. The watch expressions will keep evaluating correctly, since the functions are in the codebase. The scratch file now only contains the watch expressions.
+Let's add `fib_is_even` to the codebase as well, as we did for `foo`. At this point, we can actually delete all the functions from the file with no issues. The watch expressions will keep evaluating correctly since the functions are in the codebase. The scratch file now only contains the watch expressions.
 
-Now for the interesting part. Imagine we later decide to create a new function, also named `foo`, which does something different than calculating fibonacci numbers. Let's make this one append to a string. We'll change our watch expression with `foo` accordingly.
+Now for the interesting part. Imagine we later decide to create a new function, also named `foo`, which does something different than calculating Fibonacci numbers. Let's make this one append to a string. We'll change our watch expression with `foo` accordingly.
 
 ```
 foo : Text -> Text
@@ -438,9 +441,9 @@ Updating the codebase, nothing breaks! We've fundamentally changed the type and 
           false
 ```
 
-As you might be able to infer, renaming functions or reusing function names is always safe in Unison, and can never break any code. Neither our own, nor someone elses. Consequentially, dependency conflicts due to multiple dependencies using the same naming, or due to a dependency updating names or implementations, cannot occur either.
+As you might be able to infer, renaming functions or reusing function names is always safe in Unison, and can never break any code. Neither our own, nor someone else's. Consequentially, dependency conflicts due to multiple dependencies using the same naming, or due to a dependency updating names or implementations, cannot occur either.
 
-It's a bit interesting to see how `fib_is_even` looks now, it actually directly references the `hash` of the fibonacci function:
+It's a bit interesting to see how `fib_is_even` looks now, it actually directly references the `hash` of the Fibonacci function:
 
 ```
 .> view fib_is_even      
@@ -451,9 +454,9 @@ It's a bit interesting to see how `fib_is_even` looks now, it actually directly 
     Nat.mod (#b8ohknd8mu n) 2 == 0
 ```
 
-We can easily associate a new name with hash if desired; this is just another constant time operation. It should be evident at this point, refactoring is quite a breeze in Unison, since it is very difficult to break anything. The Unison codebase can never be in a broken or corrupt state, assuming we don't manually edit via external means, of course.
+We can easily associate a new name with the hash if desired; this is just another constant time operation. It should be evident at this point, refactoring is quite a breeze in Unison since it is very difficult to break anything. The Unison codebase can never be in a broken or corrupt state, assuming we don't manually edit via external means, of course.
 
-In addition to easy refactoring, the hashing mechanism used by Unison has some nice implications for iteration times. In fact, there is no such thing as "building" a Unison codebase. Building (parsing, typechecking) is done immediately when the code is committed to the database, and then cached as files on disk. Thus, if I write a recursive fibonacci implementation once, and commit it to the codebase, I'll never ever have to build it again, even if I decide to reimplement it with a new name. Furthermore, other people collaborating with me on the same codebase won't ever have to build it, either. For these reasons, you are almost _never_ waiting around for code to compile while writing Unison. These cached files are even used when adding new code which depends on old code. Since we have the results of typechecking old code cached, for example, Unison can go straight to typechecking _just_ the new code.
+In addition to easy refactoring, the hashing mechanism used by Unison has some nice implications for iteration times. In fact, there is no such thing as "building" a Unison codebase. Building (parsing, typechecking) is done immediately when the code is committed to the database and then cached as files on disk. Thus, if I write a recursive Fibonacci implementation once, and commit it to the codebase, I'll never ever have to build it again, even if I decide to reimplement it with a new name. Furthermore, other people collaborating with me on the same codebase won't ever have to build it, either. For these reasons, you are almost _never_ waiting around for code to compile while writing Unison. These cached files are even used when adding new code which depends on old code. Since we have the results of typechecking old code cached, for example, Unison can go straight to typechecking _just_ the new code.
 
 Unison doesn't only just cache compiled code, it also caches test results. To show this, I'll write a simple unit test verifying our string appending function from earlier:
 
@@ -485,7 +488,7 @@ The test passes! If we save the file again, we instead see:
     ✅ Passed : Proved. (cached)
 ```
 
-Since Unison is a purely functional language, and this test doesn't use an IO, it is provably deterministic. Unison has made use of this, and will never run the test again, unless the implementation of `foo` changes. Instead, we just see the cached test result. You never have to pay the computational price of rerunning tests you didn't affect with a change, yay!
+Since Unison is a purely functional language, and this test doesn't use an IO, it is provably deterministic. Unison has made use of this, and will never run the test again unless the implementation of `foo` changes. Instead, we just see the cached test result. You never have to pay the computational price of rerunning tests you didn't affect with a change, yay!
 
 Due to all of the aforementioned caching, Unison tooling has a pretty nifty set of IDE-like tools. For example, we can trivially search for all functions by type or name, both of which are snappy due to the caching:
 
@@ -500,17 +503,15 @@ Due to all of the aforementioned caching, Unison tooling has a pretty nifty set 
   2. base.io.console.printLine.doc : Doc
 ```
 
-I've gone on for quite a bit now about hashing and caching, but even ignoring these features, which are where Unison truly innovates, the language is quite pleasant. The tooling is great for such a young language, and it has all the fancy features you'd expect of a modern functional language, like algebraic data types, pattern matching, parametric polymorphism. It even has a form of effect typing called "[abilities](https://www.unison-lang.org/learn/fundamentals/abilities/)" (you can learn more about effect typing in the section on [Koka](#koka)). If any of this piques your interest, definitely try out the language.
+I've gone on for quite a bit now about hashing and caching, but even ignoring these features, which are where Unison truly innovates, the language is quite pleasant. The tooling is great for such a young language, and it has all the fancy features you'd expect of a modern functional language, like algebraic data types, pattern matching, and parametric polymorphism. It even has a form of effect typing called "[abilities](https://www.unison-lang.org/learn/fundamentals/abilities/)" (you can learn more about effect typing in the section on [Koka](#koka)). If any of this piques your interest, definitely try out the language.
 
 # APL
 ## Selling point: Terseness taken to the extreme
-APL is one of the more well known languages on this list, but an interesting and influential one nonetheless. The language was initially devised by [Kenneth Iverson](https://en.wikipedia.org/wiki/Kenneth_E._Iverson) in the 60's as an alternative mathematical notation for manipulating arrays, but was turned into a real programming language a few years later, aptly named "A Programming Language", abbreviated to APL. In other words, APL is _old_, but manages to feel nothing like other languages of the era.
+APL is one of the more well-known languages on this list, but an interesting and influential one nonetheless. The language was initially devised by [Kenneth Iverson](https://en.wikipedia.org/wiki/Kenneth_E._Iverson) in the '60s as an alternative mathematical notation for manipulating arrays, but was turned into a real programming language a few years later, aptly named "A Programming Language", abbreviated to APL. In other words, APL is _old_, but manages to feel nothing like other languages of the era.
 
-APL, like Futhark, is in the family of [array languages](https://en.wikipedia.org/wiki/Array_programming), which, as I mentioned earlier, roughly means that arrays are the primary object of focus, and that the language is built to make operating on arrays convenient and efficient. In fact, APL is often considered the granddaddy of all array languages - a language so influential it spawned an entire paradigm. Among the current generation of programmers, APL is probably most well known for its name, or for being "the language you type with those weird symbols that [you need a special keyboard for](https://microapl.com/images/aplx_keyboard.jpg)". That last part isn't actually true, by the way. You can type APL on a regular keyboard just fine.
+APL, like [Futhark](#futhark), is in the family of [array languages](https://en.wikipedia.org/wiki/Array_programming), which, as I mentioned earlier, roughly means that arrays are the primary object of focus, and that the language is built to make operating on arrays convenient and efficient. In fact, APL is often considered the granddaddy of all array languages - a language so influential it spawned an entire paradigm. Among the current generation of programmers, APL is probably most well known for its name, or for being "the language you type with those weird symbols that [you need a special keyboard for](https://microapl.com/images/aplx_keyboard.jpg)". That last part isn't actually true, by the way. You can type APL on a regular keyboard just fine.
 
-But indeed, APL code consists almost entirely of strange looking hieroglyphics, making APL code extremely terse. This is one of the main selling points of the language - function implementations in APL are often so short that assigning a name to them seems pointless, as the name itself would be more characters than the function body.
-
-> Another disclaimer: I am actually pretty terrible at APL, so don't take information presented here as expert knowledge.
+But indeed, APL code consists almost entirely of strange-looking hieroglyphics, making APL code extremely terse. This is one of the main selling points of the language - function implementations in APL are often so short that assigning a name to them seems pointless, as the name itself would be more characters than the function body.
 
 Without further ado, let's look at some code. I thought it would be fun as a first example to implement the function shown in the [Futhark section](#futhark), which calculates the length of a vector represented as an array. Here is the result:
 
@@ -518,11 +519,11 @@ Without further ado, let's look at some code. I thought it would be fun as a fir
 {(+/⍵*2)*÷2}
 ```
 
-Wow.. That is pretty short. 12 characters vs Futhark's 123, to be exact. Despite the length, quite a bit is going on here. Let's deconstruct it.
+Wow... That is pretty short. 12 characters vs Futhark's 123, to be exact. Despite the length, quite a bit is going on here. Let's deconstruct it.
 
 In APL, every function takes either 1 or 2 arguments. We call these functions monadic and dyadic respectively (not to be confused with monads from languages like Haskell, which are something else). Because of this, there is no need to name function arguments - they are already named for you. `⍺` is the left function argument, and `⍵` is the right. To define an anonymous, we use `{` squiggly brackets `}` around the function body. Looking at the snippet above, you should now see that we are defining a single argument function, which takes an argument from the right - an array, to be exact.
 
-The first operation we perform on the input array is `⍵*2`. `*` is the power operator, so this code will evaluate to a new array with all elements in `⍵` squared. Next, we use the squared array as the right hand argument to the reduction operator, `/`. This operator takes as the left argument a binary operator, and as the right argument an array, and calculates the result of placing the binary operator between each pair of elements in the array. Concretely, `+/my_array` calculates the sum of elements in an array by interspersing the addition operator `+`. So, `(+/⍵*2)` calculates the sum of squares in `⍵`. Lastly, we again use the power operator to calculate the square root of this sum, by using `÷2` as the exponent, which is the reciprocal of 2, ie. 0.5.
+The first operation we perform on the input array is `⍵*2`. `*` is the power operator, so this code will evaluate to a new array with all elements in `⍵` squared. Next, we use the squared array as the right-hand argument to the reduction operator, `/`. This operator takes as the left argument a binary operator, and as the right argument an array, and calculates the result of placing the binary operator between each pair of elements in the array. Concretely, `+/my_array` calculates the sum of elements in an array by interspersing the addition operator `+`. So, `(+/⍵*2)` calculates the sum of squares in `⍵`. Lastly, we again use the power operator to calculate the square root of this sum, by using `÷2` as the exponent, which is the reciprocal of 2, ie. 0.5.
 
 Phew, that was a mouthful. Let's try it out in an [APL REPL](https://tryapl.org/):
 ```apl
@@ -530,7 +531,7 @@ Phew, that was a mouthful. Let's try it out in an [APL REPL](https://tryapl.org/
 3.741657387
 ```
 
-That is indeed the length of the vector `<1, 2, 3>`. APL array literals are simply space separated values. To shorten this program further, we could have omitted the anonymous function and placed the argument directly into the body, like so:
+That is indeed the length of the vector `<1, 2, 3>`. APL array literals are simply space-separated values. To shorten this program further, we could have omitted the anonymous function and placed the argument directly into the body, like so:
 ```apl
 (+/1 2 3*2)*÷2
 ```
@@ -555,7 +556,7 @@ However, when applied dyadically, it gives us the index of the right argument in
     8 1 4 3 2⍳3
 4
 ```
-Indeed, 3 is at 4'th index of the left array.
+Indeed, 3 is at the 4'th index of the left array.
 
 Another interesting tidbit is that operators (and functions in general) generalize to arrays of arbitrary dimensions. This is known as rank polymorphism In fact, we've already seen this in the first example program, where we used `*` to exponentiate an entire array. Let's show a few more examples of this using perhaps the simplest operator of all, addition:
 
@@ -575,9 +576,9 @@ Another interesting tidbit is that operators (and functions in general) generali
 └─────┴─────┘
 ```
 
-Note the use of a 2 dimensional array in the bottom line. Fancy. In APL, anything can be thought of as an array. Even scalar numbers - they are just 0-dimensional arrays. This property allows the programmer to easily apply the expressive set of operations provided by the language to any kind of data.
+Note the use of a 2-dimensional array in the bottom line. Fancy. In APL, anything can be thought of as an array. Even scalar numbers are just 0-dimensional arrays. This property allows the programmer to easily apply the expressive set of operations provided by the language to any kind of data.
 
-The building blocks described so far constitute the core of the language. Quite simple, really. Most of the features I haven't described are pretty much just syntax sugar. The hard part of learning APL isn't learning the language semantics, it's learning all builtin operators and how to effectively chain them together to solve problems. Once you get the hang of it, though, APL can be a very rewarding language to write, as the time it takes to go from an idea for an algorithm to a concrete implementation can be made very short. Due to the terseness of the language, APL also excels in a REPL environment, as a sort of quick calculator on steroids.
+The building blocks described so far constitute the core of the language. Quite simple, really. Most of the features I haven't described are pretty much just syntax sugar. The hard part of learning APL isn't learning the language semantics, it's learning all built-in operators and how to effectively chain them together to solve problems. Once you get the hang of it, though, APL can be a very rewarding language to write, as the time it takes to go from an idea for an algorithm to a concrete implementation can be made very short. Due to the terseness of the language, APL also excels in a REPL environment, as a sort of quick calculator on steroids.
 
 As a final piece of piece of shilling, let me show you [John Scholes](https://www.youtube.com/watch?v=a9xAKttWgP4) famous implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) in APL:
 
@@ -598,9 +599,9 @@ This shows the first 4 iterations of a 5x7 board initialized to a random pattern
 # Prolog
 ## Selling point: Logic programming
 
-[Prolog](https://www.swi-prolog.org/) is an interesting language primarily because it is one of few languages in the paradigm known as "logic programming". It is quite literally in the name, Pro=Programming Log=Logic. In logic programming, the programmer specifies constraints which model some problem domain, and can then execute queries against these constraints to solve problems. Prolog is best explained as a step-by-step tutorial, which is what I intend to do here.
+[Prolog](https://www.swi-prolog.org/) is an interesting language primarily because it is one of few languages in the paradigm known as "logic programming". It is quite literally in the name, Pro=Programming Log=Logic. In logic programming, the programmer specifies constraints that model some problem domain, and can then execute queries against these constraints to solve problems. Prolog is best explained as a step-by-step tutorial, which is what I intend to do here.
 
-The most basic construct in Prolog is a "fact", denoted by an identifier, a list of operands, and followed by a dot. In the below snippet, we state several facts. Alice, Jane, Emma and Sofia are female, while Bob, John, Lucas and Oliver are male.
+The most basic construct in Prolog is a "fact", denoted by an identifier, a list of operands, and followed by a dot. In the below snippet, we state several facts. Alice, Jane, Emma, and Sofia are female, while Bob, John, Lucas, and Oliver are male.
 
 ```prolog
 female(alice).
@@ -700,7 +701,7 @@ X = jane
 
 This is pretty much the core of the language, although the language does have additional features such as arithmetics and lists. What I find cool about Prolog is that you can model your domain with it, and then use it to "discover" properties of the domain.
 
-Although it might not seem like it from what I've shown, general purpose programming is possible in the language. In some cases, we can even do better than what general purpose languages provide. As we've seen, there are no functions in Prolog, just relations in the form of rules and facts. Therefore, "outputs" are typically just another variable in a relation. To illustrate this, consider the builtin for appending lists:
+Although it might not seem like it from what I've shown, general-purpose programming is possible in the language. In some cases, we can even do better than what general-purpose languages provide. As we've seen, there are no functions in Prolog, just relations in the form of rules and facts. Therefore, "outputs" are typically just another variable in a relation. To illustrate this, consider the builtin for appending lists:
 
 ```prolog
 ?- append([1, 2, 3], [4, 5, 6], X).
