@@ -758,7 +758,7 @@ Readers familiar with functional programming will quickly realize this utilizes 
 
 We can query it as such:
 
-```
+```prolog
 ?- sum([1, 2, 3], X).
 X = 6
 ```
