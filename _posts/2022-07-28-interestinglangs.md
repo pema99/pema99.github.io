@@ -67,6 +67,7 @@ If you ever find yourself wanting to do some perfomant number-crunching, and you
 
 # ISPC
 ## Selling point: A programming model focused on vectorization
+
 > Again, I am quite biased on this language. I wrote my thesis about it, after all.
 
 Moore's Law is well known among programmers. Once upon a time, he postulated that the number of transistors in a CPU would double about every 2 years. For a long time, this conjecture seemed very reasonable, but as time passed, it veered further and further from reality. At some point, you simply can't pack transistors any closer to eachother without hitting a wall imposed by the laws of physics.
@@ -116,14 +117,223 @@ With relatively few changes to the original C program, we have produced a vector
 
 Like Futhark, ISPC isn't intended for use as a standalone language. Instead, given an ISPC source file, the compiler emits a C/C++ header and an object file, which can then be linked into some existing C code, as shown with the commands above. This setup makes the language extremely easy to integrate into existing C/C++ codebases - in fact, [it is used in Unreal Engine!](https://gdcvault.com/play/1026686/Intel-ISPC-in-Unreal-Engine)
 
+# Koka
+## Selling point: Algebraic effects
+In functional programming, we often talk about "(side) effects" and our desire to keep them under control. The definition of a side effect will vary a bit depending on who you ask, but I'll give it a try. A pure function is [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency), which means that any call to the function can be replaced directly with its result, without changing the behavior of the program. If we call `foo(5)`, and that evaluates to `10`, then _any and all_ occurrences of `foo(5)` can be replaced with `10`. If the function does anything to break this property - by exhibiting side effects - it is not longer pure. Common examples of side effects are reading/writing to a filesystem or console, mutating global state, use of random number generation, etc.
+
+In the absence of side effects, the behavior of code becomes simpler to reason with, and entire classes of bugs can be eliminated. As such, many functional languages implement some kind of strategy for tracking and/or limiting side effects. A common approach is to use [monads](https://pema.dev/2022/03/03/monoid/) as seen in Haskell, PureScript, Scala etc. Without going into much detail, they can be thought of as a design pattern for easily composing effectful computations, using only pure functions. They are nice since they don't necessarily have to be designed into the language, but can be implemented in any language with an expressive enough type system, such as F#, OCaml and TypeScript, neither of which are purely functional.
+
+Unfortunately monads have some issues. They are notoriously intimidating to learn about for first-timers, and they can be tricky and tedious to combine. If you, for example, had a monad representing operations that perform IO, and a monad representing operations which may fail, and you wish to represent an operation which may fail _and_ perform IO, you are often forced to either write tedious boilerplate code, or use [monad transformers](https://en.wikibooks.org/wiki/Haskell/Monad_transformers) to "stack the monads on top of eachother", which imo. can lead to some rather unelegant code.
+
+[Koka](https://koka-lang.github.io/koka/doc/book.html) is a research language which takes a completely different approach to effect handling, embedding effects directly into the type system, and implementing a type of control flow typically know as [algebraic effects](https://overreacted.io/algebraic-effects-for-the-rest-of-us/).
+
+> I must interject here. Koka has a lot more cool features going for it than just algebraic effects. Stuff like Perceus refcounting, local mutability, and an insanely cool approach to syntax sugar. I'm focusing on algebraic effects since they are what I find most innovative about the language.
+
+In Koka, each function type consists of 3 parts: The argument types, the result type, and the _effect_ type. Below are a few examples from the documentation.
+
+```fs
+fun sqr    : (int) -> total int      // total: mathematical total function    
+fun divide : (int,int) -> exn int    // exn: may raise an exception
+fun turing : (tape) -> div int       // div: may not terminate  
+fun print  : (string) -> console ()  // console: may write to the console  
+fun rand   : () -> ndet int          // ndet: non-deterministic  
+```
+If we look at the `divide` function, we see that the 2 argument types are both integers, the result type is an integer, and the effect type is `exn`, denoting computations that may produce exceptions. Importantly, the effect type can be inferred, so you do not need to manually annotate it. The language can simply figure out for you which kind of side effects are being used in the function body.
+
+Unlike monads, effect types can very easily be combined laterally. You can view the effect type of a function type as simply a list of all the effects used by the function. The syntax for combined effect types looks like so:
+
+```fs
+// This function may diverge, throw an error, or return an integer
+fun foo() : <div, exn> int
+```
+
+In addition to the effect types built into the language, the programmer may define their own effect types. For example, lets define an effect type that represents the ability to write messages to a log:
+
+```fs
+effect log
+  fun write(msg: string) : bool
+```
+
+The name of this effect is `log`, and it enables exactly one operation - writing to a log via the `write` function. We make this function return a boolean to indicate success or failure.
+
+Now, let's write a simple program which does some integer arithmetic to demonstrate our new effect:
+```fs
+fun divide(a: int, b: int)
+  a / b
+
+fun add(a: int, b: int)
+  a + b
+
+fun main()
+  val foo = add(3, 5)
+  val bar = divide(foo, 2)
+  println(bar)
+```
+
+This program will print the value `4`. No effect shenanigans happening yet. Let's say we want to add logging to our program, in order to keep track of which arithmetic operations we made during execution. We could use the `write` operation of our previously defined `log` effect, like so:
+
+```fs
+effect log
+  fun write(msg: string) : bool
+
+fun divide(a: int, b: int)
+  write ("Dividing " ++ show(a) ++ " by " ++ show(b))
+  a / b
+
+fun add(a: int, b: int)
+  write ("Adding " ++ show(a) ++ " by " ++ show(b))
+  a + b
+
+fun main()
+  val foo = add(3, 5)
+  val bar = divide(foo, 2)
+  println(bar)
+```
+
+Notice how we didn't have to change any function signatures. The compiler will automatically figure out that `divide` and `add` have the `log` effect type, although we could write it explicitly if we wanted. Compiling this code as is will result in an error:
+
+```sh
+error: there are unhandled effects for the main expression
+  inferred effect : <console,test/log>
+  unhandled effect: test/log
+  hint            : wrap the main function in a handler
+```
+
+Koka is telling us that we are making use of an effect (log), but haven't described _how_ to handle this effect. In other words, we never gave an implementation for `write`. Helpfully, the compiler even tells us what to do. Enter **effect handlers**. Let's change our main function up a bit:
+
+```fs
+fun main()
+  with handler
+    fun write(msg)
+      println(msg)
+      True
+  val foo = add(3, 5)
+  val bar = divide(foo, 2)
+  println(bar)
+```
+
+This `with handler` construction lets us specify implementations of the effectful actions used in the rest of the function body. In this case, we just implement `write` as a simple print to standard out, and return `True`. Running the program now will produce the output:
+
+```
+Adding 3 by 5
+Dividing 8 by 2
+4
+```
+
+If the body of our function used more effects than just `log`, we could add their implementations under our implementation of `write`. What's interesting about this code is that we can trivially swap the implementation of `write` used at the callsite without having to changing any other code. In other words, the code making use of the effect (`add`, `divide`) knows _nothing_ about how that effect is implemented. For example, lets swap our simple implementation with one that builds up a string instead of immediately printing, and which returns `False` on empty log entries:
+
+```fs
+fun main()
+  var theLog := ""
+  with handler
+    fun write(msg)
+      if msg == "" then
+        False
+      else
+        theLog := theLog ++ "\n" ++ msg
+        True
+  val foo = add(3, 5)
+  val bar = divide(foo, 2)
+  println(bar)
+  println("The log was: " ++ theLog)
+```
+
+Note the use a mutable variable. Koka is arguably not purely functional, as it allows local mutable variables. They cannot escape the lexical scope, though. This outputs:
+
+```
+4
+The log was: 
+Adding 3 by 5
+Dividing 8 by 2
+```
+
+As we can see, the implementation of effects used by a piece of code is _truely_ up to the caller of said code. The effectful code is generic, not bound to any specific underlying implementation. This is part what makes algebraic effects so interesting and powerful. We can use them to establish a sort of 2-way "conversation" between caller and callee. Algebraic effects are in my opinion much simpler to understand and use than monads, and the 2 are provably equally expressive. Algebraic effects are very flexible, and can be used to implement basically any kind of side-effect or custom control flow, including but not limited to async/await, exceptions, global mutable state, IO, coroutines, etc.
+
+As a final example, let's return the our program above and implement our own error handling system - currently, we can divide by 0, after all! First, we define a new effect type:
+
+```fs
+effect error<a>
+  ctl error(msg: string) : a
+```
+
+Here, we use this more general `ctl` keyword for defining our effect's single operation. Unlike `fun`, which acts exactly like a regular function, `ctl` lets us control when and whether the execution flow is passed between caller and callee. Since we don't intend to return execution flow to the callee in the case of an error, the `error` operation can return an arbitrary, generic type `a`. Next, we change up our implementation of `divide`:
+
+```fs
+fun divide(a: int, b: int)
+  if b == 0 then
+    error("Don't divide by 0, dummy")
+  else
+    write ("Dividing " ++ show(a) ++ " by " ++ show(b))
+    a / b
+```
+
+Divide will now have the type `(int, int) -> <error,log> int` we can even use the Koka REPL to verify this:
+
+```
+> :t divide
+check  : interactive
+(a : int, b : int) -> <error,log> int
+```
+
+Finally, we simplify our main function a bit for testing:
+
+```fs
+fun main()
+  with handler
+    fun write(msg)
+      println(msg)
+      True
+  println(divide(5, 0))
+```
+
+As before, if we compile the program as-is, we get an error about not handling the `error` effect. So, we add another `with handler` construction:
+
+```fs
+fun main()
+  with handler
+    fun write(msg)
+      println(msg)
+      True
+  with handler
+    ctl error(msg)
+      println("Error: " ++ msg)
+  println(divide(5, 0))
+```
+
+Which finally produces the output:
+```
+Error: Don't divide by 0, dummy
+```
+
+The use of `ctl` means that, by default, control flow never resumes at the callee. We can change that by calling the builtin `resume` operation.
+
+```fs
+fun main()
+  with handler
+    fun write(msg)
+      println(msg)
+      True
+  with handler
+    ctl error(msg)
+      println("Error: " ++ msg)
+      resume(42)
+  println(divide(5, 0))
+```
+
+Which in this case lets us, at will, resume execution at the callee, passing a default value for the `error` call to evaluate to. This program produces:
+
+```
+Error: Don't divide by 0, dummy
+42
+```
+
+I hope by now I've managed to convince you that algebraic effects are cool. I hope we see the feature in more languages in the future. They are currently a fairly common topic in programming language research, but haven't quite yet made it to the mainstream. As I alluded to in the intro of this section, Koka has a lot more going for it than just algebraic effects. I highly recommend you check out the language if you are interested in cutting-edge features that push the current boundaries of functional languages.
+
 # Unison
 ## Selling point: A language without source code
 
 # Gleam
 ## Selling point: Statically typed, functional programming on the BEAM
-
-# Koka
-## Selling point: Algebraic effects
 
 # Flix
 ## Selling point: Polymorphic effects and inline datalog
