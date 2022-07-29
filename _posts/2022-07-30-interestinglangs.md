@@ -141,7 +141,7 @@ Unfortunately, monads have some issues. They are notoriously intimidating to lea
 
 In Koka, each function type consists of 3 parts: The argument types, the result type, and the _effect_ type. Below are a few examples from the documentation.
 
-```fs
+```fsharp
 fun sqr    : (int) -> total int      // total: mathematical total function    
 fun divide : (int,int) -> exn int    // exn: may raise an exception
 fun turing : (tape) -> div int       // div: may not terminate  
@@ -152,14 +152,14 @@ If we look at the `divide` function, we see that the 2 argument types are both i
 
 Unlike monads, effect types can very easily be combined laterally. You can view the effect type of a function type as simply a list of all the effects used by the function. The syntax for combined effect types looks like this:
 
-```fs
+```fsharp
 // This function may diverge, throw an error, or return an integer
 fun foo() : <div, exn> int
 ```
 
 In addition to the effect types built into the language, the programmer may define their own effect types. For example, let's define an effect type that represents the ability to write messages to a log:
 
-```fs
+```fsharp
 effect log
   fun write(msg: string) : bool
 ```
@@ -168,7 +168,7 @@ The name of this effect is `log`, and it enables exactly one operation - writing
 
 Now, let's write a simple program that does some integer arithmetic to demonstrate our new effect:
 
-```fs
+```fsharp
 fun divide(a: int, b: int)
   a / b
 
@@ -183,7 +183,7 @@ fun main()
 
 This program will print the value `4`. No effect shenanigans happening yet. Let's say we want to add logging to our program, in order to keep track of which arithmetic operations we made during execution. We could use the `write` operation of our previously defined `log` effect, like so:
 
-```fs
+```fsharp
 effect log
   fun write(msg: string) : bool
 
@@ -212,7 +212,7 @@ error: there are unhandled effects for the main expression
 
 Koka is telling us that we are making use of an effect (log), but haven't described _how_ to handle this effect. In other words, we never gave an implementation for `write`. Helpfully, the compiler even tells us what to do. Enter **effect handlers**. Let's change our main function up a bit:
 
-```fs
+```fsharp
 fun main()
   with handler
     fun write(msg)
@@ -233,7 +233,7 @@ Dividing 8 by 2
 
 If the body of our function used more effects than just `log`, we could add their implementations under our implementation of `write`. What's interesting about this code is that we can trivially swap the implementation of `write` used at the call site without having to change any other code. In other words, the code making use of the effect (`add`, `divide`) knows _nothing_ about how that effect is implemented. For example, let's swap our simple implementation with one that builds up a string instead of immediately printing, and which returns `False` on empty log entries:
 
-```fs
+```fsharp
 fun main()
   var theLog := ""
   with handler
@@ -262,14 +262,14 @@ As we can see, the implementation of effects used by a piece of code is _truly_ 
 
 As a final example, let's return to our program above and implement our own error handling system - currently, we can divide by 0, after all! First, we define a new effect type:
 
-```fs
+```fsharp
 effect error<a>
   ctl error(msg: string) : a
 ```
 
 Here, we use this more general `ctl` keyword for defining our effect's single operation. Unlike `fun`, which acts exactly like a regular function, `ctl` lets us control when and whether the execution flow is passed between caller and callee. Since we don't intend to return execution flow to the callee in the case of an error, the `error` operation can return an arbitrary, generic type `a`. Next, we change up our implementation of `divide`:
 
-```fs
+```fsharp
 fun divide(a: int, b: int)
   if b == 0 then
     error("Don't divide by 0, dummy")
@@ -288,7 +288,7 @@ check  : interactive
 
 Finally, we simplify our main function a bit for testing:
 
-```fs
+```fsharp
 fun main()
   with handler
     fun write(msg)
@@ -299,7 +299,7 @@ fun main()
 
 As before, if we compile the program as-is, we get an error about not handling the `error` effect. So, we add another `with handler` construction:
 
-```fs
+```fsharp
 fun main()
   with handler
     fun write(msg)
@@ -318,7 +318,7 @@ Error: Don't divide by 0, dummy
 
 The use of `ctl` means that, by default, control flow never resumes at the callee. We can change that by calling the built-in `resume` operation.
 
-```fs
+```fsharp
 fun main()
   with handler
     fun write(msg)
@@ -356,7 +356,7 @@ The language is a bit tricky to demonstrate, as the programmer's workflow relies
 
 Now we can start typing some code. Here's a simple recursive Fibonacci function:
 
-```fs
+```fsharp
 foo n =
     if n < 2 then n
     else foo (n - 1) + foo (n - 2)
@@ -460,7 +460,7 @@ In addition to easy refactoring, the hashing mechanism used by Unison has some n
 
 Unison doesn't only just cache compiled code, it also caches test results. To show this, I'll write a simple unit test verifying our string appending function from earlier:
 
-```fs
+```fsharp
 test> my_test =
     check (foo "Hello" == "Hello, World")
 ```
@@ -515,7 +515,7 @@ But indeed, APL code consists almost entirely of strange-looking hieroglyphics, 
 
 Without further ado, let's look at some code. I thought it would be fun as a first example to implement the function shown in the [Futhark section](#futhark), which calculates the length of a vector represented as an array. Here is the result:
 
-```apl
+```
 {(+/⍵*2)*÷2}
 ```
 
@@ -526,18 +526,18 @@ In APL, every function takes either 1 or 2 arguments. We call these functions mo
 The first operation we perform on the input array is `⍵*2`. `*` is the power operator, so this code will evaluate to a new array with all elements in `⍵` squared. Next, we use the squared array as the right-hand argument to the reduction operator, `/`. This operator takes as the left argument a binary operator, and as the right argument an array, and calculates the result of placing the binary operator between each pair of elements in the array. Concretely, `+/my_array` calculates the sum of elements in an array by interspersing the addition operator `+`. So, `(+/⍵*2)` calculates the sum of squares in `⍵`. Lastly, we again use the power operator to calculate the square root of this sum, by using `÷2` as the exponent, which is the reciprocal of 2, ie. 0.5.
 
 Phew, that was a mouthful. Let's try it out in an [APL REPL](https://tryapl.org/):
-```apl
+```
     {(+/⍵*2)*÷2}1 2 3
 3.741657387
 ```
 
 That is indeed the length of the vector `<1, 2, 3>`. APL array literals are simply space-separated values. To shorten this program further, we could have omitted the anonymous function and placed the argument directly into the body, like so:
-```apl
+```
 (+/1 2 3*2)*÷2
 ```
 
 We could also name our function for future use:
-```apl
+```
     vector_length ← {(+/⍵*2)*÷2}
     vector_length 1 2 3
 3.741657387
@@ -545,14 +545,14 @@ We could also name our function for future use:
 
 An interesting property of APL, is that most operators can be used both monadically or dyadically. Take for example the iota operator, `⍳`, sometimes known as the index generator. If we apply it monadically to a number `n`, it gives us an array of the `n` first numbers:
 
-```apl
+```
     ⍳5
 1 2 3 4 5
 ```
 
 However, when applied dyadically, it gives us the index of the right argument in the left argument. For example, we can use it to find where a number is in an array:
 
-```apl
+```
     8 1 4 3 2⍳3
 4
 ```
@@ -560,7 +560,7 @@ Indeed, 3 is at the 4'th index of the left array.
 
 Another interesting tidbit is that operators (and functions in general) generalize to arrays of arbitrary dimensions. This is known as rank polymorphism In fact, we've already seen this in the first example program, where we used `*` to exponentiate an entire array. Let's show a few more examples of this using perhaps the simplest operator of all, addition:
 
-```apl
+```
       1 + 5
 6
 
@@ -582,7 +582,7 @@ The building blocks described so far constitute the core of the language. Quite 
 
 As a final piece of piece of shilling, let me show you [John Scholes](https://www.youtube.com/watch?v=a9xAKttWgP4) famous implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) in APL:
 
-```apl
+```
     gen←{({⊃1 ⍵ ∨.∧ 3 4 = +/ +/ 1 0 ¯1 ∘.⊖ 1 0 ¯1 ⌽¨ ⊂⍵}⍣⍵)⍺}
     R∘gen¨ ⍳4
 ┌─────────────┬─────────────┬─────────────┬─────────────┐
