@@ -343,6 +343,166 @@ As I alluded to in the intro of this section, Koka has a lot more going for it t
 
 # Unison
 ## Selling point: A language without source code
+I must admit, the sentence I've written as the selling point of this language isn't quite accurate. The [Unison](https://www.unison-lang.org/) language does, in fact, have source code - it just isn't what you store in your codebase. At first glance, Unison is a purely functional language in the ML family, with features that a reminiscent of many other, more well known languages. What Unison does different than any other language I've encountered is to "content-address" code.
+
+To quote the Unison devs, "Each Unison definition is identified by a hash of its syntax tree". A Unison codebase is not stored on disk as mutable text files containing source code, but as a dense database of definitions addressable by these hashes. The idea seems a bit wacky at first, but yields several nice benefits over other languages, some of which I'll describe shortly.
+
+The language is a bit tricky to demonstrate, as the programmers workflow relies quite heavily on an interactive command line tool called "UCM", short for Unison Codebase Manager. New Unison code is typically written in ephemeral "scratch files", which UCM will automatically watch for changes. Booting up UCM brings us to a blank command prompt. If we create a new file with a `.u` extension in the current directory, UCM notifies us:
+
+```
+  I loaded /unison/scratch.u and didn't find anything.
+```
+
+Now we can start typing some code. Here's a simple recursive fibonacci function:
+
+```fs
+foo n =
+    if n < 2 then n
+    else foo (n - 1) + foo (n - 2)
+```
+
+Saving the file, UCM tells us some more info:
+
+```
+I found and typechecked these definitions in /unison/scratch.u.
+  If you do an `add` or `update`, here's how your codebase would change:
+  
+    ⍟ These new definitions are ok to `add`:
+    
+      foo : Nat -> Nat
+
+.>
+```
+
+We can type enter `update` to add this definition to our database of code. Let's write another function which checks if the n'th fibonacci number is even. The scratch file now looks like this:
+
+```
+foo n =
+    if n < 2 then n
+    else foo (n - 1) + foo (n - 2)
+
+fib_is_even n =
+    Nat.mod (foo n) 2 == 0
+```
+
+We can call our new functions using _watch expressions_:
+
+```
+> foo 10
+> fib_is_even 10
+```
+
+Putting these lines at the bottom of our file and saving causes UCM to tell us:
+
+```
+  Now evaluating any watch expressions (lines starting with `>`)... Ctrl+C cancels.
+
+    8 | > foo 10
+          ⧩
+          55
+  
+    9 | > fib_is_even 10
+          ⧩
+          false
+```
+
+Let's add `fib_is_even` to the codebase as well, like we did for `foo`. At this point, we can actually delete all the functions from the file with no issues. The watch expressions will keep evaluating correctly, since the functions are in the codebase. The scratch file now only contains the watch expressions.
+
+Now for the interesting part. Imagine we later decide to create a new function, also named `foo`, which does something different than calculating fibonacci numbers. Let's make this one append to a string. We'll change our watch expression with `foo` accordingly.
+
+```
+foo : Text -> Text
+foo n = n ++ ", World"
+
+> foo 10
+> fib_is_even 10
+```
+
+Saving the file, UCM informs us:
+
+```
+  If you do an `add` or `update`, here's how your codebase would change:
+  
+    ⍟ These names already exist. You can `update` them to your new definition:
+    
+      foo : Text -> Text
+```
+
+Updating the codebase, nothing breaks! We've fundamentally changed the type and name of `foo`, which `fib_is_even` depended on, but `fib_is_even` still functions as intended, since it referenced `foo` by content, not by name:
+
+```
+    1 | > foo "Hello"
+          ⧩
+          "Hello, World"
+  
+    2 | > fib_is_even 10
+          ⧩
+          false
+```
+
+As you might be able to infer, renaming functions or reusing function names is always safe in Unison, and can never break any code. Neither our own, nor someone elses. Consequentially, dependency conflicts due to multiple dependencies using the same naming, or due to a dependency updating names or implementations, cannot occur either.
+
+It's a bit interesting to see how `fib_is_even` looks now, it actually directly references the `hash` of the fibonacci function:
+
+```
+.> view fib_is_even      
+
+  fib_is_even : Nat -> Boolean
+  fib_is_even n =
+    use Nat ==
+    Nat.mod (#b8ohknd8mu n) 2 == 0
+```
+
+We can easily associate a new name with hash if want; this is just another constant time operation. It should be evident at this point, refactoring is quite a breeze in Unison, since it is very difficult to break anything. The Unison codebase can never be in a broken or corrupt state, assuming we don't manually edit via external means, of course.
+
+In addition to easy refactoring, the hashing mechanism used by Unison has some nice implications for iteration times. In fact, there is no such thing as "building" a Unison codebase. Building (parsing, typechecking) is done immediately when the code is committed to the database, and then cached as files on disk. Thus, if I write a recursive fibonacci implementation once, and commit it to the codebase, I'll never ever have to build it again, even if I decide to reimplement it with a new name. Furthermore, other people collaborating with me on the same codebase won't ever have to build it, either. For these reasons, you are almost _never_ waiting around for code to compile while writing Unison. These cached files are even used when adding new code which depends on old code. Since we have the results of typechecking old code cached, for example, Unison can go straight to typechecking _just_ the new code.
+
+Unison doesn't only just cache compiled code, it also caches test results. To show this, I'll write a simple unit test verifying our string appending function from earlier:
+
+```fs
+test> my_test =
+    check (foo "Hello" == "Hello, World")
+```
+
+Saving the file, we see:
+
+```
+If you do an `add` or `update`, here's how your codebase would change:
+  
+    ⍟ These new definitions are ok to `add`:
+    
+      my_test : [Result]
+  
+  Now evaluating any watch expressions (lines starting with `>`)... Ctrl+C cancels.
+
+
+    2 |     check (foo "Hello" == "Hello, World")
+    
+    ✅ Passed : Proved.
+```
+
+The test passes! If we save the file again, we instead see:
+
+```
+    ✅ Passed : Proved. (cached)
+```
+
+Since Unison is a purely functional language, and this test doesn't use an IO, it is provably deterministic. Unison has made use, and will never run the test again, unless the implementation of `foo` changes. Instead, we just see the cached test result. You never have to pay the computational price of rerunning tests you didn't affect with a change, yay!
+
+Due to all of the aforementioned caching, the Unison tooling has a pretty nifty set of IDE-like tools. For example, we can trivially search for all functions by type or name, both of which are snappy due to the caching:
+
+```
+.> find : Nat -> Text
+
+  1. base.Nat.toText : Nat -> Text
+
+.> find printLine
+
+  1. base.io.console.printLine : Text ->{IO, Exception} ()
+  2. base.io.console.printLine.doc : Doc
+```
+
+I've gone on for quite a bit now about hashing and caching, but even ignoring these features, which are where Unison truly innovates, the language is quite pleasant. The tooling is great for such a young language, and it has all the fancy features you'd expect of a modern functional language, like algebraic data types, pattern matching, parametric polymorphism. It even has a form of effect typing called "[abilities](https://www.unison-lang.org/learn/fundamentals/abilities/)" (you can learn more about effect typing in the section on [Koka](#koka)). If any of this piques your interest, definitely try out the language.
 
 # Gleam
 ## Selling point: Statically typed, functional programming on the BEAM
@@ -440,6 +600,7 @@ As a final piece of piece of shilling, let me show you [John Scholes](https://ww
 │0 0 0 0 0 0 0│0 0 0 0 0 0 0│0 0 1 1 0 0 0│0 1 0 0 1 0 0│
 └─────────────┴─────────────┴─────────────┴─────────────┘
 ```
+
 This shows the first 4 iterations of a 5x7 board initialized to a random pattern. Name another language that lets you write something like this in such a terse manner. I'll wait.
 
 # Prolog
@@ -562,6 +723,7 @@ X = [4, 5, 6]
 ```
 
 We can even ask _which_ lists append together to form [1, 2, 3, 4]:
+
 ```prolog
 ?- append(X, Y, [1, 2, 3, 4]).
 X = [],
@@ -592,6 +754,7 @@ sum([Head|Tail], Sum) :- sum(Tail, Rest), Sum is Head + Rest.
 Readers familiar with functional programming will quickly realize this utilizes recursion. The first line states the fact that the sum of an empty list is 0. The second line is a rule consisting of 2 parts. It states that `Sum` is the sum of a list consisting of a `Head` and `Tail` if `Rest` is the sum of the `Tail` and `Head + Rest` is equal to `Sum`. This way of summing a list is identical to how one might do it in a LISP.
 
 We can query it as such:
+
 ```
 ?- sum([1, 2, 3], X).
 X = 6
