@@ -3,7 +3,7 @@ layout: post
 title: Blogs I love
 ---
 
-I spend a lot of my time seeking out and reading through technical blogs. I realized today though, that my list of go-to blogs only exists mentally. I though I should write them down somewhere, which is what this post is. I'll likely be updating this page in the future.
+I spend a lot of my time seeking out and reading through technical blogs. I realized today, that my list of go-to blogs only exists mentally. I thought I should write them down somewhere, which is what this post is. I'll likely be updating this page in the future.
 
 # Functional programming
 - [https://bartoszmilewski.com/](https://bartoszmilewski.com/)
