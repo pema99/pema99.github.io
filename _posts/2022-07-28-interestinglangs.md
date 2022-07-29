@@ -343,11 +343,11 @@ As I alluded to in the intro of this section, Koka has a lot more going for it t
 
 # Unison
 ## Selling point: A language without source code
-I must admit, the sentence I've written as the selling point of this language isn't quite accurate. The [Unison](https://www.unison-lang.org/) language does, in fact, have source code - it just isn't what you store in your codebase. At first glance, Unison is a purely functional language in the ML family, with features that a reminiscent of many other, more well known languages. What Unison does different than any other language I've encountered is to "content-address" code.
+I must admit, the sentence I've written as the selling point of this language isn't quite accurate. The [Unison](https://www.unison-lang.org/) language does, in fact, have source code - it just isn't what you store in your codebase. At first glance, Unison is a purely functional language in the ML family, with features that are reminiscent of many other, more well known languages. What Unison does differently than any other language I've encountered is to "content-address" code.
 
 To quote the Unison devs, "Each Unison definition is identified by a hash of its syntax tree". A Unison codebase is not stored on disk as mutable text files containing source code, but as a dense database of definitions addressable by these hashes. The idea seems a bit wacky at first, but yields several nice benefits over other languages, some of which I'll describe shortly.
 
-The language is a bit tricky to demonstrate, as the programmers workflow relies quite heavily on an interactive command line tool called "UCM", short for Unison Codebase Manager. New Unison code is typically written in ephemeral "scratch files", which UCM will automatically watch for changes. Booting up UCM brings us to a blank command prompt. If we create a new file with a `.u` extension in the current directory, UCM notifies us:
+The language is a bit tricky to demonstrate, as the programmer's workflow relies quite heavily on an interactive command line tool called "UCM", short for Unison Codebase Manager. New Unison code is typically written in ephemeral "scratch files", which UCM will automatically watch for changes. Booting up UCM brings us to a blank command prompt. If we create a new file with a `.u` extension in the current directory, UCM notifies us:
 
 ```
   I loaded /unison/scratch.u and didn't find anything.
@@ -374,7 +374,7 @@ I found and typechecked these definitions in /unison/scratch.u.
 .>
 ```
 
-We can type enter `update` to add this definition to our database of code. Let's write another function which checks if the n'th fibonacci number is even. The scratch file now looks like this:
+We can enter `update` to add this definition to our database of code. Let's write another function which checks if the n'th fibonacci number is even. The scratch file now looks like this:
 
 ```
 foo n =
@@ -453,7 +453,7 @@ It's a bit interesting to see how `fib_is_even` looks now, it actually directly 
     Nat.mod (#b8ohknd8mu n) 2 == 0
 ```
 
-We can easily associate a new name with hash if want; this is just another constant time operation. It should be evident at this point, refactoring is quite a breeze in Unison, since it is very difficult to break anything. The Unison codebase can never be in a broken or corrupt state, assuming we don't manually edit via external means, of course.
+We can easily associate a new name with hash if desired; this is just another constant time operation. It should be evident at this point, refactoring is quite a breeze in Unison, since it is very difficult to break anything. The Unison codebase can never be in a broken or corrupt state, assuming we don't manually edit via external means, of course.
 
 In addition to easy refactoring, the hashing mechanism used by Unison has some nice implications for iteration times. In fact, there is no such thing as "building" a Unison codebase. Building (parsing, typechecking) is done immediately when the code is committed to the database, and then cached as files on disk. Thus, if I write a recursive fibonacci implementation once, and commit it to the codebase, I'll never ever have to build it again, even if I decide to reimplement it with a new name. Furthermore, other people collaborating with me on the same codebase won't ever have to build it, either. For these reasons, you are almost _never_ waiting around for code to compile while writing Unison. These cached files are even used when adding new code which depends on old code. Since we have the results of typechecking old code cached, for example, Unison can go straight to typechecking _just_ the new code.
 
@@ -487,9 +487,9 @@ The test passes! If we save the file again, we instead see:
     ✅ Passed : Proved. (cached)
 ```
 
-Since Unison is a purely functional language, and this test doesn't use an IO, it is provably deterministic. Unison has made use, and will never run the test again, unless the implementation of `foo` changes. Instead, we just see the cached test result. You never have to pay the computational price of rerunning tests you didn't affect with a change, yay!
+Since Unison is a purely functional language, and this test doesn't use an IO, it is provably deterministic. Unison has made use of this, and will never run the test again, unless the implementation of `foo` changes. Instead, we just see the cached test result. You never have to pay the computational price of rerunning tests you didn't affect with a change, yay!
 
-Due to all of the aforementioned caching, the Unison tooling has a pretty nifty set of IDE-like tools. For example, we can trivially search for all functions by type or name, both of which are snappy due to the caching:
+Due to all of the aforementioned caching, Unison tooling has a pretty nifty set of IDE-like tools. For example, we can trivially search for all functions by type or name, both of which are snappy due to the caching:
 
 ```
 .> find : Nat -> Text
