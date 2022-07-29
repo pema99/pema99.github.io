@@ -3,7 +3,17 @@ layout: post
 title: 8 interesting languages and their selling points
 ---
 
-I've long been obsessed with everything related to programming language design and implementation. I make an effort to seek out and try languages with novel features. In this post, I'd like to briefly present and attempt to sell you on some lesser known, but very interesting languages I've come across. I won't go very in depth with either of them, but instead try to demonstrate why you might want to use them. This is not only an excuse for you to try out some new tools, but also an excuse for me to properly learn to use them. The languages aren't in any particular order, so feel free to jump straight to whatever intrigues you.
+# Foreword
+I've long been obsessed with everything related to programming language design and implementation. I make an effort to seek out and try languages with novel features. In this post, I'd like to briefly present and attempt to sell you on some lesser known, but very interesting languages I've come across. I won't go very in depth with either of them, but instead try to demonstrate why you might want to use them. This is not only an excuse for you to try out some new tools, but also an excuse for me to properly learn to use them. The languages aren't in any particular order, so feel free to jump straight to whatever intrigues you using the links below.
+
+- [Futhark - Effortless, functional GPGPU](#futhark)
+- [ISPC - A programming model focused on vectorization](#ispc)
+- [Koka - Algebraic effects](#koka)
+- [Unison - A language without source code](#unison)
+- [Gleam - Statically typed, functional programming on the BEAM](#gleam)
+- [Flix - Polymorphic effects and inline datalog](#flix)
+- [APL - Terseness taken to the extreme](#apl)
+- [Prolog - Logic programming](#prolog)
 
 # Futhark
 ## Selling point: Effortless, functional GPGPU 
