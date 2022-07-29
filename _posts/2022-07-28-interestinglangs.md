@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 8 interesting languages and their selling points
+title: 6 interesting languages and their selling points
 ---
 
 # Foreword
@@ -10,8 +10,6 @@ I've long been obsessed with everything related to programming language design a
 - [ISPC - A programming model focused on vectorization](#ispc)
 - [Koka - Algebraic effects](#koka)
 - [Unison - A language without source code](#unison)
-- [Gleam - Statically typed, functional programming on the BEAM](#gleam)
-- [Flix - Polymorphic effects and inline datalog](#flix)
 - [APL - Terseness taken to the extreme](#apl)
 - [Prolog - Logic programming](#prolog)
 
@@ -503,12 +501,6 @@ Due to all of the aforementioned caching, Unison tooling has a pretty nifty set 
 ```
 
 I've gone on for quite a bit now about hashing and caching, but even ignoring these features, which are where Unison truly innovates, the language is quite pleasant. The tooling is great for such a young language, and it has all the fancy features you'd expect of a modern functional language, like algebraic data types, pattern matching, parametric polymorphism. It even has a form of effect typing called "[abilities](https://www.unison-lang.org/learn/fundamentals/abilities/)" (you can learn more about effect typing in the section on [Koka](#koka)). If any of this piques your interest, definitely try out the language.
-
-# Gleam
-## Selling point: Statically typed, functional programming on the BEAM
-
-# Flix
-## Selling point: Polymorphic effects and inline datalog
 
 # APL
 ## Selling point: Terseness taken to the extreme
