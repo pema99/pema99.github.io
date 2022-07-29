@@ -342,6 +342,95 @@ As I alluded to in the intro of this section, Koka has a lot more going for it t
 
 # APL
 ## Selling point: Terseness taken to the extreme
+APL is one of the more well known languages on this list, but an interesting and influential one nonetheless. The langauge was initially devised by [Kenneth Iverson](https://en.wikipedia.org/wiki/Kenneth_E._Iverson) in the 60's as an alternative mathematical notation for manipulating arrays, but was turned into a real programming language a few years later, aptly named "A Programming Language", abbreviated to APL. In other words, APL is _old_, but manages to feel nothing like other languages of the era.
+
+APL, like Futhark, is in the family of [array languages](https://en.wikipedia.org/wiki/Array_programming), which, as I mentioned earlier, roughly means that arrays are the primary object of focus, and that the language is built to make operating on arrays convenient and efficient. In fact, APL is often considered the granddaddy of all array languages - a language so influential it spawned an entire paradigm. Among the current generation of programmers, APL is probably most well known for its name, or for being "the language you type with those weird symbols that [you need a special keyboard for](https://microapl.com/images/aplx_keyboard.jpg)". That last part isn't actually true, by the way. You can type APL on a regular keyboard just fine.
+
+But indeed, APL code consists almost entirely of strange looking hieroglyphics, making APL code extremely terse. This is one of th main selling points of the language - function implementations in APL are often so short that assigning a name to them seems pointless, as the name itself would be more characters than the function body.
+
+> Another disclaimer: I am actually pretty terrible at APL, so don't take information presented here as expert knowledge.
+
+Without further ado, let's look at some code. I thought it would be fun as a first example to implement the function shown in the [Futhark section](#futhark), which calculates the length of a vector represented as an array. Here is the result:
+
+```apl
+{(+/⍵*2)*÷2}
+```
+
+Wow.. That is pretty short. 12 character vs Futhark's 123, to be exact. Despite the length, quite a bit is going on here. Let's deconstruct it.
+
+In APL, every function takes either 1 or 2 arguments. We call these functions monadic and dyadic respectively (not to be confused with monads from languages like Haskell, which are something else). Because of this, there is no need to name function arguments - they are already named for you. `⍺` is the left function argument, and `⍵` is the right. To define an anonymous, we use `{` squiggly brackets `}` around the function body. Looking at the snippet above, you should now see that we are defining a single argument function, which takes an argument from the right - an array, to be exact.
+
+The first operation we perform on the input array is `⍵*2`. `*` is the power operator, so this code will evaluate to a new array with all elements in `⍵` squared. Next, we use the squared array as the right hand argument to the reduction operator, `/`. This operator takes as the left argument a binary operator, and as the right argument an array, and calculates the result of placing the binary operator between each pair of elements in the array. Concretely, `+/my_array` calculates the sum of elements in an array by interspersing the addition operator `+`. So, `(+/⍵*2)` calculates the sum of squares in `⍵`. Lastly, we again use the power operator to calculate the square root of this sum, by using `÷2` as the exponent, which is the reciprocal of 2, ie. 0.5.
+
+Phew, that was a mouthful. Let's try it out in an [APL REPL](https://tryapl.org/):
+```apl
+    {(+/⍵*2)*÷2}1 2 3
+3.741657387
+```
+
+That is indeed the length of the vector `<1, 2, 3>`. APL arrays literals are simply space separated values. To shorten this program further, we could have omitted the anonymous function and placed the argument directly into the body, like so:
+```apl
+(+/1 2 3*2)*÷2
+```
+
+We could also name our function for future use:
+```apl
+    vector_length ← {(+/⍵*2)*÷2}
+    vector_length 1 2 3
+3.741657387
+```
+
+An interesting property of APL, is that most operators can be used both monadically or dyadically. Take for example the iota operator, `⍳`, sometimes known as the index generator. If we apply it monadically to a number `n`, it gives us an array of the `n` first numbers:
+
+```
+    ⍳5
+1 2 3 4 5
+```
+
+However, when applied dyadically, it gives us the index of the right argument in the left argument. For example, we can use it to find where a number is in an array:
+
+```
+    8 1 4 3 2⍳3
+4
+```
+Indeed, 3 is at 4th index of the left array.
+
+Another interesting tidbit is that operators (and functions in general) generalize to arrays of arbitrary dimensions. This is known as rank polymorphism In fact, we've already seen this in the first example program, where we used `*` to exponentiate an entire array. Let's show a few more examples of this using perhaps the simplest operator of all, addition:
+
+```
+      1 + 5
+6
+
+      1 2 3 4 + 5
+6 7 8 9
+
+      1 2 3 + 4 5 6
+5 7 9
+
+      (1 2 3) (4 5 6) + 1 2
+┌─────┬─────┐
+│2 3 4│6 7 8│
+└─────┴─────┘
+```
+
+Note the use of a 2 dimensional array in the bottom line. Fancy. In APL, anything can be thought of as an array. Even scalar numbers - they are just 0-dimensional arrays. This property allows the programmer to easily apply the expressive set of operations provided by the language to any kind of data.
+
+The building blocks described so far constitute the core of the language. Quite simple, really. Most of the features I haven't described are pretty much just syntax sugar. The hard part of learning APL isn't learning the language semantics, it's learning all builtin operators and how to effectively chain them together to solve problems. Once you get the hang of it, though, APL can be a very rewarding language to write, as the time it takes to go from an idea for an algorithm to a concrete implementation can be made very short. Due to the terseness of the language, APL also excels in a REPL environment, as a sort of quick calculator on steroids.
+
+As a final piece of piece of shilling, let me show you [John Scholes](https://www.youtube.com/watch?v=a9xAKttWgP4) famous implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) in APL:
+
+```
+    gen←{({⊃1 ⍵ ∨.∧ 3 4 = +/ +/ 1 0 ¯1 ∘.⊖ 1 0 ¯1 ⌽¨ ⊂⍵}⍣⍵)⍺}
+    R∘gen¨ ⍳4
+┌─────────────┬─────────────┬─────────────┬─────────────┐
+│0 0 0 0 0 0 0│0 0 0 1 0 0 0│0 0 1 1 0 0 0│0 1 0 0 0 0 0│
+│0 0 1 1 1 0 0│0 0 1 1 0 0 0│0 0 1 1 1 0 0│0 1 0 0 1 0 0│
+│0 0 1 0 0 0 0│0 1 0 0 1 0 0│0 1 0 0 1 0 0│0 1 0 0 1 0 0│
+│0 0 1 1 0 0 0│0 0 1 1 0 0 0│0 0 1 1 0 0 0│0 1 0 0 1 0 0│
+│0 0 0 0 0 0 0│0 0 0 0 0 0 0│0 0 1 1 0 0 0│0 1 0 0 1 0 0│
+└─────────────┴─────────────┴─────────────┴─────────────┘
+```
+This shows the first 4 iterations of a 5x7 board initialized to a random pattern. Name another language that lets you write something like this in such a terse manner. I'll wait.
 
 # Prolog
 ## Selling point: Logic programming
