@@ -352,11 +352,11 @@ As I alluded to in the intro of this section, Koka has a lot more going for it t
 
 # APL
 ## Selling point: Terseness taken to the extreme
-APL is one of the more well known languages on this list, but an interesting and influential one nonetheless. The langauge was initially devised by [Kenneth Iverson](https://en.wikipedia.org/wiki/Kenneth_E._Iverson) in the 60's as an alternative mathematical notation for manipulating arrays, but was turned into a real programming language a few years later, aptly named "A Programming Language", abbreviated to APL. In other words, APL is _old_, but manages to feel nothing like other languages of the era.
+APL is one of the more well known languages on this list, but an interesting and influential one nonetheless. The language was initially devised by [Kenneth Iverson](https://en.wikipedia.org/wiki/Kenneth_E._Iverson) in the 60's as an alternative mathematical notation for manipulating arrays, but was turned into a real programming language a few years later, aptly named "A Programming Language", abbreviated to APL. In other words, APL is _old_, but manages to feel nothing like other languages of the era.
 
 APL, like Futhark, is in the family of [array languages](https://en.wikipedia.org/wiki/Array_programming), which, as I mentioned earlier, roughly means that arrays are the primary object of focus, and that the language is built to make operating on arrays convenient and efficient. In fact, APL is often considered the granddaddy of all array languages - a language so influential it spawned an entire paradigm. Among the current generation of programmers, APL is probably most well known for its name, or for being "the language you type with those weird symbols that [you need a special keyboard for](https://microapl.com/images/aplx_keyboard.jpg)". That last part isn't actually true, by the way. You can type APL on a regular keyboard just fine.
 
-But indeed, APL code consists almost entirely of strange looking hieroglyphics, making APL code extremely terse. This is one of th main selling points of the language - function implementations in APL are often so short that assigning a name to them seems pointless, as the name itself would be more characters than the function body.
+But indeed, APL code consists almost entirely of strange looking hieroglyphics, making APL code extremely terse. This is one of the main selling points of the language - function implementations in APL are often so short that assigning a name to them seems pointless, as the name itself would be more characters than the function body.
 
 > Another disclaimer: I am actually pretty terrible at APL, so don't take information presented here as expert knowledge.
 
@@ -366,7 +366,7 @@ Without further ado, let's look at some code. I thought it would be fun as a fir
 {(+/⍵*2)*÷2}
 ```
 
-Wow.. That is pretty short. 12 character vs Futhark's 123, to be exact. Despite the length, quite a bit is going on here. Let's deconstruct it.
+Wow.. That is pretty short. 12 characters vs Futhark's 123, to be exact. Despite the length, quite a bit is going on here. Let's deconstruct it.
 
 In APL, every function takes either 1 or 2 arguments. We call these functions monadic and dyadic respectively (not to be confused with monads from languages like Haskell, which are something else). Because of this, there is no need to name function arguments - they are already named for you. `⍺` is the left function argument, and `⍵` is the right. To define an anonymous, we use `{` squiggly brackets `}` around the function body. Looking at the snippet above, you should now see that we are defining a single argument function, which takes an argument from the right - an array, to be exact.
 
@@ -378,7 +378,7 @@ Phew, that was a mouthful. Let's try it out in an [APL REPL](https://tryapl.org/
 3.741657387
 ```
 
-That is indeed the length of the vector `<1, 2, 3>`. APL arrays literals are simply space separated values. To shorten this program further, we could have omitted the anonymous function and placed the argument directly into the body, like so:
+That is indeed the length of the vector `<1, 2, 3>`. APL array literals are simply space separated values. To shorten this program further, we could have omitted the anonymous function and placed the argument directly into the body, like so:
 ```apl
 (+/1 2 3*2)*÷2
 ```
@@ -403,7 +403,7 @@ However, when applied dyadically, it gives us the index of the right argument in
     8 1 4 3 2⍳3
 4
 ```
-Indeed, 3 is at 4th index of the left array.
+Indeed, 3 is at 4'th index of the left array.
 
 Another interesting tidbit is that operators (and functions in general) generalize to arrays of arbitrary dimensions. This is known as rank polymorphism In fact, we've already seen this in the first example program, where we used `*` to exponentiate an entire array. Let's show a few more examples of this using perhaps the simplest operator of all, addition:
 
