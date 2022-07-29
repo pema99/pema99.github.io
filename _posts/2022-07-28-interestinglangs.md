@@ -9,9 +9,9 @@ I've long been obsessed with everything related to programming language design a
 ## Selling point: Effortless, functional GPGPU 
 > Disclaimer: My opinion of Futhark is probably a bit biased, since I recently had the pleasure of [contributing to the compiler](https://github.com/diku-dk/futhark/pull/1677).
 
-Programming for the GPU is a notoriously difficult and laborious discipline. Modern GPU's are strange beasts, very unlike CPU's. Writing efficient GPGPU (General Purpose GPU) code is a daunting task, often requiring a breadth of knowledge about the target architecture.
+Programming for the GPU is a notoriously difficult and laborious discipline. Modern GPUs are strange beasts, very unlike CPU's. Writing efficient GPGPU (General Purpose GPU) code is a daunting task, often requiring a breadth of knowledge about the target architecture.
 
-[Futhark](https://futhark-lang.org/) is a purely functional, data-parallel language which attempts to make programming for the GPU much more accessible, and to unburden to programmer of much of the mental overhead usually implied by the paradigm. 
+[Futhark](https://futhark-lang.org/) is a purely functional, data-parallel language which attempts to make programming for the GPU much more accessible, and to unburden the programmer of much of the mental overhead usually implied by the paradigm. 
 
 In the case of Futhark, I think the best way to introduce the language is simply to show some code. Below is a Futhark program containing a single function, `vector_length`, which given an array of floats representing an `n`-dimensional vector, returns the length (euclidean norm) of that vector. It does this by first squaring each element, then summing all the elements up, and finally taking the square root of the sum.
 
@@ -36,14 +36,14 @@ Futhark conforms the language paradigm typically known as [array programming](ht
 ```lua
 -- Map takes as input a single-argument-function and an array, and returns
 -- the result of applying that function to each element of the array.
--- This examples multiplies each element by 2.
+-- This example multiplies each element by 2.
 map (*2) [1, 2, 3, 4] == [2, 4, 6, 8]
 
 -- Reduce (aka. fold) takes as input a function implementing an associative
 -- binary operation, a neutral element, and an array, and returns the 
 -- result of placing the binary operator between each pair of elements in
 -- the array. This 'reduces' the array to a single value.
--- This examples thus calculates the sum of the passed array.
+-- This example thus calculates the sum of the passed array.
 reduce (+) 0 [1, 2, 3, 4] == 10
 
 -- Scan is exactly like reduce, except that it returns an array of each of
@@ -53,7 +53,7 @@ scan (+) 0 [1, 2, 3, 4] == [1, 3, 6, 10]
 ```
 The Futhark compiler knows how to generate efficient, parallel GPU code implementing these combinators. Since all parallelism is derived from these, if your program does not use them, it will not be parallel, and probably quite slow - **Futhark does not use parallelizing compiler**. This isn't quite as limiting as it may sound, and the Futhark standard library contains a wide variety of functions which internally make use of these combinators. In fact, it is quite difficult to do anything useful in the language _without_ making use of them.
 
-Of course, _just_ using combinators such as these isn't enough to make more complex programs run fast. For this reason, the Futhark compiler is aggresively optimizing. In addition to the usual optimizations such as inlining and constant folding, the Futhark compiler implements some wacky domain-specific optimizations such as [fusion](https://futhark-book.readthedocs.io/en/latest/fusion.html) and [moderate flattening](https://futhark-book.readthedocs.io/en/latest/regular-flattening.html), which rearrange, transform, and sometimes eliminate array combinators so as to generate more efficient code. The result is that the code generated for any non-trivial Futhark program tends to look _absolutely_ nothing like the code it was generated from.
+Of course, _just_ using combinators such as these isn't enough to make more complex programs run fast. For this reason, the Futhark compiler is aggressively optimizing. In addition to the usual optimizations such as inlining and constant folding, the Futhark compiler implements some wacky domain-specific optimizations such as [fusion](https://futhark-book.readthedocs.io/en/latest/fusion.html) and [moderate flattening](https://futhark-book.readthedocs.io/en/latest/regular-flattening.html), which rearrange, transform, and sometimes eliminate array combinators so as to generate more efficient code. The result is that the code generated for any non-trivial Futhark program tends to look _absolutely_ nothing like the code it was generated from.
 
 ```lua
 -- The simplest form of "fusion" just turns 2 nested map's into a single
@@ -61,18 +61,18 @@ Of course, _just_ using combinators such as these isn't enough to make more comp
 map (+1) (map (*2) [1, 2, 3]) == map (\x -> (x * 2) + 1) [1, 2, 3]
 ```
 
-Lastly, it is worth pointing out that Futhark is truely _purely_ functional language, unlike other so-called pure languages, such as Haskell, which claim to have no side effects, yet provide escape hatches out of the purity. After all, there is no such thing as IO in the absence of effects. Consequently, Futhark does not support IO. Instead, the language is built to be embedded into, and called from, a host language. The compiler can emit either Python or C code which uses CUDA or OpenCL internally. It is then your job to call into this generated code.
+Lastly, it is worth pointing out that Futhark is truly _purely_ functional language, unlike other so-called pure languages, such as Haskell, which claim to have no side effects, yet provide escape hatches out of the purity. After all, there is no such thing as IO in the absence of effects. Consequently, Futhark does not support IO. Instead, the language is built to be embedded into, and called from, a host language. The compiler can emit either Python or C code which uses CUDA or OpenCL internally. It is then your job to call into this generated code.
 
-If you ever find yourself wanting to do some perfomant number-crunching, and your problem can be expressed elegantly in a functional language, definitely give Futhark a shot.
+If you ever find yourself wanting to do some performant number-crunching, and your problem can be expressed elegantly in a functional language, definitely give Futhark a shot.
 
 # ISPC
 ## Selling point: A programming model focused on vectorization
 
 > Again, I am quite biased on this language. I wrote my thesis about it, after all.
 
-Moore's Law is well known among programmers. Once upon a time, he postulated that the number of transistors in a CPU would double about every 2 years. For a long time, this conjecture seemed very reasonable, but as time passed, it veered further and further from reality. At some point, you simply can't pack transistors any closer to eachother without hitting a wall imposed by the laws of physics.
+Moore's Law is well known among programmers. Once upon a time, he postulated that the number of transistors in a CPU would double about every 2 years. For a long time, this conjecture seemed very reasonable, but as time passed, it veered further and further from reality. At some point, you simply can't pack transistors any closer to each other without hitting a wall imposed by the laws of physics.
 
-In our neverending quest for better performance, multicore CPU's were invented somewhere along the way; if we can't make a single processor any faster, why not just make more processors, and solve many problem instances at once. Programming languages were adapted to allow making use of this setup, usually via multithreading. Later still, vector instructions were introduced with instruction sets like [SSE](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) and [AVX](https://en.wikipedia.org/wiki/AVX), which allowed processing multiple pieces of data once on a single core, in a paradigm dubbed SIMD (Single-Instruction-Multiple-Data).
+In our never ending quest for better performance, multicore CPUs were invented somewhere along the way; if we can't make a single processor any faster, why not just make more processors, and solve many problem instances at once. Programming languages were adapted to allow making use of this setup, usually via multithreading. Later still, vector instructions were introduced with instruction sets like [SSE](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) and [AVX](https://en.wikipedia.org/wiki/AVX), which allowed processing multiple pieces of data once on a single core, in a paradigm dubbed SIMD (Single-Instruction-Multiple-Data).
 
 Unfortunately, modern languages still make such vector instructions tedious and cumbersome to use, as most languages were never built around or fundamentally changed to afford ergonomic use of SIMD. The options are essentially to invoke individual vector instructions manually via vector intrinsics, which are quite painful to use and annoyingly tied to a single instruction set, or to rely on the [autovectorizing capabilities](https://gcc.gnu.org/projects/tree-ssa/vectorization.html) of most modern compilers, which are brittle and difficult to reason with ([Autovectorization is not a paradigm](https://pharr.org/matt/blog/2018/04/18/ispc-origins)). I've met a plethora of programmers who neglect SIMD entirely for these reasons, which is a shame, since it is basically free performance.
 
@@ -87,7 +87,7 @@ int sumArray(int arr[], int size) {
     return accum;
 }
 ```
-Consider the above C program, which sequentially sums the elements of an array. For the sake of explanation, let's assume that our C compiler cannot automatically vectorize this code (although in reality it can, since the code is so simple). In ISPC, an idiomatic analogous program may look like so:
+Consider the above C program, which sequentially sums the elements of an array. For the sake of explanation, let's assume that our C compiler cannot automatically vectorize this code (although in reality it can, since the code is so simple). In ISPC, an idiomatic analogous program may look like this:
 
 ```c
 uniform int sumArray(uniform int arr[], uniform int size) {
@@ -101,11 +101,11 @@ uniform int sumArray(uniform int arr[], uniform int size) {
 
 Although similar, the ISPC program will make use of vector instructions, and thus be several times faster. The first major differences are the `uniform` and `varying` qualifiers. ISPC supports 2 kinds of data, as annotated by these. Conceptually, ISPC code is executed by several "program instances" simultaneously, which are sort of analogous to threads. `uniform` indicates that a piece of data is shared between all program instances, while `varying` data may differ between each program instance.
 
-Unlike threads, these conceptual program instances are always synchronized, and correspond directly to scalars within a vector register. If we, for example, increment a `varying` variable using the `+=` operator, this will automagically use a vectorized addition instruction, adding to each program instances variable simultaneously. As you might be able to guess by now, `varying` values are stored in vector registers.
+Unlike threads, these conceptual program instances are always synchronized, and correspond directly to scalars within a vector register. If we, for example, increment a `varying` variable using the `+=` operator, this will automagically use a vectorized addition instruction, adding to each program instance's variable simultaneously. As you might be able to guess by now, `varying` values are stored in vector registers.
 
-The next difference, the `foreach` construct, is a special kind of loop which automatically distributes iteration across the various program instances. Thus, the loop index `i` is `varying` value. In the first iteration of the loop, `i` will have a value of 0 for the first program instance, 1 for the second, 2 for the third, etc. If we, for example, assume 8 total program instances, in the next iteration `i` will be 8 for the first program instance, 9 for the second, 10 for the third, etc. If our total array size is 16, and the amount of program instances in 8, this would mean the loop runs for 2 iterations, processing 8 elements simultaneously in each of the 2.
+The next difference, the `foreach` construct, is a special kind of loop which automatically distributes iteration across the various program instances. Thus, the loop index `i` is `varying` value. In the first iteration of the loop, `i` will have a value of 0 for the first program instance, 1 for the second, 2 for the third, etc. If we, for example, assume 8 total program instances, in the next iteration `i` will be 8 for the first program instance, 9 for the second, 10 for the third, etc. If our total array size is 16, and the number of program instances is 8, this would mean the loop runs for 2 iterations, processing 8 elements simultaneously in each of the 2.
 
-With all of that out of the way, let me give a brief explanation of what the program in the previous snippet does. First, we initialize a varying accumulator to all 0's. Then, we loop over the array in a vectorized fashion. In each iteration, we load a vector values of values from the array, and add it component-wise to the accumulator. After the loop, the accumulator will contain a sum per program instance. We then sum up each program instances contribution using the builtin function `reduce_add`, which takes as input a varying value, and returns a single uniform value. This is the final sum.
+With all of that out of the way, let me give a brief explanation of what the program in the previous snippet does. First, we initialize a varying accumulator to all 0's. Then, we loop over the array in a vectorized fashion. In each iteration, we load a vector of values from the array, and add it component-wise to the accumulator. After the loop, the accumulator will contain a sum per program instance. We then sum up each program instance's contribution using the builtin function `reduce_add`, which takes as input a varying value, and returns a single uniform value. This is the final sum.
 
 With relatively few changes to the original C program, we have produced a vectorized ISPC program, which is very readable - no intrinsics nonsense to be seen. This is a general theme for the language. Many C programs can be sped up immensely by lazily rewriting them in ISPC, replacing some `for`'s with `foreach`.
 
@@ -119,11 +119,11 @@ Like Futhark, ISPC isn't intended for use as a standalone language. Instead, giv
 
 # Koka
 ## Selling point: Algebraic effects
-In functional programming, we often talk about "(side) effects" and our desire to keep them under control. The definition of a side effect will vary a bit depending on who you ask, but I'll give it a try. A pure function is [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency), which means that any call to the function can be replaced directly with its result, without changing the behavior of the program. If we call `foo(5)`, and that evaluates to `10`, then _any and all_ occurrences of `foo(5)` can be replaced with `10`. If the function does anything to break this property - by exhibiting side effects - it is not longer pure. Common examples of side effects are reading/writing to a filesystem or console, mutating global state, use of random number generation, etc.
+In functional programming, we often talk about "(side) effects" and our desire to keep them under control. The definition of a side effect will vary a bit depending on who you ask, but I'll give it a try. A pure function is [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency), which means that any call to the function can be replaced directly with its result, without changing the behavior of the program. If we call `foo(5)`, and that evaluates to `10`, then _any and all_ occurrences of `foo(5)` can be replaced with `10`. If the function does anything to break this property - by exhibiting side effects - it is no longer pure. Common examples of side effects are reading/writing to a filesystem or console, mutating global state, use of random number generation, etc.
 
 In the absence of side effects, the behavior of code becomes simpler to reason with, and entire classes of bugs can be eliminated. As such, many functional languages implement some kind of strategy for tracking and/or limiting side effects. A common approach is to use [monads](https://pema.dev/2022/03/03/monoid/) as seen in Haskell, PureScript, Scala etc. Without going into much detail, they can be thought of as a design pattern for easily composing effectful computations, using only pure functions. They are nice since they don't necessarily have to be designed into the language, but can be implemented in any language with an expressive enough type system, such as F#, OCaml and TypeScript, neither of which are purely functional.
 
-Unfortunately monads have some issues. They are notoriously intimidating to learn about for first-timers, and they can be tricky and tedious to combine. If you, for example, had a monad representing operations that perform IO, and a monad representing operations which may fail, and you wish to represent an operation which may fail _and_ perform IO, you are often forced to either write tedious boilerplate code, or use [monad transformers](https://en.wikibooks.org/wiki/Haskell/Monad_transformers) to "stack the monads on top of eachother", which imo. can lead to some rather unelegant code.
+Unfortunately monads have some issues. They are notoriously intimidating to learn about for first-timers, and they can be tricky and tedious to combine. If you, for example, had a monad representing operations that perform IO, and a monad representing operations which may fail, and you wish to represent an operation which may fail _and_ perform IO, you are often forced to either write tedious boilerplate code, or use [monad transformers](https://en.wikibooks.org/wiki/Haskell/Monad_transformers) to "stack the monads on top of eachother", which imo. can lead to some rather inelegant code.
 
 [Koka](https://koka-lang.github.io/koka/doc/book.html) is a research language which takes a completely different approach to effect handling, embedding effects directly into the type system, and implementing a type of control flow typically know as [algebraic effects](https://overreacted.io/algebraic-effects-for-the-rest-of-us/).
 
@@ -140,7 +140,7 @@ fun rand   : () -> ndet int          // ndet: non-deterministic
 ```
 If we look at the `divide` function, we see that the 2 argument types are both integers, the result type is an integer, and the effect type is `exn`, denoting computations that may produce exceptions. Importantly, the effect type can be inferred, so you do not need to manually annotate it. The language can simply figure out for you which kind of side effects are being used in the function body.
 
-Unlike monads, effect types can very easily be combined laterally. You can view the effect type of a function type as simply a list of all the effects used by the function. The syntax for combined effect types looks like so:
+Unlike monads, effect types can very easily be combined laterally. You can view the effect type of a function type as simply a list of all the effects used by the function. The syntax for combined effect types looks like this:
 
 ```fs
 // This function may diverge, throw an error, or return an integer
@@ -220,7 +220,7 @@ Dividing 8 by 2
 4
 ```
 
-If the body of our function used more effects than just `log`, we could add their implementations under our implementation of `write`. What's interesting about this code is that we can trivially swap the implementation of `write` used at the callsite without having to changing any other code. In other words, the code making use of the effect (`add`, `divide`) knows _nothing_ about how that effect is implemented. For example, lets swap our simple implementation with one that builds up a string instead of immediately printing, and which returns `False` on empty log entries:
+If the body of our function used more effects than just `log`, we could add their implementations under our implementation of `write`. What's interesting about this code is that we can trivially swap the implementation of `write` used at the callsite without having to change any other code. In other words, the code making use of the effect (`add`, `divide`) knows _nothing_ about how that effect is implemented. For example, lets swap our simple implementation with one that builds up a string instead of immediately printing, and which returns `False` on empty log entries:
 
 ```fs
 fun main()
@@ -369,7 +369,7 @@ true
 false
 ```
 
-We can also ask "which people are male" by using an upper case identifier as the input, indicating an unknown variable.
+We can also ask "which people are male" by using an uppercase identifier as the input, indicating an unknown variable.
 
 ```prolog
 ?- male(X).
@@ -391,7 +391,7 @@ parent(jane, lucas).
 parent(bob, lucas).
 ```
 
-We can read this as "Alice is a parent of John", "Bob is a parent of John", "Jane is parent of Emma", etc. Again, we can make some simple queries:
+We can read this as "Alice is a parent of John", "Bob is a parent of John", "Jane is a parent of Emma", etc. Again, we can make some simple queries:
 
 ```prolog
 ?- parent(alice, john).
@@ -437,7 +437,7 @@ Rules can depend on other rules, for example, we can express a grandmother const
 grandmother(A, B) :- mother(A, C), parent(C, B).
 ```
 
-Which reads as "A is the grandmother of B is A is the mother of C, and C is the parent of B". Let's see who Oliver's grandmother is:
+Which reads as "A is the grandmother of B if A is the mother of C, and C is the parent of B". Let's see who Oliver's grandmother is:
 
 ```prolog
 grandmother(X, oliver).
@@ -453,7 +453,7 @@ Although it might not seem like it from what I've shown, general purpose program
 [1, 2, 3, 4, 5, 6]
 ```
 
-Here, X is what we would typically think of as output. But since this just a relation like any other, we can also reverse it and ask "What would we have to append to [1, 2, 3] to get [1, 2, 3, 4, 5, 6]?":
+Here, X is what we would typically think of as output. But since this is just a relation like any other, we can also reverse it and ask "What would we have to append to [1, 2, 3] to get [1, 2, 3, 4, 5, 6]?":
 
 ```prolog
 ?- append([1, 2, 3], X, [1, 2, 3, 4, 5, 6]).
@@ -488,7 +488,7 @@ sum([], 0).
 sum([Head|Tail], Sum) :- sum(Tail, Rest), Sum is Head + Rest.
 ```
 
-Readers familiar with functional programming will quickly realize this utilizes recursion. The first line states the fact that the sum of an empty list is 0. The second line is a rule consisting of 2 parts. It states that `Sum` is the sum of a list consisting of a `Head` and `Tail` if `Rest` is the sum of the `Tail` and `Head + Rest` is equal to `Sum`. This way of summing a list is indentical to how one might do it in a LISP.
+Readers familiar with functional programming will quickly realize this utilizes recursion. The first line states the fact that the sum of an empty list is 0. The second line is a rule consisting of 2 parts. It states that `Sum` is the sum of a list consisting of a `Head` and `Tail` if `Rest` is the sum of the `Tail` and `Head + Rest` is equal to `Sum`. This way of summing a list is identical to how one might do it in a LISP.
 
 We can query it as such:
 ```
