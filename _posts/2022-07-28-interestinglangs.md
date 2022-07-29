@@ -392,14 +392,14 @@ We could also name our function for future use:
 
 An interesting property of APL, is that most operators can be used both monadically or dyadically. Take for example the iota operator, `⍳`, sometimes known as the index generator. If we apply it monadically to a number `n`, it gives us an array of the `n` first numbers:
 
-```
+```apl
     ⍳5
 1 2 3 4 5
 ```
 
 However, when applied dyadically, it gives us the index of the right argument in the left argument. For example, we can use it to find where a number is in an array:
 
-```
+```apl
     8 1 4 3 2⍳3
 4
 ```
@@ -407,7 +407,7 @@ Indeed, 3 is at 4'th index of the left array.
 
 Another interesting tidbit is that operators (and functions in general) generalize to arrays of arbitrary dimensions. This is known as rank polymorphism In fact, we've already seen this in the first example program, where we used `*` to exponentiate an entire array. Let's show a few more examples of this using perhaps the simplest operator of all, addition:
 
-```
+```apl
       1 + 5
 6
 
@@ -429,7 +429,7 @@ The building blocks described so far constitute the core of the language. Quite 
 
 As a final piece of piece of shilling, let me show you [John Scholes](https://www.youtube.com/watch?v=a9xAKttWgP4) famous implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) in APL:
 
-```
+```apl
     gen←{({⊃1 ⍵ ∨.∧ 3 4 = +/ +/ 1 0 ¯1 ∘.⊖ 1 0 ¯1 ⌽¨ ⊂⍵}⍣⍵)⍺}
     R∘gen¨ ⍳4
 ┌─────────────┬─────────────┬─────────────┬─────────────┐
