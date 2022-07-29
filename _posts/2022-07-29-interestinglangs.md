@@ -207,7 +207,7 @@ fun main()
 
 Notice how we didn't have to change any function signatures. The compiler will automatically figure out that `divide` and `add` have the `log` effect type, although we could write it explicitly if we wanted. Compiling this code as is will result in an error:
 
-```sh
+```
 error: there are unhandled effects for the main expression
   inferred effect : <console,test/log>
   unhandled effect: test/log
