@@ -9,11 +9,11 @@ I've long been obsessed with everything related to programming language design a
 ## Selling point: Effortless, functional GPGPU 
 > Disclaimer: My opinion of Futhark is probably a bit biased, since I recently had the pleasure of [contributing to the compiler](https://github.com/diku-dk/futhark/pull/1677).
 
-Programming for the GPU is a notoriously difficult and laborious discipline. Modern GPU's are strange beasts, very unlike CPU's. Writing efficient GPGPU (General Purpose GPU) code is a daunting task, often requiring a breadth of knowledge about the target architecture. (SOMETHING ABOUT OPENCL)
+Programming for the GPU is a notoriously difficult and laborious discipline. Modern GPU's are strange beasts, very unlike CPU's. Writing efficient GPGPU (General Purpose GPU) code is a daunting task, often requiring a breadth of knowledge about the target architecture.
 
 [Futhark](https://futhark-lang.org/) is a purely functional, data-parallel language which attempts to make programming for the GPU much more accessible, and to unburden to programmer of much of the mental overhead usually implied by the paradigm. 
 
-In the case of Futhark, I think the best way to introduce the language is simply to show some code. Below is a Futhark program containing a single function, `vector_length`, which given an array of floats representing an `n`-dimensional vector, returns the length (euclidean norm) of that vector.
+In the case of Futhark, I think the best way to introduce the language is simply to show some code. Below is a Futhark program containing a single function, `vector_length`, which given an array of floats representing an `n`-dimensional vector, returns the length (euclidean norm) of that vector. It does this by first squaring each element, then summing all the elements up, and finally taking the square root of the sum.
 
 ```js
 def vector_length [n] (vec: [n]f32) : f32 =
@@ -344,7 +344,7 @@ I hope by now I've managed to convince you that algebraic effects are cool. I ho
 # Prolog
 ## Selling point: Logic programming
 
-Prolog is an interesting language primarily because it is one of few languages in the paradigm known as "logic programming". It is quite literally in the name, Pro=Programming Log=Logic. In logic programming, the programmer specifies constraints which model some problem domain, and can then execute queries against these constraints to solve problems. Prolog is best explained as a step-by-step tutorial, which is what I intend to do here.
+[Prolog](https://www.swi-prolog.org/) is an interesting language primarily because it is one of few languages in the paradigm known as "logic programming". It is quite literally in the name, Pro=Programming Log=Logic. In logic programming, the programmer specifies constraints which model some problem domain, and can then execute queries against these constraints to solve problems. Prolog is best explained as a step-by-step tutorial, which is what I intend to do here.
 
 The most basic construct in Prolog is a "fact", denoted by an identifier, a list of operands, and followed by a dot. In the below snippet, we state several facts. Alice, Jane, Emma and Sofia are female, while Bob, John, Lucas and Oliver are male.
 
