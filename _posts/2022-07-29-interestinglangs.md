@@ -137,7 +137,7 @@ In functional programming, we often talk about "(side) effects" and our desire t
 
 In the absence of side effects, the behavior of code becomes simpler to reason with, and entire classes of bugs can be eliminated. As such, many functional languages implement some kind of strategy for tracking and/or limiting side effects. A common approach is to use [monads](https://pema.dev/2022/03/03/monoid/) as seen in Haskell, PureScript, Scala, etc. Without going into much detail, they can be thought of as a design pattern for easily composing effectful computations, using only pure functions. They are nice since they don't necessarily have to be designed into the language, but can be implemented in any language with an expressive enough type system, such as F#, OCaml, and TypeScript, neither of which are purely functional.
 
-Unfortunately, monads have some issues. They are notoriously intimidating to learn about for first-timers, and they can be tricky and tedious to combine. If you, for example, had a monad representing operations that perform IO, and a monad representing operations that may fail, and you wish to represent an operation that may fail _and_ perform IO, you are often forced to either write tedious boilerplate code or use [monad transformers](https://en.wikibooks.org/wiki/Haskell/Monad_transformers) to "stack the monads on top of each other", which imo. can lead to some rather inelegant code.
+Unfortunately, monads have some problems. They are notoriously intimidating to learn about for first-timers, and they can be tricky and tedious to combine. If you, for example, had a monad representing operations that perform IO, and a monad representing operations that may fail, and you wish to represent an operation that may fail _and_ perform IO, you are often forced to either write tedious boilerplate code or use [monad transformers](https://en.wikibooks.org/wiki/Haskell/Monad_transformers) to "stack the monads on top of each other", which imo. can lead to some rather inelegant code.
 
 [Koka](https://koka-lang.github.io/koka/doc/book.html) is a research language that takes a completely different approach to effect handling, embedding effects directly into the type system, and implementing a type of control flow typically known as [algebraic effects](https://overreacted.io/algebraic-effects-for-the-rest-of-us/).
 
@@ -413,7 +413,7 @@ Putting these lines at the bottom of our file and saving it causes UCM to tell u
           false
 ```
 
-Let's add `fib_is_even` to the codebase as well, as we did for `foo`. At this point, we can actually delete all the functions from the file with no issues. The watch expressions will keep evaluating correctly since the functions are in the codebase. The scratch file now only contains the watch expressions.
+Let's add `fib_is_even` to the codebase as well, as we did for `foo`. At this point, we can actually delete all the functions from the file with no problems. The watch expressions will keep evaluating correctly since the functions are in the codebase. The scratch file now only contains the watch expressions.
 
 Now for the interesting part. Imagine we later decide to create a new function, also named `foo`, which does something different than calculating Fibonacci numbers. Let's make this one append to a string. We'll change our watch expression with `foo` accordingly.
 
