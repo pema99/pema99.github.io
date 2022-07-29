@@ -5,7 +5,7 @@ title: Hey there!
 
 I'm Pema. I write code - sometimes. I'm particularly interested in graphics,
 virtual reality, programming language development, functional programming and
-pure mathematics. I'm currently working on Lighting at Unity.
+pure mathematics. I'm currently working at Unity, on the light transport team.
 Check out [my stuff](https://github.com/pema99), if you want, and feel free to reach
 out on any socials.
 
@@ -23,7 +23,6 @@ VRChat: [pema99](https://vrchat.com/home/user/usr_d81127c8-e8cc-476b-b74d-0c17c0
 
 # Currently working on
 - This website.
-- Extending the multicore C backend of the [Futhark](https://github.com/pema99/futhark) compiler to emit [ISPC](https://ispc.github.io/ispc.html) code.
 - My toy language, [Bonk](https://github.com/pema99/bonk).
 
 # Noteworthy projects
@@ -34,3 +33,4 @@ VRChat: [pema99](https://vrchat.com/home/user/usr_d81127c8-e8cc-476b-b74d-0c17c0
 - [glsl2hlsl](https://pema99.github.io/glsl2hlsl), a tool for converting ShaderToy shaders to working Unity shaders.
 - [Shaderception](https://github.com/pema99/Shaderception), a shader compiler and runtime that runs entirely within VRChat.
 - [A bunch of small stuff on ShaderToy](https://www.shadertoy.com/user/pema99)
+- [An ISPC backend for the Futhark language](https://futhark-lang.org/student-projects/ispc-bsc-thesis.pdf)
