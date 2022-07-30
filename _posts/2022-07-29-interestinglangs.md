@@ -21,7 +21,7 @@ Programming for the GPU is a notoriously difficult and laborious discipline. Mod
 
 [Futhark](https://futhark-lang.org/) is a purely functional, data-parallel language that attempts to make programming for the GPU much more accessible and to unburden the programmer of much of the mental overhead usually implied by the paradigm. 
 
-In the case of Futhark, I think the best way to introduce the language is simply to show some code. Below is a Futhark program containing a single function, `vector_length`, which given an array of floats representing an `n`-dimensional vector, returns the length (euclidean norm) of that vector. It does this by first squaring each element, then summing all the elements up, and finally taking the square root of the sum.
+In the case of Futhark, I think the best way to introduce the language is simply to show some code. Below is a Futhark program containing a single function, `vector_length`, which given an array of floats representing an `n`-dimensional vector, returns the length of that vector. It does this by first squaring each element, then summing all the elements up, and finally taking the square root of the sum.
 
 ```js
 def vector_length [n] (vec: [n]f32) : f32 =
