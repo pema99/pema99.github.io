@@ -568,7 +568,7 @@ However, when applied dyadically, it gives us the index of the right argument in
 ```
 Indeed, 3 is at the 4'th index of the left array.
 
-Another interesting tidbit is that operators (and functions in general) generalize to arrays of arbitrary dimensions. This is known as rank polymorphism In fact, we've already seen this in the first example program, where we used `*` to exponentiate an entire array. Let's show a few more examples of this using perhaps the simplest operator of all, addition:
+Another interesting tidbit is that operators (and functions in general) generalize to arrays of arbitrary dimensions. This is known as rank polymorphism. In fact, we've already seen this in the first example program, where we used `*` to exponentiate an entire array. Let's show a few more examples of this using perhaps the simplest operator of all, addition:
 
 ```
       1 + 5
