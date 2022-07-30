@@ -498,7 +498,7 @@ The test passes! If we save the file again, we instead see:
     ✅ Passed : Proved. (cached)
 ```
 
-Since Unison is a purely functional language, and this test doesn't use an IO, it is provably deterministic. Unison has made use of this, and will never run the test again unless the implementation of `foo` changes. Instead, we just see the cached test result. You never have to pay the computational price of rerunning tests you didn't affect with a change, yay!
+Since Unison is a purely functional language, and this test doesn't use any IO, it is provably deterministic. Unison has made use of this, and will never run the test again unless the implementation of `foo` changes. Instead, we just see the cached test result. You never have to pay the computational price of rerunning tests you didn't affect with a change, yay!
 
 Due to all of the aforementioned caching, Unison tooling has a pretty nifty set of IDE-like tools. For example, we can trivially search for all functions by type or name, both of which are snappy due to the caching:
 
