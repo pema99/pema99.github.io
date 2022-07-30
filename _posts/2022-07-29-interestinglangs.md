@@ -74,7 +74,7 @@ Of course, _just_ using combinators such as these isn't enough to make more comp
 map (+1) (map (*2) [1, 2, 3]) == map (\x -> (x * 2) + 1) [1, 2, 3]
 ```
 
-Lastly, it is worth pointing out that Futhark is truly _purely_ functional language, unlike other so-called pure languages, such as Haskell, which claim to have no side effects, yet provide escape hatches out of the purity. After all, there is no such thing as IO in the absence of effects. Consequently, Futhark does not support IO. Instead, the language is built to be embedded into, and called from, a host language. The compiler can emit either Python or C code that uses CUDA or OpenCL internally. It is then your job to call into this generated code.
+Lastly, it is worth pointing out that Futhark is a truly _purely_ functional language, unlike other so-called pure languages, such as Haskell, which claim to have no side effects, yet provide escape hatches out of the purity. After all, there is no such thing as IO in the absence of effects. Consequently, Futhark does not support IO. Instead, the language is built to be embedded into, and called from, a host language. The compiler can emit either Python or C code that uses CUDA or OpenCL internally. It is then your job to call into this generated code.
 
 If you ever find yourself wanting to do some performant number-crunching, and your problem can be expressed elegantly in a functional language, definitely give Futhark a shot.
 
