@@ -83,7 +83,7 @@ If you ever find yourself wanting to do some performant number-crunching, and yo
 
 > Again, I am quite biased on this language. I wrote my thesis about it, after all.
 
-Moore's Law is well known among programmers. Once upon a time, he postulated that the number of transistors in a CPU would double about every 2 years. For a long time, this conjecture seemed very reasonable, but as time passed, it veered further and further from reality. At some point, you simply can't pack transistors any closer to each other without hitting a wall imposed by the laws of physics.
+Moore's Law is well known among programmers. Once upon a time, Moore postulated that the number of transistors in a CPU would double about every 2 years. For a long time, this conjecture seemed very reasonable, but as time passed, it veered further and further from reality. At some point, you simply can't pack transistors any closer to each other without hitting a wall imposed by the laws of physics.
 
 In our never-ending quest for better performance, multicore CPUs were invented somewhere along the way; if we can't make a single processor any faster, why not just make more processors, and solve many problem instances at once? Programming languages were adapted to allow making use of this setup, usually via multithreading. Later still, vector instructions were introduced with instruction sets like [SSE](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) and [AVX](https://en.wikipedia.org/wiki/AVX), which allowed processing multiple pieces of data once on a single core, in a paradigm dubbed SIMD (Single-Instruction-Multiple-Data).
 
