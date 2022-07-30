@@ -129,7 +129,7 @@ With relatively few changes to the original C program, we have produced a vector
 > ./exe
 ```
 
-Like [Futhark](#futhark), ISPC isn't intended for use as a standalone language. Instead, given an ISPC source file, the compiler emits a C/C++ header and an object file, which can then be linked into some existing C code, as shown with the commands above. This setup makes the language extremely easy to integrate into existing C/C++ codebases - in fact, [it is used in Unreal Engine!](https://gdcvault.com/play/1026686/Intel-ISPC-in-Unreal-Engine)
+Like [Futhark](#futhark), ISPC isn't intended for use as a standalone language. Instead, given an ISPC source file, the compiler emits a C/C++ header and an object file, which can then be linked into some existing C/C++ code, as shown with the commands above. This setup makes the language extremely easy to integrate into existing C/C++ codebases - in fact, [it is used in Unreal Engine!](https://gdcvault.com/play/1026686/Intel-ISPC-in-Unreal-Engine)
 
 # Koka
 ## Selling point: Algebraic effects
