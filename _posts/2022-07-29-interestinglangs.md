@@ -117,7 +117,7 @@ Although similar, the ISPC program _will_ make use of vector instructions, and t
 
 Unlike threads, these conceptual program instances are always synchronized and correspond directly to scalars within a vector register. If we, for example, increment a `varying` variable using the `+=` operator, this will automagically use a vectorized addition instruction, adding to each program instance's variable simultaneously. As you might be able to guess by now, `varying` values are stored in vector registers.
 
-The next difference, the `foreach` construct, is a special kind of loop that automatically distributes iteration across the various program instances, by splitting the iteration space into chunks. Thus, the loop index `i` is `varying` value. In the first iteration of the loop, `i` will have a value of 0 for the first program instance, 1 for the second, 2 for the third, etc. If we, for example, assume 8 total program instances, in the next iteration `i` will be 8 for the first program instance, 9 for the second, 10 for the third, etc. If our total array size is 16, and the number of program instances is 8, this would mean the loop runs for 2 iterations, processing 8 elements simultaneously in each of the 2.
+The next difference, the `foreach` construct, is a special kind of loop that automatically distributes iteration across the various program instances, by splitting the iteration space into chunks. Thus, the loop index `i` is a `varying` value. In the first iteration of the loop, `i` will have a value of 0 for the first program instance, 1 for the second, 2 for the third, etc. If we, for example, assume 8 total program instances, in the next iteration `i` will be 8 for the first program instance, 9 for the second, 10 for the third, etc. If our total array size is 16, and the number of program instances is 8, this would mean the loop runs for 2 iterations, processing 8 elements simultaneously in each of the 2.
 
 With all of that out of the way, let me give a brief explanation of what the program in the previous snippet does. First, we initialize a varying accumulator to all 0's. Then, we loop over the array in a vectorized fashion. In each iteration, we load a vector of values from the array, and add it component-wise to the accumulator. After the loop, the accumulator will contain a sum per program instance. We then sum up each program instance's contribution using the built-in function `reduce_add`, which takes as input a varying value, and returns a single uniform value. This is the final sum.
 
@@ -133,9 +133,9 @@ Like [Futhark](#futhark), ISPC isn't intended for use as a standalone language. 
 
 # Koka
 ## Selling point: Algebraic effects
-In functional programming, we often talk about "(side) effects" and our desire to keep them under control. The definition of a side effect will vary a bit depending on who you ask, but I'll give it a try. A pure function is [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency), which means that any call to the function can be replaced directly with its result, without changing the behavior of the program. If we call `foo(5)`, and that evaluates to `10`, then _any and all_ occurrences of `foo(5)` can be replaced with `10`. If the function does anything to break this property - by exhibiting side effects - it is no longer pure. Common examples of side effects are reading/writing to a filesystem or console, mutating global state, use of random number generation, etc.
+In functional programming, we often talk about "(side) effects" and our desire to keep them under control. The definition of a side effect will vary a bit depending on who you ask, but I'll give it a shot. A pure function is [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency), which means that any call to the function can be replaced directly with its result, without changing the behavior of the program. If we call `foo(5)`, and that evaluates to `10`, then _any and all_ occurrences of `foo(5)` can be replaced with `10`. If the function does anything to break this property - by exhibiting side effects - it is no longer pure. Common examples of side effects are reading/writing to a filesystem or console, mutating global state, use of random number generation, etc.
 
-In the absence of side effects, the behavior of code becomes simpler to reason with, and entire classes of bugs can be eliminated. As such, many functional languages implement some kind of strategy for tracking and/or limiting side effects. A common approach is to use [monads](https://pema.dev/2022/03/03/monoid/) as seen in Haskell, PureScript, Scala, etc. Without going into much detail, they can be thought of as a design pattern for easily composing effectful computations, using only pure functions. They are nice since they don't necessarily have to be designed into the language, but can be implemented in any language with an expressive enough type system, such as F#, OCaml, and TypeScript, neither of which are purely functional.
+In the absence of side effects, the behavior of code becomes simpler to reason with, and entire classes of bugs can be eliminated. As such, many functional languages have some kind of strategy for tracking and/or limiting side effects. A common approach is to use [monads](https://pema.dev/2022/03/03/monoid/) as seen in Haskell, PureScript, Scala, etc. Without going into much detail, they can be thought of as a design pattern for easily composing computations that exhibit side effects, using only pure functions. They are nice since they don't necessarily have to be designed into the language, but can be implemented in any language with an expressive enough type system, such as F#, OCaml, and TypeScript, neither of which are purely functional.
 
 Unfortunately, monads have some problems. They are notoriously intimidating to learn about for first-timers, and they can be tricky and tedious to combine. If you, for example, had a monad representing operations that perform IO, and a monad representing operations that may fail, and you wish to represent an operation that may fail _and_ perform IO, you are often forced to either write tedious boilerplate code or use [monad transformers](https://en.wikibooks.org/wiki/Haskell/Monad_transformers) to "stack the monads on top of each other", which imo. can lead to some rather inelegant code.
 
@@ -227,7 +227,7 @@ fun main()
   println(bar)
 ```
 
-This `with handler` construction lets us specify implementations of the effectful actions used in the rest of the function body. In this case, we just implement `write` as a simple print to standard out, and return `True`. Running the program now will produce the output:
+This `with handler` construction lets us specify implementations of the effectful operations used in the rest of the function body. In this case, we just implement `write` as a simple print to stdout, and return `True`. Running the program now will produce the output:
 
 ```
 Adding 3 by 5
@@ -235,7 +235,7 @@ Dividing 8 by 2
 4
 ```
 
-If the body of our function used more effects than just `log`, we could add their implementations under our implementation of `write`. What's interesting about this code is that we can trivially swap the implementation of `write` used at the call site without having to change any other code. In other words, the code making use of the effect (`add`, `divide`) knows _nothing_ about how that effect is implemented. For example, let's swap our simple implementation with one that builds up a string instead of immediately printing, and which returns `False` on empty log entries:
+If the body of our function used more effects than just `log`, we could add their implementations under our implementation of `write`. What's interesting about this code is that we can trivially swap the implementation of `write` used at the call site without having to change any other code. The code making use of the effect (`add`, `divide`) knows _nothing_ about how that effect is implemented. For example, let's swap our simple implementation with one that builds up a string instead of immediately printing, and which returns `False` on empty log entries:
 
 ```fsharp
 fun main()
@@ -253,7 +253,7 @@ fun main()
   println("The log was: " ++ theLog)
 ```
 
-Note the use a mutable variable. Koka is arguably not purely functional, as it allows local mutable variables. They cannot escape the lexical scope, though. This outputs:
+Note the use of a mutable variable. Koka is arguably not purely functional, as it allows local mutable variables. They cannot escape the lexical scope, though. This code outputs:
 
 ```
 4
@@ -262,9 +262,9 @@ Adding 3 by 5
 Dividing 8 by 2
 ```
 
-As we can see, the implementation of effects used by a piece of code is _truly_ up to the caller of said code. The effectful code is generic, not bound to any specific underlying implementation. This is part of what makes algebraic effects so interesting and powerful. We can use them to establish a sort of 2-way "conversation" between caller and callee. Algebraic effects are in my opinion much simpler to understand and use than monads, and can be used to solve many of the [same problems](https://homepages.inf.ed.ac.uk/slindley/papers/effmondel-jfp.pdf). Algebraic effects are very flexible and can be used to implement basically any kind of side-effect or custom control flow, including but not limited to async/await, exceptions, global mutable state, IO, coroutines, etc.
+As we can see, the implementation of effects used by a piece of code is _truly_ up to the caller of said code. The effectful code is generic, not bound to any specific underlying implementation. This is part of what makes algebraic effects so interesting and powerful. We can use them to establish a sort of 2-way "conversation" between caller and callee. Algebraic effects are in my opinion much simpler to understand and use than monads, and can be used to solve many of the [same problems](https://homepages.inf.ed.ac.uk/slindley/papers/effmondel-jfp.pdf). They are also very flexible and can be used to implement basically any kind of side-effect or custom control flow, including but not limited to async/await, exceptions, global mutable state, IO, coroutines, etc.
 
-As a final example, let's return to our program above and implement our own error handling system - currently, we can divide by 0, after all! First, we define a new effect type:
+As a final example, let's return to our program above and implement our own error handling system - currently, we can divide by 0! First, we define a new effect type:
 
 ```fsharp
 effect error<a>
@@ -344,7 +344,7 @@ Error: Don't divide by 0, dummy
 
 I hope by now I've managed to convince you that algebraic effects are cool. I hope we see the feature in more languages in the future. They are currently a fairly common topic in programming language research but haven't quite yet made it to the mainstream. Functional programming is, imo, not about eliminating side effects, but rather about structuring them in a reasonable, which lets us easily reason with the behavior of a program, avoiding nasty surprises from _unexpected_ side effects. Algebraic effects are one cool way to achieve this.
 
-As I alluded to in the intro of this section, Koka has a lot more going for it than just algebraic effects. I highly recommend you check out the language if you are interested in cutting-edge features that push the current boundaries of functional languages.
+As I alluded to in the intro of this section, Koka has a lot more going for it than just algebraic effects. I highly recommend you check out the language if you are interested in trying out cutting-edge features that push the current boundaries of functional languages.
 
 # Unison
 ## Selling point: A language without source code
@@ -462,7 +462,7 @@ It's a bit interesting to see how `fib_is_even` looks now, it actually directly 
     Nat.mod (#b8ohknd8mu n) 2 == 0
 ```
 
-We can easily associate a new name with the hash if desired; this is just another constant time operation. It should be evident at this point, refactoring is quite a breeze in Unison since it is very difficult to break anything. The Unison codebase can never be in a broken or corrupt state, assuming we don't manually edit via external means, of course.
+We can easily associate a new name with the hash if desired; this is just another constant time operation. It should be evident at this point, that refactoring is quite a breeze in Unison, since it is very difficult to break anything. The Unison codebase can never be in a broken or corrupt state, assuming we don't manually edit via external means, of course.
 
 In addition to easy refactoring, the hashing mechanism used by Unison has some nice implications for iteration times. In fact, there is no such thing as "building" a Unison codebase. Building (parsing, typechecking) is done immediately when the code is committed to the database and then cached as files on disk. Thus, if I write a recursive Fibonacci implementation once, and commit it to the codebase, I'll never ever have to build it again, even if I decide to reimplement it with a new name. Furthermore, other people collaborating with me on the same codebase won't ever have to build it, either. For these reasons, you are almost _never_ waiting around for code to compile while writing Unison. These cached files are even used when adding new code which depends on old code. Since we have the results of typechecking old code cached, for example, Unison can go straight to typechecking _just_ the new code.
 
@@ -495,6 +495,7 @@ here's how your codebase would change:
 The test passes! If we save the file again, we instead see:
 
 ```
+    ...
     ✅ Passed : Proved. (cached)
 ```
 
@@ -519,7 +520,7 @@ I've gone on for quite a bit now about hashing and caching, but even ignoring th
 ## Selling point: Terseness taken to the extreme
 APL is one of the more well-known languages on this list, but an interesting and influential one nonetheless. The language was initially devised by [Kenneth Iverson](https://en.wikipedia.org/wiki/Kenneth_E._Iverson) in the '60s as an alternative mathematical notation for manipulating arrays, but was turned into a real programming language a few years later, aptly named "A Programming Language", abbreviated to APL. In other words, APL is _old_, but manages to feel nothing like other languages of the era.
 
-APL, like [Futhark](#futhark), is in the family of [array languages](https://en.wikipedia.org/wiki/Array_programming), which, as I mentioned earlier, roughly means that arrays are the primary object of focus, and that the language is built to make operating on arrays convenient and efficient. In fact, APL is often considered the granddaddy of all array languages - a language so influential it spawned an entire paradigm. Among the current generation of programmers, APL is probably most well known for its name, or for being "the language you type with those weird symbols that [you need a special keyboard for](https://microapl.com/images/aplx_keyboard.jpg)". That last part isn't actually true, by the way. You can type APL on a regular keyboard just fine.
+APL, like [Futhark](#futhark), is in the family of [array languages](https://en.wikipedia.org/wiki/Array_programming), which, as I mentioned earlier, roughly means that arrays are the primary object of focus, and that the language is built to make operating on arrays convenient and efficient. In fact, APL is often considered the granddaddy of all array languages - a language so influential it spawned an entire paradigm! Among the current generation of programmers, APL is probably most well known for its name, or for being "the language you type with those weird symbols that [you need a special keyboard for](https://microapl.com/images/aplx_keyboard.jpg)". That last part isn't actually true, by the way. You can type APL on a regular keyboard just fine.
 
 But indeed, APL code consists almost entirely of strange-looking hieroglyphics, making APL code extremely terse. This is one of the main selling points of the language - function implementations in APL are often so short that assigning a name to them seems pointless, as the name itself would be more characters than the function body.
 
@@ -531,7 +532,7 @@ Without further ado, let's look at some code. I thought it would be fun as a fir
 
 Wow... That is pretty short. 12 characters vs Futhark's 123, to be exact. Despite the length, quite a bit is going on here. Let's deconstruct it.
 
-In APL, every function takes either 1 or 2 arguments. We call these functions monadic and dyadic respectively (not to be confused with monads from languages like Haskell, which are something else). Because of this, there is no need to name function arguments - they are already named for you. `⍺` is the left function argument, and `⍵` is the right. To define an anonymous, we use `{` squiggly brackets `}` around the function body. Looking at the snippet above, you should now see that we are defining a single argument function, which takes an argument from the right - an array, to be exact.
+In APL, every function takes either 1 or 2 arguments. We call these functions monadic and dyadic respectively (not to be confused with monads from languages like Haskell, which are something different). Because of this, there is no need to name function arguments - they are already named for you. `⍺` is the left function argument, and `⍵` is the right. To define an anonymous function, we use `{` squiggly brackets `}` around the function body. Looking at the snippet above, you should now see that we are defining a single argument function, which takes an argument from the right - an array, to be exact.
 
 The first operation we perform on the input array is `⍵*2`. `*` is the power operator, so this code will evaluate to a new array with all elements in `⍵` squared. Next, we use the squared array as the right-hand argument to the reduction operator, `/`. This operator takes as the left argument a binary operator, and as the right argument an array, and calculates the result of placing the binary operator between each pair of elements in the array. Concretely, `+/my_array` calculates the sum of elements in an array by interspersing the addition operator `+`. So, `(+/⍵*2)` calculates the sum of squares in `⍵`. Lastly, we again use the power operator to calculate the square root of this sum, by using `÷2` as the exponent, which is the reciprocal of 2, ie. 0.5.
 
@@ -541,7 +542,7 @@ Phew, that was a mouthful. Let's try it out in an [APL REPL](https://tryapl.org/
 3.741657387
 ```
 
-That is indeed the length of the vector `<1, 2, 3>`. APL array literals are simply space-separated values. To shorten this program further, we could have omitted the anonymous function and placed the argument directly into the body, like so:
+That is indeed the length of the vector `[1, 2, 3]`. APL array literals are simply space-separated values. To shorten this program further, we could have omitted the anonymous function and placed the argument directly into the body, like so:
 ```
 (+/1 2 3*2)*÷2
 ```
@@ -553,14 +554,14 @@ We could also name our function for future use:
 3.741657387
 ```
 
-An interesting property of APL, is that most operators can be used both monadically or dyadically. Take for example the iota operator, `⍳`, sometimes known as the index generator. If we apply it monadically to a number `n`, it gives us an array of the `n` first numbers:
+An interesting property of APL, is that most operators can be used _both_ monadically or dyadically. Take for example the iota operator, `⍳`, sometimes known as the index generator. If we apply it monadically to a number `n`, it gives us an array of the `n` first numbers:
 
 ```
     ⍳5
 1 2 3 4 5
 ```
 
-However, when applied dyadically, it gives us the index of the right argument in the left argument. For example, we can use it to find where a number is in an array:
+However, when applied dyadically, it gives us the index of the right argument in the left argument. For example, we can use it to find where a number is in an array of numbers:
 
 ```
     8 1 4 3 2⍳3
@@ -586,7 +587,7 @@ Another interesting tidbit is that operators (and functions in general) generali
 └─────┴─────┘
 ```
 
-Note the use of a 2-dimensional array in the bottom line. Fancy. In APL, anything can be thought of as an array. Even scalar numbers are just 0-dimensional arrays. This property allows the programmer to easily apply the expressive set of operations provided by the language to any kind of data.
+Note the use of a 2-dimensional array in the bottom line. Fancy. In APL, anything can be thought of as an array. Even scalar numbers are just 1-element arrays. This property allows the programmer to easily apply the expressive set of operations provided by the language to any kind of data.
 
 The building blocks described so far constitute the core of the language. Quite simple, really. Most of the features I haven't described are pretty much just syntax sugar. The hard part of learning APL isn't learning the language semantics, it's learning all built-in operators and how to effectively chain them together to solve problems. Once you get the hang of it, though, APL can be a very rewarding language to write, as the time it takes to go from an idea for an algorithm to a concrete implementation can be made very short. Due to the terseness of the language, APL also excels in a REPL environment, as a sort of quick calculator on steroids.
 
@@ -609,7 +610,7 @@ This shows the first 4 iterations of a 5x7 board initialized to a random pattern
 # Prolog
 ## Selling point: Logic programming
 
-[Prolog](https://www.swi-prolog.org/) is an interesting language primarily because it is one of few languages in the paradigm known as "logic programming". It is quite literally in the name, Pro=Programming Log=Logic. In logic programming, the programmer specifies constraints that model some problem domain, and can then execute queries against these constraints to solve problems. Prolog is best explained as a step-by-step tutorial, which is what I intend to do here.
+[Prolog](https://www.swi-prolog.org/) is an interesting language primarily because it is one of relatively few languages in the paradigm known as "logic programming". It is quite literally in the name, Pro=Programming Log=Logic. In logic programming, the programmer specifies constraints that model some problem domain, and can then execute queries against these constraints to solve problems. Prolog is best explained as a step-by-step tutorial, which is what I intend to do here.
 
 The most basic construct in Prolog is a "fact", denoted by an identifier, a list of operands, and followed by a dot. In the below snippet, we state several facts. Alice, Jane, Emma, and Sofia are female, while Bob, John, Lucas, and Oliver are male.
 
@@ -644,7 +645,7 @@ X = lucas
 X = oliver
 ```
 
-The repl will then print all values of `X` which make the query true. Facts can also have multiple operands:
+The REPL will then print all values of `X` which make the query true. Facts can also have multiple operands:
 
 ```prolog
 parent(alice, john).
@@ -709,7 +710,7 @@ grandmother(X, oliver).
 X = jane
 ```
 
-This is pretty much the core of the language, although the language does have additional features such as arithmetics and lists. What I find cool about Prolog is that you can model your domain with it, and then use it to "discover" properties of the domain.
+This is pretty much the core of the language, although the language does have several additional features such as arithmetics and lists. What I find cool about Prolog is that you can model your domain with it, and then use it to "explore" properties of the domain.
 
 Although it might not seem like it from what I've shown, general-purpose programming is possible in the language. In some cases, we can even do better than what general-purpose languages provide. As we've seen, there are no functions in Prolog, just relations in the form of rules and facts. Therefore, "outputs" are typically just another variable in a relation. To illustrate this, consider the builtin for appending lists:
 
@@ -718,7 +719,7 @@ Although it might not seem like it from what I've shown, general-purpose program
 [1, 2, 3, 4, 5, 6]
 ```
 
-Here, X is what we would typically think of as output. But since this is just a relation like any other, we can also reverse it and ask "What would we have to append to [1, 2, 3] to get [1, 2, 3, 4, 5, 6]?":
+Here, X is what we would think of as output in other languages. But since this is just a relation like any other, we can also reverse it and ask "What would we have to append to [1, 2, 3] to get [1, 2, 3, 4, 5, 6]?":
 
 ```prolog
 ?- append([1, 2, 3], X, [1, 2, 3, 4, 5, 6]).
@@ -754,7 +755,7 @@ sum([], 0).
 sum([Head|Tail], Sum) :- sum(Tail, Rest), Sum is Head + Rest.
 ```
 
-Readers familiar with functional programming will quickly realize this utilizes recursion. The first line states the fact that the sum of an empty list is 0. The second line is a rule consisting of 2 parts. It states that `Sum` is the sum of a list consisting of a `Head` and `Tail` if `Rest` is the sum of the `Tail` and `Head + Rest` is equal to `Sum`. This way of summing a list is identical to how one might do it in a LISP.
+Readers familiar with functional programming will quickly realize this utilizes recursion. The first line states the fact that the sum of an empty list is 0. The second line is a rule consisting of 2 parts. It states that `Sum` is the sum of a list consisting of a `Head` and `Tail` if `Rest` is the sum of the `Tail`, and `Head + Rest` is equal to `Sum`. This way of summing a list is nearly identical to how one might do it in a LISP.
 
 We can query it as such:
 
