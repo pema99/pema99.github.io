@@ -113,7 +113,7 @@ uniform int sumArray(uniform int arr[], uniform int size) {
 }
 ```
 
-Although similar, the ISPC program will make use of vector instructions, and thus be several times faster. The first major differences are the `uniform` and `varying` qualifiers. ISPC supports 2 kinds of data, as annotated by these. Conceptually, ISPC code is executed by several "program instances" simultaneously, which are sort of analogous to threads. `uniform` indicates that a piece of data is shared between all program instances, while `varying` data may differ between each program instance.
+Although similar, the ISPC program _will_ make use of vector instructions, and thus be several times faster. The first major differences are the `uniform` and `varying` qualifiers. ISPC supports 2 kinds of data, as annotated by these. Conceptually, ISPC code is executed by several "program instances" simultaneously, which are sort of analogous to threads. `uniform` indicates that a piece of data is shared between all program instances, while `varying` data may differ between each program instance.
 
 Unlike threads, these conceptual program instances are always synchronized and correspond directly to scalars within a vector register. If we, for example, increment a `varying` variable using the `+=` operator, this will automagically use a vectorized addition instruction, adding to each program instance's variable simultaneously. As you might be able to guess by now, `varying` values are stored in vector registers.
 
