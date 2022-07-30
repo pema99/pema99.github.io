@@ -262,7 +262,7 @@ Adding 3 by 5
 Dividing 8 by 2
 ```
 
-As we can see, the implementation of effects used by a piece of code is _truly_ up to the caller of said code. The effectful code is generic, not bound to any specific underlying implementation. This is part of what makes algebraic effects so interesting and powerful. We can use them to establish a sort of 2-way "conversation" between caller and callee. Algebraic effects are in my opinion much simpler to understand and use than monads, and the 2 are provably equally expressive. Algebraic effects are very flexible and can be used to implement basically any kind of side-effect or custom control flow, including but not limited to async/await, exceptions, global mutable state, IO, coroutines, etc.
+As we can see, the implementation of effects used by a piece of code is _truly_ up to the caller of said code. The effectful code is generic, not bound to any specific underlying implementation. This is part of what makes algebraic effects so interesting and powerful. We can use them to establish a sort of 2-way "conversation" between caller and callee. Algebraic effects are in my opinion much simpler to understand and use than monads, and can be used to solve many of the [same problems](https://homepages.inf.ed.ac.uk/slindley/papers/effmondel-jfp.pdf). Algebraic effects are very flexible and can be used to implement basically any kind of side-effect or custom control flow, including but not limited to async/await, exceptions, global mutable state, IO, coroutines, etc.
 
 As a final example, let's return to our program above and implement our own error handling system - currently, we can divide by 0, after all! First, we define a new effect type:
 
