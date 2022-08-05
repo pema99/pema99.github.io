@@ -338,7 +338,7 @@ Error: Don't divide by 0, dummy
 42
 ```
 
-I hope by now I've managed to convince you that algebraic effects are cool. I hope we see the feature in more languages in the future. They are currently a fairly common topic in programming language research but haven't quite yet made it to the mainstream. Functional programming is, imo, not about eliminating side effects, but rather about structuring them in a reasonable, which lets us easily reason with the behavior of a program, avoiding nasty surprises from _unexpected_ side effects. Algebraic effects are one cool way to achieve this.
+I hope by now I've managed to convince you that algebraic effects are cool. I hope we see the feature in more languages in the future. They are currently a fairly common topic in programming language research but haven't quite yet made it to the mainstream. Functional programming is, imo, not about eliminating side effects, but rather about structuring them in a reasonable manner, which lets us easily reason with the behavior of a program, avoiding nasty surprises from _unexpected_ side effects. Algebraic effects are one cool way to achieve this.
 
 As I alluded to in the intro of this section, Koka has a lot more going for it than just algebraic effects. I highly recommend you check out the language if you are interested in cutting-edge features that push the current boundaries of functional languages.
 
