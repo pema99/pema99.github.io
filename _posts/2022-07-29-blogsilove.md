@@ -61,6 +61,9 @@ I spend a lot of my time seeking out and reading through technical blogs. I real
 
 - [http://cnlohr.blogspot.com/](http://cnlohr.blogspot.com/)
   <br>Friend of mine and certified C-boomer. Doesn't post very often.
+  
+- [https://boxcat.site/udon/](https://boxcat.site/udon/)
+  <br>Only contains one post so far about speeding up the VRChat Udon virtual machine. It's neat.
 
 # Techno wizardry
 - [https://wunkolo.github.io/](https://wunkolo.github.io/)
