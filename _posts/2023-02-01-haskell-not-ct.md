@@ -13,6 +13,7 @@ Before we get started, I want to get a few important disclaimers out of the way:
 
 - This is not a Haskell tutorial and will assume some familiarity with the language. However, if you are proficient with any functional language, especially if it is a dialect of ML, you should be able to follow along.
 - You do **not** need to know any category theory to learn and become proficient with Haskell. If you are looking to learn the language, I recommend [Learn You A Haskell](http://learnyouahaskell.com/).
+- I'll try not to assume you know any category theory already.
 - I am not a category theorist. I consider myself a novice. This is just my attempt of making sense of the parts I am familiar with, so take it with a grain of salt.
 - As with several of my posts in the past, this is going to be structured more like a collection of notes, than as a coherent story.
 
