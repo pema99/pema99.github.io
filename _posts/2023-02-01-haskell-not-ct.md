@@ -5,7 +5,7 @@ title: Haskell is not category theory
 
 # What, why, who?
 
-If you have hung out in Haskell communities, you might have heard people mentioning concepts from category theory, perhaps even claiming that Haskell is built upon category-theoretic foundations.
+If you have hung out in Haskell communities, you might have heard people mentioning concepts from the mathematical field of category theory, perhaps even claiming that Haskell is built upon category-theoretic foundations.
 
 There is some truth to this, but I think it is more accurate to say that certain abstractions in Haskell are _inspired_ by category theory. When learning Haskell, I took this connection too literally and ended up confusing the hell out of myself. This post is aimed at my former self and aims to clear up some confusions I came across while trying to make sense of it all.
 
