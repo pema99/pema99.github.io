@@ -270,7 +270,7 @@ instance Monad Maybe where
 
 That's all fine and good, but what about the 2 monad laws from earlier? Does our implementation satisfy these? Let's take another look at the first law, $j \bullet Fj = j \bullet jF$, and translate each piece of the equation into Haskell:
 
-- The composition operator '$\bullet$' is function composition '`.`'.
+- The composition operator $\bullet$ is function composition '`.`'.
 - The natural transformation $j$ is the `j` function from earlier.
 - The $F$ construct in $Fj$ translates to `fmap`. We are applying our functor $F$ to the natural transformation $j$, which in Haskell was just a function. Remember, `fmap` is the portion of a functor that maps functions to functions.
 - The $F$ construct in $jF$ disappears. Here, the functor $F$ is applied to the objects (types) in $Hask$, turning any type `a` into the type `Maybe a`. We use this type to select the component of $j$ to apply. Concretely, we select the instantiation of `j` which applies to `Maybe` values - this is just `j`.
@@ -308,7 +308,7 @@ Which also holds for all possibilities. Both `(j . fmap r)` and `(j . r)` will d
 You might have heard the meme-worthy phrase "a monad is simply a monoid in the category of endofunctors" before. I don't intend to give a full explanation of what this phrase means, but I'd like to build some intuition. Most of the words in this phrase should be familiar by known, but I haven't yet defined what a _monoid_ is. The classical definition of a monoid is:
 
 - A set S
-- ... equipped with a binary operator '$\otimes$'
+- ... equipped with a binary operator $\otimes$
 - ... which is associative, $(a \otimes b) \otimes c = a \otimes (b \otimes c)$
 - ... and has an _neutral_ element $ne$ such that for all $a \in S$, we have $a \otimes ne = ne \otimes a = ne$
 
