@@ -299,7 +299,7 @@ Cool. Does it hold? Well, let's check every possibility:
 Yep, it checks out! Following similar logic, we can translate the second of the 2 laws into Haskell as:
 
 ```hs
-j . fmap r = j . r = id
+j . fmap r == j . r == id
 ```
 
 Which also holds for all possibilities. Both `(j . fmap r)` and `(j . r)` will do absolutely nothing when applied to a `Maybe` value.
@@ -323,14 +323,14 @@ In the last section, we derived a few laws for monads, written in Haskell:
 
 ```hs
 j . fmap j == j . j
-j . fmap r = j . r = id
+j . fmap r == j . r == id
 ```
 
 Using the aforementioned standard library functions, we can generalize these to work for any monad:
 
 ```hs
 join . fmap join == join . join
-join . fmap return = join . return = id
+join . fmap return == join . return == id
 ```
 
 If you stare at these laws for a moment, you might notice that they look sort of similar to the requirements for a monoid.
@@ -355,8 +355,8 @@ To illustrate this principle, let's take a look at some properties of category-t
 In Haskell, these laws are spelled:
 
 ```hs
-fmap id = id
-fmap f . fmap g = fmap (f . g)
+fmap id == id
+fmap f . fmap g == fmap (f . g)
 ```
 
 Now consider the following botched implementation of the `Functor` typeclass for `Maybe`:
