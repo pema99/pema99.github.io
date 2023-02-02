@@ -59,7 +59,7 @@ When we are talking about Haskell from a category-theoretic lens, we are almost 
 
 I lied. $Hask$ is technically not a category. There are several reasons for this, but I'll focus on just one of them.
 
-Haskell has the notion of a "bottom" value (uwu). Bottom values are a member of _any_ type. A bottom value is trivial to define - we just recurse infinitely!
+Haskell has the notion of a _bottom_ value (uwu). Bottom values are a member of _any_ type. A bottom value is trivial to define - we just recurse infinitely!
 
 ```hs
 bottom :: a
@@ -103,7 +103,7 @@ So we can tell the difference between `foo` and `id . foo`, breaking the criteri
 
 # `Functor` is not $Functor$
 
-Another common object in category theory is a "functor". A functor is a mapping (arrow) from a category to a category. I'll write these as $F: A \rightarrow B$ where $F$ is a functor from category $A$ to category $B$. Such a functor will map:
+Another common object in category theory is a _functor_. A functor is a mapping (arrow) from a category to a category. I'll write these as $F: A \rightarrow B$ where $F$ is a functor from category $A$ to category $B$. Such a functor will map:
 
 - Each object $a$ in category $A$ to an object $F(a)$ in category $B$
 - Each arrow $x: a \rightarrow b$ in category $A$ to an arrow $F(x) : F(a) \rightarrow F(b)$
@@ -224,7 +224,7 @@ r :: a -> Maybe a
 r a = Just a
 ```
 
-This function lets us "lift" a value of any type into our monad.
+This function lets us _lift_ a value of any type into our monad.
 
 Next, recall that the natural transformation $j$ mapped from some composition of functors $F \times F$ to functor $F$. In Haskell, we would write $F \times F$ as `Functor f => f (f a)`, or `Maybe (Maybe a)` for the concrete case of `Maybe`. We get the following:
 
@@ -235,7 +235,7 @@ j (Just (Nothing)) = Nothing
 j (Just (Just a)) = Just a
 ```
 
-This function lets us remove one level of monadic structure, "flattening" a nested monad in a meaningful way. For the `Maybe` monad, it works sort of like a logical and.
+This function lets us remove one level of monadic structure, _flattening_ a nested monad in a meaningful way. For the `Maybe` monad, it works sort of like a logical and.
 
 With these implementations in mind, let's take a look at how Haskell's `Monad` typeclass looks (omitting a few irrelevancies):
 
