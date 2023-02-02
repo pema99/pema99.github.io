@@ -24,21 +24,21 @@ Before we get started, I want to get a few important disclaimers out of the way:
 The primary object of study in category theory is the category. A category consists of:
 
 - A collection of _objects_.
-- A collection of _morphisms_, also known as _arrows_, which map from one object to another. I'll write these as $f: a \rightarrow b$. Here, $f$ is an arrow from the object $a$ to the object $b$.
-- A binary operation called _composition_, which combines arrows together. I'll write composition as $x \bullet y$ where $x$ and $y$ are arrows.
+- A collection of _morphisms_, also known as _arrows_, which map from one object to another. I'll write these as $$f: a \rightarrow b$$. Here, $$f$$ is an arrow from the object $$a$$ to the object $$b$$.
+- A binary operation called _composition_, which combines arrows together. I'll write composition as $$x \bullet y$$ where $$x$$ and $$y$$ are arrows.
 
 A few additional criteria must be satisfied:
 
-- Whenever we have an arrow from $a$ to $b$, and an arrow from $b$ to $c$, there is also an arrow from $a$ to $c$ which is the composition of the two. Thus, $(x: b \rightarrow c) \bullet (y: a \rightarrow b) = (z: a \rightarrow c)$.
-- Composition is associative, so $x \bullet (y \bullet z)$ = $(x \bullet y) \bullet z$.
-- For every object $a$, there is an identity arrow $I_a: x \rightarrow x$ which just maps from the object to itself.
-- Composition with an identity arrow has no effect, so $I \bullet f = f \bullet I = f$.
+- Whenever we have an arrow from $$a$$ to $$b$$, and an arrow from $$b$$ to $$c$$, there is also an arrow from $$a$$ to $$c$$ which is the composition of the two. Thus, $$(x: b \rightarrow c) \bullet (y: a \rightarrow b) = (z: a \rightarrow c)$$.
+- Composition is associative, so $$x \bullet (y \bullet z)$$ = $$(x \bullet y) \bullet z$$.
+- For every object $$a$$, there is an identity arrow $$I_a: x \rightarrow x$$ which just maps from the object to itself.
+- Composition with an identity arrow has no effect, so $$I \bullet f = f \bullet I = f$$.
 
 This is intentionally pretty abstract. In the next section, I'll give a concrete example of a category.
 
-# $Hask$ is a category
+# $$Hask$$ is a category
 
-A concrete example of a category is the category of Haskell types, typically called $Hask$. In this category:
+A concrete example of a category is the category of Haskell types, typically called $$Hask$$. In this category:
 
 - Our objects are types, such as `Boolean`, `String`, `[a]`, and so on.
 - Our arrows are just plain old functions. They take a value of one type and map it to a value of another.
@@ -51,13 +51,13 @@ All the criteria for a category are satisfied:
 - Function composition is associative, `(x . y) . z == x . (y . z)`.
 - Composing the identity function with any other function has no effect, `id . f == f . id == f`.
 
-When we are talking about Haskell from a category-theoretic lens, we are almost always talking about $Hask$. Since types are more or less sets of possible values, this category is closely related to the category of sets, typically denoted $Set$.
+When we are talking about Haskell from a category-theoretic lens, we are almost always talking about $$Hask$$. Since types are more or less sets of possible values, this category is closely related to the category of sets, typically denoted $$Set$$.
 
-# $Hask$ is not a category
+# $$Hask$$ is not a category
 
 > Note: If you are not interested in extreme pedantry, feel free to skip this section as well.
 
-I lied. $Hask$ is technically not a category. There are several reasons for this, but I'll focus on just one of them.
+I lied. $$Hask$$ is technically not a category. There are several reasons for this, but I'll focus on just one of them.
 
 Haskell has the notion of a _bottom_ value (uwu). Bottom values are a member of _any_ type. A bottom value is trivial to define - we just recurse infinitely!
 
@@ -101,16 +101,16 @@ This program will output:
 
 So we can tell the difference between `foo` and `id . foo`, breaking the criteria! Oh, and by the way `<<loop>>` is just Haskell's way to tell us "this is definitely going to loop forever".
 
-# `Functor` is not $Functor$
+# `Functor` is not $$Functor$$
 
-Another common object in category theory is a _functor_. A functor is a mapping (arrow) from a category to a category. I'll write these as $F: A \rightarrow B$ where $F$ is a functor from category $A$ to category $B$. Such a functor will map:
+Another common object in category theory is a _functor_. A functor is a mapping (arrow) from a category to a category. I'll write these as $$F: A \rightarrow B$$ where $$F$$ is a functor from category $$A$$ to category $$B$$. Such a functor will map:
 
-- Each object $a$ in category $A$ to an object $F(a)$ in category $B$
-- Each arrow $x: a \rightarrow b$ in category $A$ to an arrow $F(x) : F(a) \rightarrow F(b)$
+- Each object $$a$$ in category $$A$$ to an object $$F(a)$$ in category $$B$$
+- Each arrow $$x: a \rightarrow b$$ in category $$A$$ to an arrow $$F(x) : F(a) \rightarrow F(b)$$
 
-In the above, $F(a)$ should be read as "the result of applying functor F to element a", if $a$ is an object, we get an object back, and if $a$ is an arrow, we get an arrow back. You can view functors as a kind of polymorphic function on elements (be they objects or arrows) in a category.
+In the above, $$F(a)$$ should be read as "the result of applying functor F to element a", if $$a$$ is an object, we get an object back, and if $$a$$ is an arrow, we get an arrow back. You can view functors as a kind of polymorphic function on elements (be they objects or arrows) in a category.
 
-A simple example of a functor is the _identity functor_, which does ... wait for it ... absolutely nothing! Every object and arrow in $A$ is mapped to the same object and arrow in $B$. Of course, an identity functor from $A$ to $B$ can only exist if $A$ and $B$ are the same since the mapping must be valid for _all_ objects in $A$. We call functors from a category to that same category _endofunctors_.
+A simple example of a functor is the _identity functor_, which does ... wait for it ... absolutely nothing! Every object and arrow in $$A$$ is mapped to the same object and arrow in $$B$$. Of course, an identity functor from $$A$$ to $$B$$ can only exist if $$A$$ and $$B$$ are the same since the mapping must be valid for _all_ objects in $$A$$. We call functors from a category to that same category _endofunctors_.
 
 Haskell's standard library includes a typeclass (like a trait in Rust, or a C# interface on steroids) called `Functor`. It looks like this:
 
@@ -128,9 +128,9 @@ fmap (*5) (Just 3) == Just 6
 fmap (-10) Nothing == Nothing
 ```
 
-If you are anything like me when I was learning Haskell, you might be tempted to assume that Haskell's `Functor` is equivalent to a functor from category theory, but in fact, it is something much more restricted. Perhaps the most obvious difference is that every Haskell `Functor` is really an _endofunctor on $Hask$_, since $Hask$ is the only category we can talk about in Haskell. What other differences are there, though?
+If you are anything like me when I was learning Haskell, you might be tempted to assume that Haskell's `Functor` is equivalent to a functor from category theory, but in fact, it is something much more restricted. Perhaps the most obvious difference is that every Haskell `Functor` is really an _endofunctor on $$Hask$$_, since $$Hask$$ is the only category we can talk about in Haskell. What other differences are there, though?
 
-Recall that objects in $Hask$ are types, and arrows are functions. A proper functor $F$ would then have to consist of:
+Recall that objects in $$Hask$$ are types, and arrows are functions. A proper functor $$F$$ would then have to consist of:
 
 - A mapping from a type `a` to a type `F(a)`
 - A mapping from functions of type `a -> b` to functions of type `F(a) -> F(b)`
@@ -156,11 +156,11 @@ instance Functor Identity where
     fmap f (Identity a) = Identity (f a)
 ```
 
-With a property identity functor $F$, we would have that that $F(a) = a$ for any object or arrow $a$. This clearly isn't the case here; the values `Identity "foo"` and `"foo"` have two different types. Here we have an example of an endofunctor that cannot be made an instance of the `Functor` typeclass.
+With a property identity functor $$F$$, we would have that that $$F(a) = a$$ for any object or arrow $$a$$. This clearly isn't the case here; the values `Identity "foo"` and `"foo"` have two different types. Here we have an example of an endofunctor that cannot be made an instance of the `Functor` typeclass.
 
 # A note on kinds of functors
 
-Another piece of information that is implicit in Haskell's `Functor` typeclass, is that it is _covariant_. Covariance means that direction of arrows in the category upon which the functor acts ($Hask$ in our case) is preserved. We can also define a contravariant functor, which flips the direction of arrows. In Haskell, the `Contravariant` typeclass is used to describe such functors:
+Another piece of information that is implicit in Haskell's `Functor` typeclass, is that it is _covariant_. Covariance means that direction of arrows in the category upon which the functor acts ($$Hask$$ in our case) is preserved. We can also define a contravariant functor, which flips the direction of arrows. In Haskell, the `Contravariant` typeclass is used to describe such functors:
 
 ```hs
 class Contravariant f where
@@ -178,7 +178,7 @@ Haskell's standard library contains several other kinds of functors lifted from 
 
 # Natural transformations
 
-I've described how functors are mappings between categories. Before moving on to monads, I should also mention mappings between functors. These are known as _natural transformations_. I'll write these as $N_a : F(a) \rightarrow G(a)$ where $N$ is a natural transformation from functor $F$ to functor $G$. $N_a$ is called the _component_ of $N$ at $a$. This is the concrete arrow of $N$ that applies to object $a$. 
+I've described how functors are mappings between categories. Before moving on to monads, I should also mention mappings between functors. These are known as _natural transformations_. I'll write these as $$N_a : F(a) \rightarrow G(a)$$ where $$N$$ is a natural transformation from functor $$F$$ to functor $$G$$. $$N_a$$ is called the _component_ of $$N$$ at $$a$$. This is the concrete arrow of $$N$$ that applies to object $$a$$. 
 
 We can express natural transformations quite directly in Haskell - they are just polymorphic functions. Here's an example using our `Identity` functor implementation from earlier:
 
@@ -197,20 +197,20 @@ identityToMaybe :: Identity Boolean -> Maybe Boolean
 identityToMaybe :: Identity [Integer] -> Maybe [Integer]
 ```
 
-# `Monad` is almost $Monad$
+# `Monad` is almost $$Monad$$
 
 For the same reason that Haskell's `Functor` is not quite a full-blown category-theoretic functor, Haskell's `Monad` can never be full-blown. It comes a tad closer than in the case of functor, though.
 
-In category theory, a monad is typically defined in terms of an endofunctor $F: C \rightarrow C$ together with 2 _natural transformations_ $r: I_C \rightarrow F$ and $j: (F \times F) \rightarrow F$ where $I_C$ is the identity functor from $C$ to $C$, and $F \times F$ is the _functor composition_ of $F$ with itself. Just as we could use $\bullet$ to compose 2 arrows into a new arrow, we can use $\times$ to compose 2 functors into a new functor. Additionally, a few monad laws must hold:
+In category theory, a monad is typically defined in terms of an endofunctor $$F: C \rightarrow C$$ together with 2 _natural transformations_ $$r: I_C \rightarrow F$$ and $$j: (F \times F) \rightarrow F$$ where $$I_C$$ is the identity functor from $$C$$ to $$C$$, and $$F \times F$$ is the _functor composition_ of $$F$$ with itself. Just as we could use $$\bullet$$ to compose 2 arrows into a new arrow, we can use $$\times$$ to compose 2 functors into a new functor. Additionally, a few monad laws must hold:
 
-- $j \bullet Fj = j \bullet jF$
-- $j \bullet Fr = j \bullet rF = I_F$
+- $$j \bullet Fj = j \bullet jF$$
+- $$j \bullet Fr = j \bullet rF = I_F$$
 
-Where $I_F$ is the identity natural transformation from $F$ to $F$. 
+Where $$I_F$$ is the identity natural transformation from $$F$$ to $$F$$. 
 
-The notation $Fj$ means a natural transformation whose components $(Fj)_a$ are given by $F(j_a)$, ie. selecting the specific arrow from $j$ which applies to object $a$, _and then_ applying functor $F$ to the result. Similarly, $jF$ is a natural transformation with components $(jF)_a = j_{F(a)}$, ie. applying the functor $F$ to object $a$ first, and then using the resulting object to select an arrow from $j$.
+The notation $$Fj$$ means a natural transformation whose components $$(Fj)_a$$ are given by $$F(j_a)$$, ie. selecting the specific arrow from $$j$$ which applies to object $$a$$, _and then_ applying functor $$F$$ to the result. Similarly, $$jF$$ is a natural transformation with components $$(jF)_a = j_{F(a)}$$, ie. applying the functor $$F$$ to object $$a$$ first, and then using the resulting object to select an arrow from $$j$$.
 
-Let's take a specific monad, `Maybe`, and see if we can write an implementation of $r$ and $j$ that seems to make sense. In the context of $Hask$, the natural transformation $r$ should be a function from the `Identity` functor to some other `Functor`. Since we are using `Maybe` as an example, this `Functor` is just `Maybe`. We get the following:
+Let's take a specific monad, `Maybe`, and see if we can write an implementation of $$r$$ and $$j$$ that seems to make sense. In the context of $$Hask$$, the natural transformation $$r$$ should be a function from the `Identity` functor to some other `Functor`. Since we are using `Maybe` as an example, this `Functor` is just `Maybe`. We get the following:
 
 ```hs
 r :: Identity a -> Maybe a
@@ -226,7 +226,7 @@ r a = Just a
 
 This function lets us _lift_ a value of any type into our monad.
 
-Next, recall that the natural transformation $j$ mapped from some composition of functors $F \times F$ to functor $F$. In Haskell, we would write $F \times F$ as `Functor f => f (f a)`, or `Maybe (Maybe a)` for the concrete case of `Maybe`. We get the following:
+Next, recall that the natural transformation $$j$$ mapped from some composition of functors $$F \times F$$ to functor $$F$$. In Haskell, we would write $$F \times F$$ as `Functor f => f (f a)`, or `Maybe (Maybe a)` for the concrete case of `Maybe`. We get the following:
 
 ```hs
 j :: Maybe (Maybe a) -> Maybe a
@@ -269,12 +269,12 @@ instance Monad Maybe where
     return = r
 ```
 
-That's all fine and good, but what about the 2 monad laws from earlier? Does our implementation satisfy these? Let's take another look at the first law, $j \bullet Fj = j \bullet jF$, and translate each piece of the equation into Haskell:
+That's all fine and good, but what about the 2 monad laws from earlier? Does our implementation satisfy these? Let's take another look at the first law, $$j \bullet Fj = j \bullet jF$$, and translate each piece of the equation into Haskell:
 
-- The composition operator $\bullet$ is function composition '`.`'.
-- The natural transformation $j$ is the `j` function from earlier.
-- The $F$ construct in $Fj$ translates to `fmap`. We are applying our functor $F$ to the natural transformation $j$, which in Haskell was just a function. Remember, `fmap` is the portion of a functor that maps functions to functions.
-- The $F$ construct in $jF$ disappears. Here, the functor $F$ is applied to the objects (types) in $Hask$, turning any type `a` into the type `Maybe a`. We use this type to select the component of $j$ to apply. Concretely, we select the instantiation of `j` which applies to `Maybe` values - this is just `j`.
+- The composition operator $$\bullet$$ is function composition '`.`'.
+- The natural transformation $$j$$ is the `j` function from earlier.
+- The $$F$$ construct in $$Fj$$ translates to `fmap`. We are applying our functor $$F$$ to the natural transformation $$j$$, which in Haskell was just a function. Remember, `fmap` is the portion of a functor that maps functions to functions.
+- The $$F$$ construct in $$jF$$ disappears. Here, the functor $$F$$ is applied to the objects (types) in $$Hask$$, turning any type `a` into the type `Maybe a`. We use this type to select the component of $$j$$ to apply. Concretely, we select the instantiation of `j` which applies to `Maybe` values - this is just `j`.
 
 Putting all of this together, we can translate the law into Haskell like so:
 
@@ -309,14 +309,14 @@ Which also holds for all possibilities. Both `(j . fmap r)` and `(j . r)` will d
 You might have heard the meme-worthy phrase "a monad is simply a monoid in the category of endofunctors" before. I don't intend to give a full explanation of what this phrase means, but I'd like to build some intuition. Most of the words in this phrase should be familiar by known, but I haven't yet defined what a _monoid_ is. The classical definition of a monoid is:
 
 - A set S
-- ... equipped with a binary operator $\otimes$
-- ... which is associative, $(a \otimes b) \otimes c = a \otimes (b \otimes c)$
-- ... and has an _neutral_ element $ne$ such that for all $a \in S$, we have $a \otimes ne = ne \otimes a = a$
+- ... equipped with a binary operator $$\otimes$$
+- ... which is associative, $$(a \otimes b) \otimes c = a \otimes (b \otimes c)$$
+- ... and has an _neutral_ element $$ne$$ such that for all $$a \in S$$, we have $$a \otimes ne = ne \otimes a = a$$
 
 Typical examples include:
 
-- The set of natural numbers with $+$ as the operator, and $0$ as the neutral element.
-- The set of natural numbers with $*$ as the operator, and $1$ as the neutral element.
+- The set of natural numbers with $$+$$ as the operator, and $$0$$ as the neutral element.
+- The set of natural numbers with $$*$$ as the operator, and $$1$$ as the neutral element.
 - The set of strings with string concatenation as the operator, and "" as the neutral element.
 
 In the last section, we derived a few laws for monads, written in Haskell:
@@ -347,10 +347,10 @@ So far, I've shed some light on the differences between some common abstractions
 
 Haskell isn't capable of enforcing these laws! For all of these abstractions, we can write implementations that type check but have absolutely nothing to do with category theory.
 
-To illustrate this principle, let's take a look at some properties of category-theoretic functors that I chose to omit earlier. For any functor $F: A \rightarrow B$, the following laws must hold:
+To illustrate this principle, let's take a look at some properties of category-theoretic functors that I chose to omit earlier. For any functor $$F: A \rightarrow B$$, the following laws must hold:
 
-- $F(I_a) = I_{F(a)}$ where both $I$'s are identity arrows in their respective categories. Put simply, functors must preserve identity.
-- $F(x \bullet y) = F(x) \bullet F(y)$, for all arrows $x$ and $y$ in category $A$. Put simply, functors must preserve composition.
+- $$F(I_a) = I_{F(a)}$$ where both $$I$$'s are identity arrows in their respective categories. Put simply, functors must preserve identity.
+- $$F(x \bullet y) = F(x) \bullet F(y)$$, for all arrows $$x$$ and $$y$$ in category $$A$$. Put simply, functors must preserve composition.
 
 In Haskell, these laws are spelled:
 
