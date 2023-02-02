@@ -10,6 +10,9 @@ pre {
 
 code {
   font-size: 85%;
+  background-color: var(--code-bg);
+  border-radius: var(--border-radius);
+  padding: 0.15rem;
 }
 
 pre {
