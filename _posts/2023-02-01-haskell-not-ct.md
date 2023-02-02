@@ -337,7 +337,7 @@ If you stare at these laws for a moment, you might notice that they look sort of
 
 The first law is roughly saying "If we have a stack of 3 nested monadic values, it doesn't matter if we first use `join` to flatten the innermost 2 values (the left-hand side), or the 2 outermost values (the right-hand side)". In other words, it doesn't matter how we group our `join`'s - this is the essence of associativity.
 
-The second law is saying "If we inject an extra monadic layer into a monadic value using `fmap return`, and then flatten using `join` (left-hand side), _or_ we wrap a monadic value in another monadic layer using `return`, and then flatten with `join` (middle part of the equation), we have achieved nothing. Since we achieved nothing, both of these operations are equivalent to the identity function `id`". Here, `return` plays the role of a monoidal neutral element, and the law essentially describes left and right identity.
+The second law is saying "If we inject an extra monadic layer into a monadic value using `fmap return`, and then flatten using `join` (left-hand side), _or_ we wrap a monadic value in another monadic layer using `return`, and then flatten with `join` (middle part of the equation), we have achieved nothing. Since we achieved nothing, both of these operations are equivalent to the identity function `id`". Here, `return` plays the role of a monoidal neutral element, and the law describes something similar to left and right identity.
 
 This intuitive explanation should hopefully give a hint as to why we can consider monads to be a specific kind of monoid.
 
