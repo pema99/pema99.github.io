@@ -311,7 +311,7 @@ You might have heard the meme-worthy phrase "a monad is simply a monoid in the c
 - A set S
 - ... equipped with a binary operator $\otimes$
 - ... which is associative, $(a \otimes b) \otimes c = a \otimes (b \otimes c)$
-- ... and has an _neutral_ element $ne$ such that for all $a \in S$, we have $a \otimes ne = ne \otimes a = ne$
+- ... and has an _neutral_ element $ne$ such that for all $a \in S$, we have $a \otimes ne = ne \otimes a = a$
 
 Typical examples include:
 
