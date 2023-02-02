@@ -49,7 +49,7 @@
   --code-font: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
   --code-color: var(--grape);
-  --code-bg: var(#0e0e0e);
+  --code-bg: #0e0e0e;
 
   --spacer: 1rem;
   --spacer-2: calc(var(--spacer) * 1.5);
@@ -68,7 +68,7 @@
 
     --border-color: rgba(255, 255, 255, 0.15);
 
-    --code-bg: var(#0e0e0e);
+    --code-bg: #0e0e0e;
   }
 }
 
@@ -80,5 +80,5 @@
   --link-color: var(--dark-poole-link-color);
   --link-hover-color: var(--dark-poole-link-hover);
   --border-color: rgba(255, 255, 255, 0.15);
-  --code-bg: var(#0e0e0e);
+  --code-bg: #0e0e0e;
 }
