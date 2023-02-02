@@ -390,3 +390,5 @@ Of course, these kinds of botched implementations are not common and are conside
 - https://stackoverflow.com/questions/3870088/a-monad-is-just-a-monoid-in-the-category-of-endofunctors-whats-the-problem
 
 - https://stackoverflow.com/questions/45829110/monad-laws-expressed-in-terms-of-join-instead-of-bind
+
+- https://math.andrej.com/2016/08/06/hask-is-not-a-category/
