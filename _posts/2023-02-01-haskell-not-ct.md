@@ -379,16 +379,16 @@ Of course, these kinds of botched implementations are not common and are conside
 
 # Some links
 
-- https://wiki.haskell.org/Hask
+- [https://wiki.haskell.org/Hask](https://wiki.haskell.org/Hask)
 
-- https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/
+- [https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/](https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/)
 
-- https://1lab.dev/#category-theory
+- [https://1lab.dev/#category-theory](https://1lab.dev/#category-theory)
 
-- https://ncatlab.org/nlab/show/whiskering
+- [https://ncatlab.org/nlab/show/whiskering](https://ncatlab.org/nlab/show/whiskering)
 
-- https://stackoverflow.com/questions/3870088/a-monad-is-just-a-monoid-in-the-category-of-endofunctors-whats-the-problem
+- [https://stackoverflow.com/questions/3870088/a-monad-is-just-a-monoid-in-the-category-of-endofunctors-whats-the-problem](https://stackoverflow.com/questions/3870088/a-monad-is-just-a-monoid-in-the-category-of-endofunctors-whats-the-problem)
 
-- https://stackoverflow.com/questions/45829110/monad-laws-expressed-in-terms-of-join-instead-of-bind
+- [https://stackoverflow.com/questions/45829110/monad-laws-expressed-in-terms-of-join-instead-of-bind](https://stackoverflow.com/questions/45829110/monad-laws-expressed-in-terms-of-join-instead-of-bind)
 
-- https://math.andrej.com/2016/08/06/hask-is-not-a-category/
+- [https://math.andrej.com/2016/08/06/hask-is-not-a-category/](https://math.andrej.com/2016/08/06/hask-is-not-a-category/)
