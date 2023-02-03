@@ -160,7 +160,7 @@ With a property identity functor $$F$$, we would have that that $$F(a) = a$$ for
 
 # A note on kinds of functors
 
-Another piece of information that is implicit in Haskell's `Functor` typeclass, is that it is _covariant_. Covariance means that direction of arrows in the category upon which the functor acts ($$Hask$$ in our case) is preserved. We can also define a contravariant functor, which flips the direction of arrows. In Haskell, the `Contravariant` typeclass is used to describe such functors:
+Another piece of information that is implicit in Haskell's `Functor` typeclass, is that it is _covariant_. Covariance means that the direction of arrows in the category upon which the functor acts ($$Hask$$ in our case) is preserved. We can also define a contravariant functor, which flips the direction of arrows. In Haskell, the `Contravariant` typeclass is used to describe such functors:
 
 ```hs
 class Contravariant f where
@@ -306,7 +306,7 @@ Which also holds for all possibilities. Both `(j . fmap r)` and `(j . r)` will d
 
 # Monoid in the category of endofunctors
 
-You might have heard the meme-worthy phrase "a monad is simply a monoid in the category of endofunctors" before. I don't intend to give a full explanation of what this phrase means, but I'd like to build some intuition. Most of the words in this phrase should be familiar by known, but I haven't yet defined what a _monoid_ is. The classical definition of a monoid is:
+You might have heard the meme-worthy phrase "a monad is simply a monoid in the category of endofunctors" before. I don't intend to give a full explanation of what this phrase means, but I'd like to build some intuition. Most of the words in this phrase should be familiar by now, but I haven't yet defined what a _monoid_ is. The classical definition of a monoid is:
 
 - A set S
 - ... equipped with a binary operator $$\otimes$$
