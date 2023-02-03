@@ -31,7 +31,7 @@ A few additional criteria must be satisfied:
 
 - Whenever we have an arrow from $$a$$ to $$b$$, and an arrow from $$b$$ to $$c$$, there is also an arrow from $$a$$ to $$c$$ which is the composition of the two. Thus, $$(x: b \rightarrow c) \bullet (y: a \rightarrow b) = (z: a \rightarrow c)$$.
 - Composition is associative, so $$x \bullet (y \bullet z)$$ = $$(x \bullet y) \bullet z$$.
-- For every object $$a$$, there is an identity arrow $$I_a: x \rightarrow x$$ which just maps from the object to itself.
+- For every object $$a$$, there is an identity arrow $$I_a: a \rightarrow a$$ which just maps from the object to itself.
 - Composition with an identity arrow has no effect, so $$I \bullet f = f \bullet I = f$$.
 
 This is intentionally pretty abstract. In the next section, I'll give a concrete example of a category.
