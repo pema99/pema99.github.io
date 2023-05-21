@@ -89,3 +89,6 @@ I spend a lot of my time seeking out and reading through technical blogs. I real
 
 - [http://paulbourke.net/](http://paulbourke.net/)
   <br>Website of the legendary Paul Bourke. Not really a blog, but great technical pages and documentation on stuff you've probably never heard about.
+
+- [https://psychopath.io/](https://psychopath.io/)
+  <br>Blog about a path tracer. Lots of great in-depth articles on here.
