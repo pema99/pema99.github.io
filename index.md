@@ -23,7 +23,7 @@ VRChat: [pema99](https://vrchat.com/home/user/usr_d81127c8-e8cc-476b-b74d-0c17c0
 
 # Currently working on
 - This website.
-- A path tracer [rust-path-tracer](https://github.com/pema99/rust-path-tracer).
+- A path tracer, [rust-path-tracer](https://github.com/pema99/rust-path-tracer).
 
 # Noteworthy projects
 - [rust-path-tracer](https://github.com/pema99/rust-path-tracer), a GPU accelerated path tracer written entirely in Rust.
