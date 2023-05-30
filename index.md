@@ -23,10 +23,11 @@ VRChat: [pema99](https://vrchat.com/home/user/usr_d81127c8-e8cc-476b-b74d-0c17c0
 
 # Currently working on
 - This website.
-- My toy language, [Bonk](https://github.com/pema99/bonk).
+- A path tracer [rust-path-tracer](https://github.com/pema99/rust-path-tracer).
 
 # Noteworthy projects
-- [Raytracer](https://github.com/pema99/Raytracer), a fairly fleshed out CPU-based path tracer.
+- [rust-path-tracer](https://github.com/pema99/rust-path-tracer), a GPU accelerated path tracer written entirely in Rust.
+- [Raytracer](https://github.com/pema99/Raytracer), an older but fairly fleshed out CPU-based path tracer.
 - [LotusNES](https://github.com/pema99/LotusNES), an NES emulator written in C#. It runs Battletoads!
 - [Bonk](https://github.com/pema99/bonk), my functional ML-like toy language.
 - [Shader Knowledge](https://github.com/pema99/shader-knowledge), where I share VRChat specific shader trickery.
