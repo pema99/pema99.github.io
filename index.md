@@ -17,7 +17,7 @@ GitHub: [pema99](https://github.com/pema99)
 
 Twitter: [@pemathedev](https://twitter.com/pemathedev)
 
-Discord: Pema99#9042
+Discord: pema99
 
 VRChat: [pema99](https://vrchat.com/home/user/usr_d81127c8-e8cc-476b-b74d-0c17c0aeb6ff)
 
