@@ -9,7 +9,7 @@ pure mathematics. I'm currently working at Unity, on the light transport team.
 Check out [my stuff](https://github.com/pema99), if you want, and feel free to reach
 out on any socials.
 
-I also run a [blog](archive.md) and host my [Obsidian knowledge base](https://pema.dev/obsidian/math/light-transport/the-rendering-equation.html) on this domain.
+I also run a [blog](archive.md) and host my [personal notes](https://pema.dev/obsidian/math/light-transport/the-rendering-equation.html) on this domain.
 
 # Socials
 GitHub: [pema99](https://github.com/pema99)
