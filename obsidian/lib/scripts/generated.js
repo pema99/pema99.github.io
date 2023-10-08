@@ -1,1 +1,1 @@
-let nodes={paths:["math/light-transport/spherical-harmonics.html"],nodeCount:1,linkSources:[],linkTargets:[],labels:["Spherical Harmonics"],radii:[null],linkCount:0},attractionForce=1,linkLength=10,repulsionForce=150,centralForce=3,edgePruning=100
+let nodes={paths:["math/light-transport/spherical-integrals.html"],nodeCount:1,linkSources:[],linkTargets:[],labels:["Spherical integrals"],radii:[null],linkCount:0},attractionForce=1,linkLength=10,repulsionForce=150,centralForce=3,edgePruning=100
