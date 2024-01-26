@@ -33,6 +33,9 @@ I spend a lot of my time seeking out and reading through technical blogs. I real
 - [https://futhark-lang.org/blog.html](https://futhark-lang.org/blog.html)
   <br>Development blog for the Futhark language, a data-parallel functional language targeting GPUs.
 
+- [http://blog.vmchale.com/](http://blog.vmchale.com/)
+  <br>Array languages and functional programming galore.
+
 # Unity stuff
 - [https://bgolus.medium.com/](https://bgolus.medium.com/])
   <br>The KING of the Unity forums.
