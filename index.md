@@ -20,17 +20,15 @@ Discord: pema99
 
 VRChat: [pema99](https://vrchat.com/home/user/usr_d81127c8-e8cc-476b-b74d-0c17c0aeb6ff)
 
-# Currently working on
-- This website.
-- A path tracer, [rust-path-tracer](https://github.com/pema99/rust-path-tracer).
-
 # Noteworthy projects
 - [rust-path-tracer](https://github.com/pema99/rust-path-tracer), a GPU accelerated path tracer written entirely in Rust.
 - [Raytracer](https://github.com/pema99/Raytracer), an older but fairly fleshed out CPU-based path tracer.
 - [LotusNES](https://github.com/pema99/LotusNES), an NES emulator written in C#. It runs Battletoads!
+- [UnityShaderParser](https://github.com/pema99/UnityShaderParser), a parser and preprocessor library for HLSL and ShaderLab.
 - [Bonk](https://github.com/pema99/bonk), my functional ML-like toy language.
 - [Shader Knowledge](https://github.com/pema99/shader-knowledge), where I share VRChat specific shader trickery.
 - [glsl2hlsl](https://pema99.github.io/glsl2hlsl), a tool for converting ShaderToy shaders to working Unity shaders.
 - [Shaderception](https://github.com/pema99/Shaderception), a shader compiler and runtime that runs entirely within VRChat.
+- [SHTools](https://github.com/pema99/glsl2hlsl), a small library for manipulating Spherical Harmonics in Unity.
 - [A bunch of small stuff on ShaderToy](https://www.shadertoy.com/user/pema99)
 - [An ISPC backend for the Futhark language](https://futhark-lang.org/student-projects/ispc-bsc-thesis.pdf)

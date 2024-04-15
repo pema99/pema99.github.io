@@ -95,3 +95,6 @@ I spend a lot of my time seeking out and reading through technical blogs. I real
 
 - [https://psychopath.io/](https://psychopath.io/)
   <br>Blog about a path tracer. Lots of great in-depth articles on here.
+
+- [http://timjones.io/](http://timjones.io/)
+  <br>Shader and graphics guru.
