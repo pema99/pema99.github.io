@@ -22,7 +22,9 @@ public class Program
             string questionContent = question.Groups[1].Value.Trim()
                 .Replace("\r", "")
                 .Replace("\n", "\\n")
-                .Replace("\"", "\\\"");
+                .Replace("\"", "\\\"")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;");
 
             // Extract the answer
             var answer = Regex.Match(content, @"Answer: (.*)");
@@ -41,7 +43,9 @@ public class Program
             string explanationContent = explanation.Groups[1].Value.Trim()
                 .Replace("\r", "")
                 .Replace("\n", "\\n")
-                .Replace("\"", "\\\"");
+                .Replace("\"", "\\\"")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;");
 
             // Print JS
             sb.AppendLine("    {");
