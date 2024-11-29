@@ -3,7 +3,7 @@ const questions = [
         question: "using System;\n                    \npublic class Foo\n{\n    public override string ToString() { return \"0\"; }\n    public static implicit operator string(Foo f) { return \"1\"; }\n}\n\npublic class Program\n{\n    public static void Main()\n    {\n        Foo f = new Foo();\n        Console.Write(f);\n        Console.Write($\"{f}\");\n        Console.Write(f + \"\");\n        Console.Write((object)f);\n    }\n}",
         answer: "1010",
         explanation: "TODO",
-        hint: "String interpolation works on any type of object.",
+        hint: "TODO",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUAAkKOJJL1QGZ8N8AxAe3rwG89jL96A3AUzDACWcHtUwAGfABV6AZWCCoAcwAUASnzNqAdnwAiMboDc+AL5siHVJgBs+AQFsADgBsBAYwHBOjvgENg9GCiYsoM9PgAZuqaqDq6mEameGa45FQ0Vlos5oQY6DkaBcRhkfgAvPhQPADudIxqhkVEAML0UADO9M48AHQA6oLAPMpRjQSk+K0dXb0DnsMAJLrMESa6qmMTk22d3f2DwxH4iHrrmxNTu7MHysr0AEYAVjxuwKqjBSkmQA"
     },
     {
@@ -56,11 +56,46 @@ const questions = [
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINTMB2PAbz2PtPXTwEhbcHPyAGYgMwD2A4gF5iUCABtJAblYsAln2IAKQcIUBnHgEpiAYQFRNAyQFMAdAHUwC4GZUAibo51zcLRcrVDiW8QLAPMQCYOJSknqGxqaWNnYOjpiu7p5Kqup+2lCBwQCGUHDh0lFGJubWtvZO6Cny6T4a2qiYvKHFkQZlsZUJToR1HAwAvnjDQA=="
     },
     {
+        question: "using System;\n                    \npublic class Program\n{\n    interface IFoo\n    {\n        void Bar(int a = 1);\n    }\n    \n    public class Baz : IFoo\n    {\n        public void Bar(int a = 2) { Console.Write(a); }\n    }\n    \n    public static void Main()\n    {\n        new Baz().Bar();\n    }\n}",
+        answer: "2",
+        explanation: "TODO",
+        hint: "TODO",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUASEML1QGYACDSzAdjwG898BLKYAUzADMBDAY3bkAkgDEA9mKaMC+VABZyAIR5gAFK2Dke5ALzlMASgDc+JgF8mTMpXRKeAL3Ihh4yQWmFr8u2o1bd5OgG5PTkAMJiUADOYgA27AB0AOpgzByqPMbkFgQ5pgQY6FJM+FDsAO529qoGCcpqxuZ4ZkA==="
+    },
+    {
+        question: "using System;\n                    \npublic class Program\n{\n    struct Foo : IDisposable\n    {\n        public int id;\n        \n        public void Dispose()\n        {\n            if (this.id != 0)\n            {\n                Console.Write(\"0\");\n            }\n            this.id = 0;\n        }\n    }\n    \n    public static void Main()\n    {\n        var baz = new Foo();\n        baz.id = 1;\n        \n        using (var boo = ((IDisposable)baz))\n        {\n            Console.Write(((Foo)boo).id);\n        }\n        Console.Write(baz.id);\n    }\n}",
+        answer: "101",
+        explanation: "TODO",
+        hint: "TODO",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUASEML1QGYACDSzAdjwG898BnYSAY2HIDEB7X8iHIBJACIBLZgAdezAIYAjADYBTJowL4y5cVC7i4Abib4T21ABZyE6bJUAKAJQmNRcQDNy94AAtJAOgNyAEIAXnIABmdNfFciAGFeKGZeVX8AdTBxYAcAIgjcx2MYgF8TfF8AoPCI4sIyggbTAgx0dRMANzkwcgU5AC9ycKgVAHcefic6/D7+wLgh8kxpswivLp6FfkX7ezFJGXllFUdZx2jCOPxE5NSVDKyc3fs+XlP+R3mikybrpJS0plsg5Zl86g0SkA"
+    },
+    {
+        question: "using System;\nusing System;\n\nclass Program\n{\n    public static bool GetNum(bool useDecimal, out object val)\n    {\n        if (useDecimal)\n        {\n            val = 1M;\n            return true;\n        }\n        else\n        {\n            val = 2;\n            return false;\n        }\n    }\n    \n    public static void Main()\n    {\n        try\n        {\n            object result;\n            bool isDecimal = GetNum(true, out result);\n            decimal amount = (decimal)(isDecimal ? result : 0);\n            Console.Write(amount);\n            \n            isDecimal = GetNum(false, out result);\n            amount = (decimal)(isDecimal ? result : 0);\n            Console.Write(amount);\n        }\n        catch\n        {\n            Console.Write(\"3\");\n        }\n    }\n}",
+        answer: "13",
+        explanation: "TODO",
+        hint: "TODO",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUHjAAlUwHY8BvPASFQGZjMA2QgIwHt2AbQgcQFNgAOQgBbABQduhCAGd+AEX4BjAJaiAhlxiF2EYLtYArFQYBuWgJQ0quatVUAzQuLmKV6qzWq371CzwAvISYALIA3N60pITAkPyRdtQAvt78XPLevvYBhMHoiX6oMY5a8oUpNKl2eIR1xOjotfXZcQCeWVHsxqaEYPyyEFzAFdRSPKqySmqaQXyCIhJxEPw6egb9g8OWo3Aes4QaonpQBsHiezNW4pPTnjwA/H0DQwYghAAMO1EAwuxQsm4/AAdAB1MCqYD8cRHE7Ab5JahRW77LR5ebCMTiUoZVa6fTPLbw0aw6BnFyXe6WG5TVGPQmvQjvL6jP4AoFgiFQmHHMkI+zVezKDTAZQAC06iLZgK4IPBkOhACI6IqdkiktV6oRqskgA=="
+    },
+    {
+        question: "using System;\n\npublic interface Up&lt;U&gt;\n{\n    void Bar(U i);\n    void Bar(int i);\n}\n\npublic interface Down&lt;U&gt;\n{\n    void Bar(int i);\n    void Bar(U i);\n}\n\npublic class Foo : Up&lt;int&gt;, Down&lt;int&gt; \n{\n    void Up&lt;int&gt;.Bar(int i) { Console.Write(\"0\"); }\n    void Down&lt;int&gt;.Bar(int i) { Console.Write(\"1\"); }\n    public void Bar(int i) { Console.Write(\"2\"); }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Foo foo = new Foo();\n        ((Up&lt;int&gt;)foo).Bar(0);\n        ((Down&lt;int&gt;)foo).Bar(0);\n    }\n}",
+        answer: "21",
+        explanation: "TODO",
+        hint: "TODO",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBLKYAUzADMBDAY0uIFUAHAHhYD48BvPMSHFUAFmIAhOmAAULMgEoA3IOFjJ0meWCKVuAL54CJbdXpNiAEQD2AdyhdeuAbmEjxU2dt2qh6z3I+Bka4RCLoxABi1tbEIKyc2twwVnYOScT8vu4JHEkAdAHepArEfMQAwtZQAM7WADaU+QDqYKRUMgBEAAydysSGrmriNvZ5FNyFmsWl5VW1DU2t7ZRdmH1KA9lh/tMUimWV1XWNLW0dnegbW8H4oRGomADsWUN+mABsOQCydOQyCmyLjcbmisRoMWIAF5iFBKLYojEAXoQcIZHJEhMFBDrAoprJuspsm50aN0licXiAoSUcJBvogA="
+    },
+    {
         question: "using System;\n\npublic class Foo&lt;T&gt;\n{\n    public void Bar() { Console.Write(\"0\"); }\n}\n\npublic static class FooExt\n{\n    public static void Bar&lt;T&gt;(this Foo&lt;T&gt; foo) { Console.Write(\"1\"); }\n}\n\npublic class Program\n{	\n    public static void Main()\n    {\n        Foo&lt;int&gt; f = new Foo&lt;int&gt;();\n        f.Bar();\n    }\n}",
         answer: "0",
         explanation: "TODO",
         hint: "TODO",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINiAxAe0oB4AVAPjwG89j3STUAWYgIQCGYABQBKYs2IBhSlADOlADYBTAHQB1MAEtgy4QCIADPtEBuYgF88V/LiKlMANlLoK1AKIAPYCzYd7qE6kvIJg9AzCwAAWWnJutIzEAGbU4pIy8kpqmjp6+pgm5jY2BFyugQDsLACQfuwY6HUSTRzxNFpQwAzJxAC8xFDKAO5tHV1ipi0cSaqhE03FQA==="
+    },
+    {
+        question: "using System;\n\npublic struct Foo : IDisposable\n{\n    public int a;\n    \n    public void Dispose()\n    {\n        a++;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var foo = new Foo();\n        \n        using (var bar = foo)\n        {\n            using (var baz = bar)\n            {\n                Console.Write(baz.a);\n            }\n            Console.Write(bar.a);\n        }\n        Console.Write(foo.a);\n    }\n}",
+        answer: "000",
+        explanation: "TODO",
+        hint: "TODO",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7e4kYgSQBEBLUgB3tICGAIwA2AUzwBvPAEgixTlBoCA3LNnzUAFmJde/MQAoAlLOm4ZMgYkRqLAXzyP8uDMVSYA7FLzE/7zAA2dx0AWQFFE19/c3844gA3ATBiADNGYgBeYigxAHc6RhM7eP9ZOQAGYkMklKFkrLTGUwsZc0tK6trieoAvRvqwFo72joBheihSenEAOgB1ME5gIz7ZgWM7Dudxyem5xeXV5PXN8p2ZCamZsQWllcN0+lOS/2d7IA"
     },
     {
         question: "using System;\nusing System.Collections;\n\npublic class Foo : IEnumerable\n{\n    IEnumerator IEnumerable.GetEnumerator()\n    {\n        return new int[] { 0 }.GetEnumerator();\n    }\n\n    public IEnumerator GetEnumerator()\n    {\n        return new int[] { 1 }.GetEnumerator();\n    }\n}\n\npublic class Program\n{	\n    public static void Main()\n    {\n        foreach (var f in new Foo())\n            Console.Write(f);\n        \n        foreach (var f in (IEnumerable)new Foo())\n            Console.Write(f);\n    }\n}",
