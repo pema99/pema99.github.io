@@ -65,11 +65,11 @@ document.getElementById("button-hint").addEventListener("click", function() {
 });
 
 document.getElementById("button-skip").addEventListener("click", function() {
-    window.location.href = `?num=${Math.floor(Math.random() * questions.length)}`;
+    window.location.href = `?num=${pickRandomQuestion()}`;
 });
 
 document.getElementById("button-next").addEventListener("click", function() {
-    window.location.href = `?num=${Math.floor(Math.random() * questions.length)}`;
+    window.location.href = `?num=${pickRandomQuestion()}`;
 });
 
 document.getElementById("code-box").innerHTML = questions[num].question;
