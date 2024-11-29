@@ -1,10 +1,10 @@
 const questions = [
     {
-        question: "using System;\n                    \npublic class Foo\n{\n    public override string ToString() { return \"0\"; }\n    public static implicit operator string(Foo f) { return \"1\"; }\n}\n\npublic class Program\n{\n    public static void Main()\n    {\n        Foo f = new Foo();\n        Console.Write(f);\n        Console.Write($\"{f}\");\n        Console.Write(f + \"\");\n    }\n}",
-        answer: "101",
+        question: "using System;\n                    \npublic class Foo\n{\n    public override string ToString() { return \"0\"; }\n    public static implicit operator string(Foo f) { return \"1\"; }\n}\n\npublic class Program\n{\n    public static void Main()\n    {\n        Foo f = new Foo();\n        Console.Write(f);\n        Console.Write($\"{f}\");\n        Console.Write(f + \"\");\n        Console.Write((object)f);\n    }\n}",
+        answer: "1010",
         explanation: "TODO",
         hint: "String interpolation works on any type of object.",
-        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUASEML1QGYACDcgMQHta8BvPfM82gNwFMwwBLOF0qYADOQAqtAMrB+UAOYAKAJTlGlAOzkARCO0BucgF8WbVJgBs5PgFsADgBs+AYz7B2dngENgtMMJFFOlpyADNVdVQtbUwDYzwTXBIKKnMNJlN0dBZmAnxgsPIAXnIoLgB3GnoVfRZ8AGFaKABnWgcuADoAdX5gLkVw2rzGlrbOnrd+gBJtRlCjbWUhwhHW9u7e/tDyRB1F5cSjIA="
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUAAkKOJJL1QGZ8N8AxAe3rwG89jL96A3AUzDACWcHtUwAGfABV6AZWCCoAcwAUASnzNqAdnwAiMboDc+AL5siHVJgBs+AQFsADgBsBAYwHBOjvgENg9GCiYsoM9PgAZuqaqDq6mEameGa45FQ0Vlos5oQY6DkaBcRhkfgAvPhQPADudIxqhkVEAML0UADO9M48AHQA6oLAPMpRjQSk+K0dXb0DnsMAJLrMESa6qmMTk22d3f2DwxH4iHrrmxNTu7MHysr0AEYAVjxuwKqjBSkmQA"
     },
     {
         question: "using System;\n\npublic class Foo&lt;T&gt; { }\n\npublic static class FooExt\n{\n    public static void Bar(this Foo&lt;int&gt; foo) { Console.Write(\"0\"); }\n    public static void Bar&lt;T&gt;(this Foo&lt;T&gt; foo) { Console.Write(\"1\"); }\n}\n\npublic class Program\n{	\n    public static void Main()\n    {\n        Foo&lt;int&gt; f = new Foo&lt;int&gt;();\n        f.Bar();\n        Baz(f);\n    }\n        \n    public static void Baz&lt;T&gt;(Foo&lt;T&gt; f)\n    {\n        f.Bar();\n    }\n}",
