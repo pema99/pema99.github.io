@@ -73,3 +73,8 @@ document.getElementById("button-next").addEventListener("click", function() {
 });
 
 document.getElementById("code-box").innerHTML = questions[num].question;
+
+// Disable enter on the text box
+document.getElementById("form").addEventListener("submit", function(e) {
+    e.preventDefault();
+});
