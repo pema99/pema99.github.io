@@ -28,11 +28,11 @@ const questions = [
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7egZQomrwG89ifiAHMAEsAbgENgAU2KCoNSvWjAA3N15Fps4gEkolMBIC2EzQF4AfMUSJ5ilbgC+eAiQx1GAYQA2o0qU6qeARFxKRk5BVk7XmJ1MO1dfSNTCysbSLxHfFx1V1RMAHZ/XGiczAA2Yn1ROHooTwBPN2ZWamJRYhNiKAkAdwAKAEootRdyppYqGgAjDq7eweGePABIUoqqmrrGhnovH1JiSlnu/qGAmNGKnb3fYjhj+bOskvR0c65i6N53WtJ6TwkADoAOpCSR9USAnR6QzGYBPL7fX7/IGgwTgyHQxJwp7LZbnaI/KB/AEgsESPpTKEJWGyBGI4hEkmo8mU6kwpLwux4lbLJkosnoimUdnYumLL780lo8EirG0rm83lSllCvpwUUK+mIlWC8Ea+Wc7XETL2IA="
     },
     {
-        question: "using System;\n\npublic struct Foo\n{\n    public int num;\n    public void Set() =&gt; num = 1;\n}\n\npublic class Program\n{\n    public static void Bar(in Foo f)\n    {\n        f.Set();\n        Console.Write(f.num);\n    }\n    \n    public static void Baz(Foo f)\n    {\n        f.Set();\n        Console.Write(f.num);\n    }\n\n    static void Main()\n    {\n        Foo bar = new Foo();\n        Bar(bar);\n        Baz(bar);\n    }\n}",
+        question: "using System;\n\npublic struct Foo\n{\n    public int num;\n    public void Set() { num = 1; }\n}\n\npublic class Program\n{\n    public static void Bar(in Foo f)\n    {\n        f.Set();\n        Console.Write(f.num);\n    }\n    \n    public static void Baz(Foo f)\n    {\n        f.Set();\n        Console.Write(f.num);\n    }\n\n    static void Main()\n    {\n        Foo bar = new Foo();\n        Bar(bar);\n        Baz(bar);\n    }\n}",
         answer: "01",
         explanation: "TODO",
         hint: "TODO",
-        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7evAbzwEgjiBLKGqCALYBudp1QAWYgGUApsAAUASmIBeAHzF+A1cUwjcAXzwESGYqkwB2FnmJ3zpzADZzkgEIBDMPJ51GxADNFdlZcNjYAgDpZBUV9cIBheihSegAbGUiAdTAuYBl5KK049iMw0UcXCWJPAC95BnpA4LDQ8KiYpXi2JJT0zJy8gqLBErCy23sLKskAWQ8eJUm7NrZG4gAjLx0oGQB3P3ou9jZPby2wMfC6+Qux+2IygyA==="
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7evAbz2PeKOIEsoaoIAWwDcbDl1QAWYgGUApsAAUASmLNiAwcQC8xTMOIBfPMfy4J6TpgDsLMewmYAbJ2kAhAIZhFvOo2IAZsr2aiEcgQB08krKorjh4QDC9FCk9AA2chEA6mDcwHKKARGasSGm4SGOLlLEngBeigz0gcHxHKztCZHRKnHd7MmpGVm5+YXFpf0cplXOrsQAsh68KiGdA34tAEZeOhpyAO5bfWEcnt67YGVdCQ2KVzfhpoZAA"
     },
     {
         question: "using System;\n\npublic struct Foo\n{\n    public Foo()\n    {\n        Console.Write(\"0\");\n    }\n}\n\npublic class Program\n{\n    public static Foo bar;\n    public static Foo baz = new Foo();\n\n    public static void Main()\n    {\n        Foo bom = new Foo();\n    }\n}",
