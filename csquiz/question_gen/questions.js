@@ -16,30 +16,30 @@ const questions = [
     {
         question: "using System;\nusing System.Runtime.InteropServices;\n                    \npublic class Program\n{\n    public struct Empty { }\n    public struct OneByte { byte a; }\n    \n    public static int Size(object obj)\n    {\n        return Marshal.SizeOf(obj);\n    }\n    \n    public static void Main()\n    {\n        Console.Write(Marshal.SizeOf&lt;Empty&gt;());\n        Console.Write(Marshal.SizeOf&lt;OneByte&gt;());\n        Console.Write(Size(new OneByte()));\n    }\n}",
         answer: "111",
-        explanation: "In this question, we query the size in bytes of a few different objects.<br><br>In the first case, the size is 1 byte, because .NET has no zero-sized types, and 1 is the minimum.<br><br>In the second case, the size is again 1 byte, because the contains 1 byte, which meets the minimum size.<br><br>In the final case, the size is also 1 byte. Casting to object doesn't erase the type information, it just boxes the struct. <code>Marshal.TypeOf(object)</code> uses the runtime type information of the boxed struct to return the correct size. You can read more about boxing <a href=\"https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing\">on MSDN.</a>",
+        explanation: "In this question, we query the size in bytes of a few different objects.<br><br>In the first case, the size is 1 byte, because .NET has no zero-sized types, and 1 is the minimum.<br><br>In the second case, the size is again 1 byte, because the contains 1 byte, which meets the minimum size.<br><br>In the final case, the size is also 1 byte. Casting to object doesn't erase the type information, it just boxes the struct (copies it to the heap). <code>Marshal.TypeOf(object)</code> uses the runtime type information of the boxed struct to return the correct size. You can read more about boxing <a href=\"https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing\">on MSDN.</a>",
         hint: "In .NET, all objects implement a <code>GetType()</code> method. Also, there are no zero-sized types.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUKgBgAJVMA6AJWmAEsBbAUzIEkpgGwB7ABwGUOAbjQDGDAM4BuPAEhZsvKgDMJdCUwB2PAG9pMjOhlaZ0gMKcoYzgBsmAdTA12ACjE0AXg04AzJzTYBKfylcWTMLazsHZwBZAEMwMQALWKsyXncGAHkvAB4/YAA+J0Dg+RDTc0sbMntHBhcM7ycAI05rEuMwqsi6pziE5NT0j2yc1usijvLOyoiaqPrXDybhZLAp0Nnq2pj4pJS0jNHV+MmgmQBfPAugA==="
     },
     {
         question: "using System;\n\npublic struct FooStruct\n{\n    private int count;\n    public int Increment =&gt; ++count;\n}\n\npublic class FooClass\n{\n    private int count;\n    public int Increment =&gt; ++count;\n}\n\npublic class Program\n{\n    public static readonly FooStruct a = new();\n    public static FooStruct b = new();\n    \n    public static readonly FooClass c = new();\n    public static FooClass d = new();\n\n    public static void Main()\n    {\n        Console.Write(a.Increment);\n        Console.Write(a.Increment);\n        \n        Console.Write(b.Increment);\n        Console.Write(b.Increment);\n        \n        Console.Write(c.Increment);\n        Console.Write(c.Increment);\n        \n        Console.Write(d.Increment);\n        Console.Write(d.Increment);\n    }\n}",
         answer: "11121212",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "This question highlights a feature of C# called <a href=\"https://devblogs.microsoft.com/premier-developer/avoiding-struct-and-readonly-reference-performance-pitfalls-with-errorprone-net/\">defensive copy</a>, which ensures that mutations on value types referenced through read-only variables have no effect on the original value. <br><br>For the objects <code>b</code>, <code>c</code>, and <code>d</code>, defensive copy has no effect, as we either have a reference type (a class) or a mutable value type field (a struct), so we print \"12\".<br><br>However, for the object <code>a</code> defensive copy kicks in, as we are trying to mutate a read-only value type field. Thus, both evaluations of <code>a.Increment</code> make a copy of the original struct and mutate this copy. The result is printing \"11\".<br><br>In all cases, the original structs are zero-initialized.",
+        hint: "If we changed all <code>struct</code>s in the code to <code>class</code>es, the output of the program would change.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7egZQomrwG89ifiAHMAEsAbgENgAU2KCoNSvWjAA3N15Fps4gEkolMBIC2EzQF4AfMUSJ5ilbgC+eAiQx1GAYQA2o0qU6qeARFxKRk5BVk7XmJ1MO1dfSNTCysbSLxHfFx1V1RMAHZ/XGiczAA2Yn1ROHooTwBPN2ZWamJRYhNiKAkAdwAKAEootRdyppYqGgAjDq7eweGePABIUoqqmrrGhnovH1JiSlnu/qGAmNGKnb3fYjhj+bOskvR0c65i6N53WtJ6TwkADoAOpCSR9USAnR6QzGYBPL7fX7/IGgwTgyHQxJwp7LZbnaI/KB/AEgsESPpTKEJWGyBGI4hEkmo8mU6kwpLwux4lbLJkosnoimUdnYumLL780lo8EirG0rm83lSllCvpwUUK+mIlWC8Ea+Wc7XETL2IA="
     },
     {
         question: "using System;\n\npublic struct Foo\n{\n    public int num;\n    public void Set() { num = 1; }\n}\n\npublic class Program\n{\n    public static void Bar(in Foo f)\n    {\n        f.Set();\n        Console.Write(f.num);\n    }\n    \n    public static void Baz(Foo f)\n    {\n        f.Set();\n        Console.Write(f.num);\n    }\n\n    static void Main()\n    {\n        Foo bar = new Foo();\n        Bar(bar);\n        Baz(bar);\n    }\n}",
         answer: "01",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "This question highlights a feature of C# called <a href=\"https://devblogs.microsoft.com/premier-developer/avoiding-struct-and-readonly-reference-performance-pitfalls-with-errorprone-net/\">defensive copy</a>, which ensures that mutations on value types referenced through read-only variables have no effect on the original value. <br><br>In the function <code>Bar</code>, when we use <code>Set()</code> to mutate the input struct, a hidden copy of the struct is made, and this copy is what is mutated. Thus the first <code>Console.Write</code> prints 0. In the second case, this copy does not occur as the input is not read-only, so we print 1.<br><br>If <code>Foo</code> had been a reference type (a class) instead of a value type (a struct), this program would have printed \"11\".",
+        hint: "If we changed <code>Foo</code> from a <code>struct</code> to a <code>class</code>, the output of the program would change.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7evAbz2PeKOIEsoaoIAWwDcbDl1QAWYgGUApsAAUASmLNiAwcQC8xTMOIBfPMfy4J6TpgDsLMewmYAbJ2kAhAIZhFvOo2IAZsr2aiEcgQB08krKorjh4QDC9FCk9AA2chEA6mDcwHKKARGasSGm4SGOLlLEngBeigz0gcHxHKztCZHRKnHd7MmpGVm5+YXFpf0cplXOrsQAsh68KiGdA34tAEZeOhpyAO5bfWEcnt67YGVdCQ2KVzfhpoZAA"
     },
     {
-        question: "using System;\n\npublic struct Foo\n{\n    public Foo()\n    {\n        Console.Write(\"0\");\n    }\n}\n\npublic class Program\n{\n    public static Foo bar;\n    public static Foo baz = new Foo();\n\n    public static void Main()\n    {\n        Foo bom = new Foo();\n    }\n}",
-        answer: "0",
-        explanation: "TODO",
-        hint: "TODO",
-        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7evAbz2PeKLsYAoBKNh1a4Oo4gGF6UUvQA2AUwB0AdTABLYPJ4AiAAza+AbkHsAvnnP5cXDJ0wB2Fic4lUmAGzd6xAEYBDMGMRDhsPL18/AC9iAF5iKHkAdy9+IOcMdGdhMQ4Gbx96AFtY+KSUo2dLUyA==="
+        question: "using System;\n\npublic struct Foo\n{\n    public Foo()\n    {\n        Console.Write(\"0\");\n    }\n}\n\npublic class Program\n{\n    public static Foo bar;\n    public static Foo baz = new Foo();\n\n    public static void Main()\n    {\n        Foo bom = new Foo();\n        bom = bar;\n        bom = baz;\n    }\n}",
+        answer: "00",
+        explanation: "Parameterless struct constructors are a relatively new feature added in C# 10. They must be called explicitly to trigger, thus we only print \"0\" twice.",
+        hint: "Struct fields are zero-initialized by default.",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7evAbz2PeKLsYAoBKNh1a4Oo4gGF6UUvQA2AUwB0AdTABLYPJ4AiAAza+AbkHsAvnnP5cXDJ0wB2Fic4lUmAGzd6xAEYBDMGMRDhsPL18/AC9iAF5iKHkAdy9+IOcMdGdhMQ4Gbx96AFtY+KSUo2dRAuK4/0DKjmqS/0ig0UtTIA"
     },
     {
         question: "using System;\n\npublic class Program\n{\n    public static void Main()\n    {\n        string foo = null;\n        if (foo is string bar) Console.Write(\"0\");\n        if (foo is string) Console.Write(\"1\");\n        if (foo is null) Console.Write(\"2\");\n        if (foo is var baz) Console.Write(\"3\");\n    }\n}",
@@ -63,17 +63,17 @@ const questions = [
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUASEML1QGYACDSzAdjwG898BLKYAUzADMBDAY3bkAkgDEA9mKaMC+VABZyAIR5gAFK2Dke5ALzlMASgDc+JgF8mTMpXRKeAL3Ihh4yQWmFr8u2o1bd5OgG5PTkAMJiUADOYgA27AB0AOpgzByqPMbkFgQ5pgQY6FJM+FDsAO529qoGCcpqxuZ4ZkA==="
     },
     {
-        question: "using System;\n                    \npublic class Program\n{\n    struct Foo : IDisposable\n    {\n        public int id;\n        \n        public void Dispose()\n        {\n            if (this.id != 0)\n            {\n                Console.Write(\"0\");\n            }\n            this.id = 0;\n        }\n    }\n    \n    public static void Main()\n    {\n        var baz = new Foo();\n        baz.id = 1;\n        \n        using (var boo = ((IDisposable)baz))\n        {\n            Console.Write(((Foo)boo).id);\n        }\n        Console.Write(baz.id);\n    }\n}",
+        question: "using System;\n                    \npublic class Program\n{\n    struct Foo : IDisposable\n    {\n        public int id;\n        \n        public void Dispose()\n        {\n            if (this.id != 0)\n            {\n                Console.Write(\"0\");\n            }\n            this.id = 0;\n        }\n    }\n    \n    public static void Main()\n    {\n        var baz = new Foo();\n        baz.id = 1;\n        \n        using (baz)\n        {\n            Console.Write(baz.id);\n        }\n        \n        Console.Write(baz.id);\n    }\n}",
         answer: "101",
-        explanation: "TODO",
-        hint: "TODO",
-        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUASEML1QGYACDSzAdjwG898BnYSAY2HIDEB7X8iHIBJACIBLZgAdezAIYAjADYBTJowL4y5cVC7i4Abib4T21ABZyE6bJUAKAJQmNRcQDNy94AAtJAOgNyAEIAXnIABmdNfFciAGFeKGZeVX8AdTBxYAcAIgjcx2MYgF8TfF8AoPCI4sIyggbTAgx0dRMANzkwcgU5AC9ycKgVAHcefic6/D7+wLgh8kxpswivLp6FfkX7ezFJGXllFUdZx2jCOPxE5NSVDKyc3fs+XlP+R3mikybrpJS0plsg5Zl86g0SkA"
+        explanation: "The <code>using</code> statement will generate code that boxes the input struct before calling <code>Dispose</code>, by casting it to <code>IDisposable</code>. Boxing a struct involves copying it to the heap. Thus, a copy is disposed, not the original struct. The desugared program looks like this:<br><pre><code><br>Foo foo = default(Foo);<br>foo.id = 1; // foo.id == 1<br>Foo foo2 = foo; // foo2.id == 1<br>try<br>{<br>    Console.Write(foo.id); // print \"1\"<br>}<br>finally<br>{<br>    // a copy of foo2 is made and disposed<br>    // the dispose method prints \"0\"<br>    ((IDisposable)foo2).Dispose();<br>}<br>Console.Write(foo.id); // print \"1\", as foo.id was never modified<br></code></pre><br><br>Don't use <code>using</code> statements with disposable value types - it's a footgun.",
+        hint: "<code>using</code> statements <b>require</b> the operand to implement <code>IDisposable</code>.",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUASEML1QGYACDSzAdjwG898BnYSAY2HIDEB7X8iHIBJACIBLZgAdezAIYAjADYBTJowL4y5cVC7i4Abib4T21ABZyE6bJUAKAJQmNRcQDNy94AAtJAOgNyAEIAXnIABmdNfFciAGFeKGZeVX8AdTBxYAcAIgjcx2MYgF8TfF8AoPCI4sIyggbTAgx0dRMANzkwcgU5AC9ycKgVAHcefic6/D7+wLgh8kxpswivWejCOPxE5NSVDKyc+1n5opMG8ivrq5NdlLTM7IdTg3PGvBKgA="
     },
     {
         question: "using System;\nusing System;\n\nclass Program\n{\n    public static bool GetNum(bool useDecimal, out object val)\n    {\n        if (useDecimal)\n        {\n            val = 1M;\n            return true;\n        }\n        else\n        {\n            val = 2;\n            return false;\n        }\n    }\n    \n    public static void Main()\n    {\n        try\n        {\n            object result;\n            bool isDecimal = GetNum(true, out result);\n            decimal amount = (decimal)(isDecimal ? result : 0);\n            Console.Write(amount);\n            \n            isDecimal = GetNum(false, out result);\n            amount = (decimal)(isDecimal ? result : 0);\n            Console.Write(amount);\n        }\n        catch\n        {\n            Console.Write(\"3\");\n        }\n    }\n}",
         answer: "13",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "Every time the compiler encounters a ternary expression, it must determine the type of each branch, and these must match. The type of the branches is determined only using information in the ternary expression, nothing outside of it. On top of this, a 0 literal is by default an integer. Thus the choices for types of the branches in both ternary expressions is between <code>int</code> and <code>object</code>. Every <code>int</code> is convertible to object, but not vice-versa, so the compiler chooses <code>object</code>. The first ternary is equivalent to:<br><pre><code><br>decimal amount = (decimal)(isDecimal ? result : (object)((int)0));<br></code></pre> In the first ternary expression, <code>GetNum</code> returns a decimal, which is then boxed (copied to the heap) and casted to decimal. This works fine, so we print \"1\".<br><br>In the next ternary expression, <code>GetNum</code> returns a integer, but we take the false-branch of the ternary, which returns a boxed integer. There is no unboxing conversion from integer to decimal, so this throws an invalid cast exception, and we print \"3\".<br><br>More info on <a href=\"https://learn.microsoft.com/en-us/archive/blogs/ericlippert/representation-and-identity\">boxing here</a>, and on <a href=\"https://learn.microsoft.com/en-us/archive/blogs/ericlippert/cast-operators-do-not-obey-the-distributive-law\">this specific program here</a>.",
+        hint: "Both branches of a ternary expression must evaluate to the same type.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUHjAAlUwHY8BvPASFQGZjMA2QgIwHt2AbQgcQFNgAOQgBbABQduhCAGd+AEX4BjAJaiAhlxiF2EYLtYArFQYBuWgJQ0quatVUAzQuLmKV6qzWq371CzwAvISYALIA3N60pITAkPyRdtQAvt78XPLevvYBhMHoiX6oMY5a8oUpNKl2eIR1xOjotfXZcQCeWVHsxqaEYPyyEFzAFdRSPKqySmqaQXyCIhJxEPw6egb9g8OWo3Aes4QaonpQBsHiezNW4pPTnjwA/H0DQwYghAAMO1EAwuxQsm4/AAdAB1MCqYD8cRHE7Ab5JahRW77LR5ebCMTiUoZVa6fTPLbw0aw6BnFyXe6WG5TVGPQmvQjvL6jP4AoFgiFQmHHMkI+zVezKDTAZQAC06iLZgK4IPBkOhACI6IqdkiktV6oRqskgA=="
     },
     {
@@ -96,6 +96,13 @@ const questions = [
         explanation: "TODO",
         hint: "TODO",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBnYSAY2GIDEB7e4kYgSQBEBLUgB3tICGAIwA2AUzwBvPAEgixTlBoCA3LNnzUAFmJde/MQAoAlLOm4ZMgYkRqLAXzyP8uDMVSYA7FLzE/7zAA2dx0AWQFFE19/c3844gA3ATBiADNGYgBeYigxAHc6RhM7eP9ZOQAGYkMklKFkrLTGUwsZc0tK6trieoAvRvqwFo72joBheihSenEAOgB1ME5gIz7ZgWM7Dudxyem5xeXV5PXN8p2ZCamZsQWllcN0+lOS/2d7IA"
+    },
+    {
+        question: "using System;\n\npublic class Foo\n{\n    public static int count;\n    public Foo() { count++; }\n}\n\npublic class Program\n{\n    public static Foo baz = new Foo();\n    \n    public static void Main()\n    {\n        new Program();\n\n        new Foo();\n        \n        Console.Write(Foo.count);\n    }\n}",
+        answer: "1",
+        explanation: "If none of the static fields in a type are used, no static field initializer will be executed for that type. We do use <code>Program</code> on the first line of <code>Main</code>, but we never refer to any static fields, so the program prints \"1\". If we had written something like <code>baz = baz;</code>, the program would print \"2\".",
+        hint: "When exactly are static fields initialized?",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINiAxAe0rwG89jHSTVMA2YgSymGIGNK0YAG4GTIhWoAKAJTFa/QT0SJhxAL55N+XBLKsA7HTGM97SZWIAjAIYAvYgF5iUAKYB3C7NG4mxE6To6AH0vn5Mbp5UlN4BfnFMAMKUUADOlAA2rgB0AOpgnMCuUtHZAkIyPn7a6kA="
     },
     {
         question: "using System;\nusing System.Collections;\n\npublic class Foo : IEnumerable\n{\n    IEnumerator IEnumerable.GetEnumerator()\n    {\n        return new int[] { 0 }.GetEnumerator();\n    }\n\n    public IEnumerator GetEnumerator()\n    {\n        return new int[] { 1 }.GetEnumerator();\n    }\n}\n\npublic class Program\n{	\n    public static void Main()\n    {\n        foreach (var f in new Foo())\n            Console.Write(f);\n        \n        foreach (var f in (IEnumerable)new Foo())\n            Console.Write(f);\n    }\n}",
@@ -121,15 +128,15 @@ const questions = [
     {
         question: "using System;\n\npublic class Program\n{\n    public static void Main()\n    {\n        Console.Write((int)Math.Round(-0.5));\n        Console.Write((int)Math.Round(0.5));\n        Console.Write((int)Math.Round(1.5));\n    }\n}",
         answer: "002",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "C# uses the rounding mode <a href=\"https://learn.microsoft.com/en-us/dotnet/api/system.midpointrounding?view=net-9.0#system-midpointrounding-toeven\"><code>MidpointRounding.ToEven</code></a> by default, also known as Banker's rounding. Midpoint values are rounded to the nearest even number.",
+        hint: "The question is asking about the default rounding mode used by C#. The answer is strange but not uncommon.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINTMB2PAbzwEgN17bc66BhAeygGdOAbAKYA6AOpgAlsEEAKGRKjAAlAFkAhsAAWwgEqdocGQFoADMICsSpQG56HbnyFjJ0uQuXqtu/VENnLNnZcvAIi4lKy8oqqGtp6BjKYFla2rAC+eGlAA="
     },
     {
         question: "using System;\n                    \npublic class Program\n{\n    public enum Foo { A = 1, B = 2 }\n    \n    public static void Bar(Foo a) { Console.Write(\"0\"); }\n    public static void Bar(object a) { Console.Write(\"1\"); }\n    \n    public static void Main()\n    {\n        Bar(0);\n        Bar(1);\n        Bar((object)(Foo.A));\n    }\n}",
         answer: "011",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "This is a quirk of the language. There is always an implicit conversion from 0 (and only 0) to any enum. The specs' section 6.1.3 says \"An implicit enumeration conversion permits the decimal-integer-literal 0 to be converted to any enum-type and to any nullable-type whose underlying type is an enum-type\". Therefore, the first statement picks the enum-typed overload of <code>Bar</code>, and 2 next statements picks the object-typed overload.",
+        hint: "0 is a special case for enum conversion.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUASEML1QGYACDSzAdjwG898zyBTKCAW3IDEB7PuXrkAguQC85TDHIAhCeXTkAvkyYtUmAGyUALHICGYABT9BBgJRDyAYT5QAznwA2rAHQB1MAEtgrYwBEAAwBFgDcKuoUmjqo+rJGxnwARgBWrADGwOSW1naOLu5evv4BmKERqgTq6OhMjAT4CSZB4UxNiZhtjc3GSWmZwBamAm4iFt34VcpAA=="
     },
     {
@@ -142,8 +149,8 @@ const questions = [
     {
         question: "using System;\nusing System.Runtime.InteropServices;\n                    \npublic class Program\n{	\n    public static void Main()\n    {\n        Console.Write(sizeof(int));\n        Console.Write(Marshal.SizeOf&lt;int&gt;());\n        \n        Console.Write(sizeof(bool));\n        Console.Write(Marshal.SizeOf&lt;bool&gt;());\n        \n        Console.Write(sizeof(char));\n        Console.Write(Marshal.SizeOf&lt;char&gt;());\n    }\n}",
         answer: "441421",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "<code>sizeof(int)</code> and <code>Marshal.SizeOf&lt;int&gt;()</code> both return 4, nothing strange going on there.<br><br><code>sizeof(bool)</code> returns 1 as C# uses 1-byte bools. <code>Marshal.SizeOf&lt;bool&gt;()</code> returns 4 as booleans don't generally have a well-established fixed size in native code. 4 is chosen as a decent default as WinAPI, one of the main uses for P/Invoke, uses 4-byte booleans.<br><br><code>sizeof(char)</code> returns 2 because C# uses UTF-16 characters and string, and <code>Marshal.SizeOf&lt;char&gt;()</code> returns 1 because a C-style ASCII character is assumed.",
+        hint: "The <code>sizeof</code> operator returns the C#-native size in bytes of a type. <code>Marshal.SizeOf</code> returns the size in bytes for the purposes of marshalling data, such as when calling into native code.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUKgBgAJVMA6AJWmAEsBbAUzIEkpgGwB7ABwGUOAbjQDGDAM4BuPAEhZsvKgDMJdCUwB2PAG9pMjOhlaZ0gMKcoYzgBsmAdTA12ACjE0AXg04AzJzTYBKfylcWTMLazsHZwBZAEMwMQALWKsyXncGAHkvAB4/YAA+J0Dg+RDTc0sbMntHBhcM7ycAI05rEuMwqsi6pziE5NT0j2yc1usijvLOyoiaqPrXDybhZLAp0Nnq2pj4pJS0jNHV+MmgmQBfPAugA==="
     },
 ];
