@@ -42,10 +42,8 @@ public class Program
             var explanation = Regex.Match(content, @"(?s)Explanation:\w*(.*)");
             string explanationContent = explanation.Groups[1].Value.Trim()
                 .Replace("\r", "")
-                .Replace("\n", "\\n")
-                .Replace("\"", "\\\"")
-                .Replace("<", "&lt;")
-                .Replace(">", "&gt;");
+                .Replace("\n", "<br>")
+                .Replace("\"", "\\\"");
 
             // Print JS
             sb.AppendLine("    {");

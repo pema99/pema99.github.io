@@ -2,22 +2,22 @@ const questions = [
     {
         question: "using System;\n                    \npublic class Foo\n{\n    public override string ToString() { return \"0\"; }\n    public static implicit operator string(Foo f) { return \"1\"; }\n}\n\npublic class Program\n{\n    public static void Main()\n    {\n        Foo f = new Foo();\n        Console.Write(f);\n        Console.Write($\"{f}\");\n        Console.Write(f + \"\");\n        Console.Write((object)f);\n    }\n}",
         answer: "1010",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "The class <code>Foo</code> defines 2 members - a <code>ToString()</code> method and an implicit conversion to string. The question is about which of the these is preferred in different cases.<br><br>In the first case, the implicit conversion is preferred because <code>Console.Write()</code> has an overload that takes a string. There also happens to be an overload taking <code>object</code>, but when resolving function overloads, the overload with the most specific types (string) is chosen.<br><br>In the second case, we are using string interpolation. String interpolation works with any object, and has a few rules for how the conversion is done. If we pass a custom formatter, that is used. Next, if the type implements <code>IFormattable</code>, that is used. Finally, we fall back to the <code>ToString()</code> method, which is guaranteed to exist for any object.<br><br>In the third case, the implicit conversion is used again. There is no addition operator between <code>Foo</code> and string, so the only thing the language can do to resolve this is cast one side to string.<br><br>In the final case, we explicitly cast to object. Now the operand exactly matches the overload of <code>Console.Write()</code> that takes an <code>object</code>. The only way to convert any <code>object</code> to a string is via its <code>ToString()</code> method.",
+        hint: "In .NET, all objects have a <code>ToString()</code> method. String interpolation works with any type.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUAAkKOJJL1QGZ8N8AxAe3rwG89jL96A3AUzDACWcHtUwAGfABV6AZWCCoAcwAUASnzNqAdnwAiMboDc+AL5siHVJgBs+AQFsADgBsBAYwHBOjvgENg9GCiYsoM9PgAZuqaqDq6mEameGa45FQ0Vlos5oQY6DkaBcRhkfgAvPhQPADudIxqhkVEAML0UADO9M48AHQA6oLAPMpRjQSk+K0dXb0DnsMAJLrMESa6qmMTk22d3f2DwxH4iHrrmxNTu7MHysr0AEYAVjxuwKqjBSkmQA"
     },
     {
-        question: "using System;\n\npublic class Foo&lt;T&gt; { }\n\npublic static class FooExt\n{\n    public static void Bar(this Foo&lt;int&gt; foo) { Console.Write(\"0\"); }\n    public static void Bar&lt;T&gt;(this Foo&lt;T&gt; foo) { Console.Write(\"1\"); }\n}\n\npublic class Program\n{	\n    public static void Main()\n    {\n        Foo&lt;int&gt; f = new Foo&lt;int&gt;();\n        f.Bar();\n        Baz(f);\n    }\n        \n    public static void Baz&lt;T&gt;(Foo&lt;T&gt; f)\n    {\n        f.Bar();\n    }\n}",
+        question: "using System;\n\npublic class Foo&lt;T&gt; { }\n\npublic static class FooExt\n{\n    public static void Bar(this Foo&lt;int&gt; foo) { Console.Write(\"0\"); }\n    public static void Bar&lt;T&gt;(this Foo&lt;T&gt; foo) { Console.Write(\"1\"); }\n}\n\npublic class Program\n{\n    public static void Main()\n    {\n        Foo&lt;int&gt; f = new Foo&lt;int&gt;();\n        f.Bar();\n        Baz(f);\n    }\n        \n    public static void Baz&lt;T&gt;(Foo&lt;T&gt; f)\n    {\n        f.Bar();\n    }\n}",
         answer: "01",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "<code>FooExt</code> defines 2 overloaded extension methods on <code>Foo&lt;T&gt;</code>. The question is about which overload is chosen in 2 different cases. Extension method overloads are resolved entirely at compile time, and the resolution algorithm always prefers the overload with the most concrete/specific type. <br><br>In the first case, we know at compile time that we have <code>Foo&lt;int&gt;</code>. <code>Foo&lt;int&gt;</code> is more specific than <code>Foo&lt;T&gt;</code>, so we pick that corresponding overload.<br><br>In the second case, looking at the body of <code>Baz</code>, the only information the function has at compile time is that the input is of type <code>Foo&lt;T&gt;</code>, so there is only one possible choice of overload. In C#, generics are a feature of the runtime - they are not monomorphized.",
+        hint: "Resolution of overloaded extension methods is done entirely at compile time.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINiAxAe0oB4AVAPmIG9iBfPAk1TANlPQVqAUQAewPMzwBIIqT6kALMQBCAQzAAKYAAsAlgGchtPVGBMAZtQCULYgGFKUA5QA2AUwB0AdTB7g7poARAAMQdYA3Owycjz8qMrqYPQM2vpGVLSMxFaUtqyOzm5evv6BQZjhURy4NVwC8gDsktIx6OgyUrjS0pk0puY5xAC8xFDuAO7G/WapkTLSFp5JmvPd0uoAXpoWa9I1PTHcCgmqapspmn3Zu50LSyt7NWxAA"
     },
     {
         question: "using System;\nusing System.Runtime.InteropServices;\n                    \npublic class Program\n{\n    public struct Empty { }\n    public struct OneByte { byte a; }\n    \n    public static int Size(object obj)\n    {\n        return Marshal.SizeOf(obj);\n    }\n    \n    public static void Main()\n    {\n        Console.Write(Marshal.SizeOf&lt;Empty&gt;());\n        Console.Write(Marshal.SizeOf&lt;OneByte&gt;());\n        Console.Write(Size(new OneByte()));\n    }\n}",
         answer: "111",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "In this question, we query the size in bytes of a few different objects.<br><br>In the first case, the size is 1 byte, because .NET has no zero-sized types, and 1 is the minimum.<br><br>In the second case, the size is again 1 byte, because the contains 1 byte, which meets the minimum size.<br><br>In the final case, the size is also 1 byte. Casting to object doesn't erase the type information, it just boxes the struct. <code>Marshal.TypeOf(object)</code> uses the runtime type information of the boxed struct to return the correct size. You can read more about boxing <a href=\"https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing\">on MSDN.</a>",
+        hint: "In .NET, all objects implement a <code>GetType()</code> method. Also, there are no zero-sized types.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUKgBgAJVMA6AJWmAEsBbAUzIEkpgGwB7ABwGUOAbjQDGDAM4BuPAEhZsvKgDMJdCUwB2PAG9pMjOhlaZ0gMKcoYzgBsmAdTA12ACjE0AXg04AzJzTYBKfylcWTMLazsHZwBZAEMwMQALWKsyXncGAHkvAB4/YAA+J0Dg+RDTc0sbMntHBhcM7ycAI05rEuMwqsi6pziE5NT0j2yc1usijvLOyoiaqPrXDybhZLAp0Nnq2pj4pJS0jNHV+MmgmQBfPAugA==="
     },
     {
@@ -44,8 +44,8 @@ const questions = [
     {
         question: "using System;\n\npublic class Program\n{\n    public static void Main()\n    {\n        string foo = null;\n        if (foo is string bar) Console.Write(\"0\");\n        if (foo is string) Console.Write(\"1\");\n        if (foo is null) Console.Write(\"2\");\n        if (foo is var baz) Console.Write(\"3\");\n    }\n}",
         answer: "23",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "In this question we pattern match on a null-valued string with 4 different patterns.<br><br>The first 2 patterns do not match, as pattern matching on a speficic type always inserts an implicit null-check. <br><br>The third pattern matches because foo is, in fact, null. <br><br>The final pattern also matches, because <code>var</code> patterns are special and match any value, including null. <code>var</code> patterns are not super useful in isolation, but can be combined with other patterns, like so:<br><pre><code class=\"language-csharp\"><br>public struct Foo<br>{<br>    public string bar;<br>}<br><br>static void Main()<br>{<br>    var foo = new Foo();<br>    if (foo is Foo { bar: var boo })<br>    {<br>        ...<br>    }<br>}<br></code></pre>",
+        hint: "Pattern matching on a <b>specific</b> type inserts an implicit null-check.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINTMB2PAbz2PtPXTodtwY/IAZiAzAe37EAvMSgQANhIDcLTsQCWvYgAoBQhQGduxAEYBDMAEpiAYX5RN/CQFMAdAHUwC4DZUAiLu6Oz28xcpqgoraqJhcJuaW1vZOLm7umN6+/gGq6iFikhKRFla2js6uHujJcpxK6cFaxABuhnr6AF650QVxxe6EZX70AL54fUA="
     },
     {
@@ -58,8 +58,8 @@ const questions = [
     {
         question: "using System;\n                    \npublic class Program\n{\n    interface IFoo\n    {\n        void Bar(int a = 1);\n    }\n    \n    public class Baz : IFoo\n    {\n        public void Bar(int a = 2) { Console.Write(a); }\n    }\n    \n    public static void Main()\n    {\n        new Baz().Bar();\n    }\n}",
         answer: "2",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "Default parameter values on interfaces are bit special. They are not enforced on implementors, so the only time they are relevant is when you are calling a method directly on an interface type, like so:<br><pre><code><br>IFoo foo = new Baz();<br>foo.Bar(); // Prints 1<br></code></pre>",
+        hint: "Think about what would happen if we were implementing multiple interfaces that define the same method, but with different default parameters.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUASEML1QGYACDSzAdjwG898BLKYAUzADMBDAY3bkAkgDEA9mKaMC+VABZyAIR5gAFK2Dke5ALzlMASgDc+JgF8mTMpXRKeAL3Ihh4yQWmFr8u2o1bd5OgG5PTkAMJiUADOYgA27AB0AOpgzByqPMbkFgQ5pgQY6FJM+FDsAO529qoGCcpqxuZ4ZkA==="
     },
     {
@@ -84,10 +84,10 @@ const questions = [
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAIBLKYAUzADMBDAY0uIFUAHAHhYD48BvPMSHFUAFmIAhOmAAULMgEoA3IOFjJ0meWCKVuAL54CJbdXpNiAEQD2AdyhdeuAbmEjxU2dt2qh6z3I+Bka4RCLoxABi1tbEIKyc2twwVnYOScT8vu4JHEkAdAHepArEfMQAwtZQAM7WADaU+QDqYKRUMgBEAAydysSGrmriNvZ5FNyFmsWl5VW1DU2t7ZRdmH1KA9lh/tMUimWV1XWNLW0dnegbW8H4oRGomADsWUN+mABsOQCydOQyCmyLjcbmisRoMWIAF5iFBKLYojEAXoQcIZHJEhMFBDrAoprJuspsm50aN0licXiAoSUcJBvogA="
     },
     {
-        question: "using System;\n\npublic class Foo&lt;T&gt;\n{\n    public void Bar() { Console.Write(\"0\"); }\n}\n\npublic static class FooExt\n{\n    public static void Bar&lt;T&gt;(this Foo&lt;T&gt; foo) { Console.Write(\"1\"); }\n}\n\npublic class Program\n{	\n    public static void Main()\n    {\n        Foo&lt;int&gt; f = new Foo&lt;int&gt;();\n        f.Bar();\n    }\n}",
+        question: "using System;\n\npublic class Foo&lt;T&gt;\n{\n    public void Bar() { Console.Write(\"0\"); }\n}\n\npublic static class FooExt\n{\n    public static void Bar&lt;T&gt;(this Foo&lt;T&gt; foo) { Console.Write(\"1\"); }\n}\n\npublic class Program\n{\n    public static void Main()\n    {\n        Foo&lt;int&gt; f = new Foo&lt;int&gt;();\n        f.Bar();\n    }\n}",
         answer: "0",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "The question is asking which method is preferred if you have an extension method and inherent method that are equally good choices. In this case, the inherent method is preferred, as it is considered more specific. <br><br>Eric Lippert describes the behavior by describing a <a href=\"https://ericlippert.com/2013/12/23/closer-is-better/\">\"closeness\" heuristic</a>.",
+        hint: "The various mechanisms in C# that resolve ambiguity tend to prefer the most specific/concrete choice.",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINiAxAe0oB4AVAPjwG89j3STUAWYgIQCGYABQBKYs2IBhSlADOlADYBTAHQB1MAEtgy4QCIADPtEBuYgF88V/LiKlMANlLoK1AKIAPYCzYd7qE6kvIJg9AzCwAAWWnJutIzEAGbU4pIy8kpqmjp6+pgm5jY2BFyugQDsLACQfuwY6HUSTRzxNFpQwAzJxAC8xFDKAO5tHV1ipi0cSaqhE03FQA==="
     },
     {
@@ -100,9 +100,9 @@ const questions = [
     {
         question: "using System;\nusing System.Collections;\n\npublic class Foo : IEnumerable\n{\n    IEnumerator IEnumerable.GetEnumerator()\n    {\n        return new int[] { 0 }.GetEnumerator();\n    }\n\n    public IEnumerator GetEnumerator()\n    {\n        return new int[] { 1 }.GetEnumerator();\n    }\n}\n\npublic class Program\n{	\n    public static void Main()\n    {\n        foreach (var f in new Foo())\n            Console.Write(f);\n        \n        foreach (var f in (IEnumerable)new Foo())\n            Console.Write(f);\n    }\n}",
         answer: "10",
-        explanation: "TODO",
-        hint: "TODO",
-        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINiAxAe0oB4AVAPjwG89j3STUAWYgIQCGYABQBKYs2IBhSlADOlADYBTAHQB1MAEtgy4QCIADPtEBuYgF88V/LiKlMANlLoK1AKIAPYCzYd7qE6kvIJg9AzCwAAWWnJutIzEAGbU4pIy8kpqmjp6+pgm5jY2BFyugQDsLACQfuwY6HUSTRzxNFpQwAzJxAC8xFDKAO5tHV1ipi0cSaqhE03FQA==="
+        explanation: "The class <code>Foo</code> implements the interface <code>IEnumerable</code> with 2 methods - 1 implicit implementation and 1 explicit implementation. The reason these 2 mechanisms of implementing interfaces exist, is to handle cases where multiple interfaces define the same members. You can either have 1 implicit implementation binding to multiple interfaces, or several explicit implementations binding to each their interface. In this case, we only have 1 interface, but C# still allows us to implement it with both mechanisms. The implementations will just overlap.<br><br>The next important piece of information is that <code>foreach</code> uses <a href=\"https://im5tu.io/article/2022/01/things-you-might-not-know-about-csharp-duck-typing/\">duck typing</a>. In other words, the <code>foreach</code> construct doesn't care that our type implements <code>IEnumerable</code>, it's completely irrelevant. All it requires is a method called <code>GetEnumerator</code> which returns an <code>IEnumerator</code>.<br><br>The question thus boils down to this: Which of 2 the implementations is preferred in these 2 cases:<br><pre><code><br>(new Foo()).GetEnumerator()<br>((IEnumerable)new Foo()).GetEnumerator()<br></code></pre><br>In the first case, we choose the implicit implementation as it is considered more specific (or \"closer\" <a href=\"https://ericlippert.com/2013/12/23/closer-is-better/\">in the words of Eric Lippert</a>) - we are talking about the concrete <code>Foo</code> type after all. <br><br>In the second case, there is only 1 possible choice, as neither of the implementations are virtual. We've thrown away the type of <code>Foo</code> for the purposes of compile time analysis, and only have an <code>IEnumerable</code>. The call is thus resolved to the explicit implementation at compile time.",
+        hint: "In C#, the <code>foreach</code> construct is duck-typed, and doesn't care about which interfaces the operand implements.",
+        sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUKgBgAJVMA6AYQHsAbGgUwGNgBLKqAZwG489UBmEuiIAxKlSIgSmfngDeeIkqIBJAKJQIAW3pgAhsCphp/MgHF6wDdt0GjACgCUi5QtzKPJAOxEo9AO5ELFDAANoAukRyRMQAvuaW1jr6hmBOPO7KsbyZSgKqSbapRBZWmsl2ac65US6e3r4BQSERUUSYRPGlhSkOjhke2bhDfIIY0l7yAJB1QuizbvVKAGZG9HqMABZE9gBuesbLzY2BYlRO1Uue1Jy09GQA6mAswPT2y/2zHl/Kq2DrWx2+0Ox3spH4jj8p3EFx+9RuHDuj2er3enxqQ1iQA=="
     },
     {
         question: "using System;\n\npublic class Program\n{\n    public static void Main()\n    {\n        string x = new string(new char[0]);\n        string y = new string(new char[0]);\n        if (object.ReferenceEquals(x, y))\n            Console.Write(1);\n        else\n            Console.Write(0);\n    }\n}",
@@ -114,8 +114,8 @@ const questions = [
     {
         question: "using System;\n\npublic class Program\n{\n    public static void Foo&lt;T&gt;()\n        where T : new()\n    {\n        T t = new T();\n        if (typeof(T) == t.GetType())\n            Console.Write(\"0\");\n        else\n            Console.Write(\"1\");\n    }\n    \n    public static void Main()\n    {\n        try\n        {\n            Foo&lt;int&gt;();\n            Foo&lt;int?&gt;();\n        }\n        catch\n        {\n            Console.Write(\"2\");\n        }\n    }\n}",
         answer: "02",
-        explanation: "TODO",
-        hint: "TODO",
+        explanation: "The first call to <code>Foo</code> works completely as you'd expect and prints \"0\". The default constructor for an <code>int</code> just produces the value 0.<br><br>The second call uses a <b>nullable</b> int as the generic type. Default constructing a nullable int like so: <code>var a = new int?();</code> will simply produce the value <code>null</code>. We then try to call <code>t.GetType()</code>, but <code>t</code> is <code>null</code>, so the function throws a null reference exception, and we enter the exception handler, printing \"2\".",
+        hint: "<code>int?</code> denotes a nullable <code>int</code>. What do you get if you call the default constructor for a nullable <code>int</code>?",
         sharpLabUrl: "https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINTMB2PAbzwEgjyA2UgFmIDEB7LgHgBUAfAAoAlPToB3ABYBTMLOL9iIYlFmSx9Wrjp1lwYgF41GpWIDcEgJYAzYsOABPAA6yut4f1HGTwAHQA4rLA/K6yYuK6egDCXFAAzlwANrL+AOpg1sARAEQADLmiVtGyyQmyEnRxiSlpmdl5mEUldAC+9PQY6NoSwGBOEjp6dNx81lDAIsVVY7wTwAD8063tEgDGAIbA69JDVTVJqRlZOcK56C0SHbo3bUA"
     },
     {
