@@ -30,6 +30,7 @@ function updateAnswered() {
 document.getElementById("total").innerHTML = questions.length;
 updateAnswered();
 
+document.getElementById("current").innerHTML = num;
 
 document.getElementById("button-submit").addEventListener("click", function() {
     const answer = document.getElementById("text-output").value;
