@@ -41,6 +41,7 @@ document.getElementById("button-submit").addEventListener("click", function() {
         document.getElementById("nav").classList.add("d-none");
 
         document.getElementById("explanation-content").innerHTML = questions[num].explanation;
+        document.getElementById("sharplab").href = questions[num].sharpLabUrl;
 
         // Save that the user has answered this specific question
         localStorage.setItem(`question-${num}`, true);
@@ -58,6 +59,7 @@ document.getElementById("button-reveal").addEventListener("click", function() {
     document.getElementById("text-output").value = questions[num].answer;
 
     document.getElementById("explanation-content").innerHTML = questions[num].explanation;
+    document.getElementById("sharplab").href = questions[num].sharpLabUrl;
 });
 
 document.getElementById("button-hint").addEventListener("click", function() {
