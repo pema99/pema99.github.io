@@ -3,11 +3,21 @@ const urlParams = new URLSearchParams(window.location.search);
 
 function pickRandomQuestion() {
     var candidates = [];
+    // Try to pick a question we haven't seen first
     for (let i = 0; i < questions.length; i++) {
-        if (!localStorage.getItem(`question-${i}`)) {
+        if (!localStorage.getItem(`question-${i}`) && !localStorage.getItem(`skipped-${i}`)) {
             candidates.push(i);
         }
     }
+    // If we've seen all questions, try to pick an unanswered question
+    if (candidates.length === 0) {
+        for (let i = 0; i < questions.length; i++) {
+            if (!localStorage.getItem(`question-${i}`)) {
+                candidates.push(i);
+            }
+        }
+    }
+    // If we've answered all questions, pick a random one
     if (candidates.length === 0) {
         return Math.floor(Math.random() * questions.length);
     }
@@ -60,6 +70,8 @@ document.getElementById("button-reveal").addEventListener("click", function() {
 
     document.getElementById("explanation-content").innerHTML = questions[num].explanation;
     document.getElementById("sharplab").href = questions[num].sharpLabUrl;
+
+    localStorage.setItem(`skipped-${num}`, true);
 });
 
 document.getElementById("button-hint").addEventListener("click", function() {
@@ -69,6 +81,8 @@ document.getElementById("button-hint").addEventListener("click", function() {
 
 document.getElementById("button-skip").addEventListener("click", function() {
     window.location.href = `?num=${pickRandomQuestion()}`;
+
+    localStorage.setItem(`skipped-${num}`, true);
 });
 
 document.getElementById("button-next").addEventListener("click", function() {
