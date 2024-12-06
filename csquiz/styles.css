@@ -5,6 +5,10 @@
 
 /* Override dark mode styles */
 @media (prefers-color-scheme: dark) {
+  code {
+    color: #e6c07b;
+  }
+    
   .bg-light {
     background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity)) !important;
   }
