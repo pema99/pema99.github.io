@@ -46,3 +46,6 @@ nav:
 
   - title: Blog
     url: /archive
+  
+  - title: Notes
+    url: /obsidian/math/light-transport/the-rendering-equation
