@@ -3,7 +3,7 @@ layout: post
 title: On mipmap selection
 published: false
 ---
-In this post, I want to shed some light on something I've been wondering about for quite a while: How exactly are mipmap/LOD levels selected when sampling textures on the GPU? If you already know what mipmapping is, why we use it, and what pixel derivatives (`ddx()` / `ddy()`) are, you can skip to the section [[#Derivatives to mipmap levels]]. The post does, however, assume some knowledge of graphics programming.
+In this post, I want to shed some light on something I've been wondering about for quite a while: How exactly are mipmap/LOD levels selected when sampling textures on the GPU? If you already know what mipmapping is, why we use it, and what pixel derivatives (`ddx()` / `ddy()`) are, you can skip to the section [Derivatives to mipmap levels](#d). The post does, however, assume some knowledge of graphics programming.
 
 # Mipmapping primer
 
@@ -25,18 +25,18 @@ float4 frag (float2 uv : TEXCOORD0) : SV_Target
 ```
 
 When applied to a quad and fed a brick texture as input, we get this:
-![](assets/AliasedBricks.png)
+![](/assets/AliasedBricks.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
 Notice that the surface looks rather 'pixelated', especially near the far edge. This is called texture [aliasing](https://en.wikipedia.org/wiki/Aliasing). The root cause is that the size of the texture space region covered by a screen pixel varies with distance and viewing angle.
-![](assets/MipmapAreaExplainer.png)
+![](/assets/MipmapAreaExplainer.png){:style="display:block; margin-left:auto; margin-right:auto"}
 >Consider, for illustration, the tilted quadrilateral. Observe how the same area in screen space can correspond to very different areas in texture space. The blue square covers roughly 4 pixels, while the green one covers roughly 12, even though they have the same area in screen space.
 
 The more shallow the viewing angle, the more [texels](https://en.wikipedia.org/wiki/Texel_(graphics)) are covered by each pixel on the screen. Since we only sample 1 texel for every screen pixel, most of the texels covered by the screen pixel are *aliased* into a single sample - the contribution from the covered texels that were not sampled is lost!
 
 The typical solution to this is [mipmapping](https://en.wikipedia.org/wiki/Mipmap) - we first generate a bunch of smaller versions of our texture, called *mipmaps*, by averaging texels from the higher resolution texture. As the mipmaps get smaller, their contents get more blurry. We are effectively applying a series of [low-pass filters](https://en.wikipedia.org/wiki/Low-pass_filter) to the texture. We typically name the mipmaps using numbers, where 0 is the full resolution texture, and each subsequent number corresponds to a lower resolution texture. I'll call these numbers 'mipmap levels'.
-![](assets/BrickMips.gif)
+![](/assets/BrickMips.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 In cases where texture sampling would result in aliasing, because too many texels are covered by the pixel, we instead sample a lower resolution mipmap to mitigate it. That way, we get an approximate average of the texels in the covered area. Here's the same setup before, but now with mipmapping enabled:
-![](assets/MipmapExample.png)
+![](/assets/MipmapExample.png){:style="display:block; margin-left:auto; margin-right:auto"}
 We didn't have to change the shader at all to achieve this - when `Texture2D.Sample()` is used, and the input texture contains mipmaps, the GPU will automatically select an appropriate mipmap level for each sample!
 
 If you are like me, you won't find this explanation very satisfying. The GPU does _some magic_ to select a mipmap level? Ok - so how does it work? That's what the rest of this post is about.
@@ -57,7 +57,7 @@ float4 frag (float2 uv : TEXCOORD0) : SV_Target
 }
 ```
 
-The more shallow the viewing angle, the larger the derivatives get. Additionally, the derivatives are larger further away from the camera. ![](assets/PixelDerivatives.gif)
+The more shallow the viewing angle, the larger the derivatives get. Additionally, the derivatives are larger further away from the camera. ![](/assets/PixelDerivatives.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 
 These conditions line up well with the cases where texture sampling would result in ugly aliasing, so it shouldn't come as a big surprise that the selection of mipmap levels has something to do with the derivatives of the input texture sampling coordinates. In fact, `Texture2D.Sample()` can be seen as syntax sugar for the more general `Texture2D.SampleGrad()` function:
 
@@ -71,21 +71,25 @@ Texture2D.SampleGrad(sampler, location, ddx(location), ddy(location));
 
 This description still leaves an open question: How exactly does `Texture2D.SampleGrad()` use the input derivatives to determine which mipmap level to sample?
 
-# Derivatives to mipmap levels
+# Derivatives to mipmap levels {#d}
 
 `Texture2D.SampleGrad()` has some internal logic that maps from the derivatives of the sampling location to a specific mipmap level. This function directly corresponds to a hardware instruction on the GPU, though, so we unfortunately can't just 'look at the code'. To get a better idea of how it works, we can ask 2 questions: What does the mapping look like conceptually, and what does the hardware do in practice? Both questions are surprisingly difficult to find answers to online, but I'll tackle them both one by one.
 
-## What does the mapping look like conceptually?
+## What does the mapping look like conceptually? {#a}
 
 One place you might think to look for information on how the mapping should work is in the spec for your graphics library of choice. I find the [GLES3.0](https://registry.khronos.org/OpenGL/specs/es/3.0/es_spec_3.0.pdf) spec particularly readable. According to section 3.8.10.1 "Scale Factor and Level of Detail", the mipmap level is calculated like so:
+
 $$
 MipLevel(x, y) = log_2(\rho(x, y))
 $$
-Where $x, y$ are the coordinates of the pixel, and $\rho$ is a "scale factor" defined by:
+
+Where $$x, y$$ are the coordinates of the pixel, and $$\rho$$ is a "scale factor" defined by:
+
 $$
 \rho = max\Bigg\{\sqrt{\bigg(\frac{\partial u}{\partial x}\bigg)^2 + \bigg(\frac{\partial v}{\partial x}\bigg)^2},\sqrt{\bigg(\frac{\partial u}{\partial y}\bigg)^2 + \bigg(\frac{\partial v}{\partial y}\bigg)^2}\Bigg\}
 $$
-Here, $u$ and $v$ denote the coordinates of the sampling location in texture space, scaled to the range $[0; TextureSize]$, so $\frac{\partial u}{\partial x}$ for example is the partial derivative of the horizontal coordinate of the sampling location with respect to the $x$, i.e. `ddx(u)`.
+
+Here, $$u$$ and $$v$$ denote the coordinates of the sampling location in texture space, scaled to the range $$[0; TextureSize]$$, so $$\frac{\partial u}{\partial x}$$ for example is the partial derivative of the horizontal coordinate of the sampling location with respect to the $$x$$, i.e. `ddx(u)`.
 
 That's a bit of a mouthful, so let's translate it to code:
 
@@ -109,10 +113,10 @@ This should be _somewhat_ intuitive - as the length of the derivatives increase,
 
 If you search around the web for how to calculate mipmap level manually, you will probably find a solution like this. However, as we will soon see, this is not the full story.
 
-## What does the hardware actually do?
+## What does the hardware actually do? {#c}
 
 As I mentioned earlier, since `Texture2D.SampleGrad()` is implemented in hardware, we can't look at the implementation directly. However, we _can_ use observations of its behavior to deduce what it is doing. To facilitate this, I will first need a texture with mipmaps that are easily distinguishable from each other. Luckily, most graphics frameworks let you manually fill in the texture data for each mipmap - they don't _have_ to be blurry versions of the full-resolution texture. Since I'm using Unity for visualization, I wrote [a little script](https://gist.github.com/pema99/c706b38eb94b13a1680c8635c180b228) that produces a texture where each mipmap is a single, bright, clearly distinguishable color. The resulting texture looks like this:
-![](assets/WeirdMips.gif)
+![](/assets/WeirdMips.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 
 Next, I wrote a shader that samples the texture using `Texture2D.SampleGrad()`, but where the sampling location is a constant, and the derivatives are based on UV coordinates. `Texture2D.SampleGrad()` takes a partial derivative of the sampling location for both the X and Y axes, each of which are 2-dimensional vectors, so this is technically a 6-dimensional function. Since we are keeping the sampling location fixed, it is a 4-dimensional function in practice. Functions of over 3 dimensions are a bit tricky to visualize, so I'll focus on just the derivatives for the X axis for now, and leave the Y axis derivatives as 0:
 
@@ -138,7 +142,7 @@ float4 frag (float2 uv : TEXCOORD0) : SV_Target
 ```
 
 Applying this shader to a quad yields on my machine (GPU is an RTX 4070 super):
-![](assets/NvidiaViz.png)
+![](/assets/NvidiaViz.png){:style="display:block; margin-left:auto; margin-right:auto"}
 The image is scaled such that the bottom left corner corresponds to X axis derivatives of (-1, -1), and the top left corner corresponds to (1, 1). The color at each pixel indicates which mipmap level is being sampled when `Texture2D.SampleGrad()` is passed derivatives corresponding to the pixel coordinates.
 
 When I first saw this result, I was a bit surprised. Why are there jagged edges!? The formulas described in the previous section should result in a bunch of perfect concentric circles! As it turns out, current graphics libraries leave the specifics of the implementation up to the GPU vendor, and only prescribe some loose criteria on the implementation. Nvidia cards use a particularly crude approximation.
@@ -146,7 +150,7 @@ When I first saw this result, I was a bit surprised. Why are there jagged edges!
 > Side note: This is just one of many, many pieces of functionality that differ in implementation across different vendors. It's a pet peeve of mine when people assume that there is a "one true correct" implementation of pretty much anything in GPU-land. To name a few other areas where vendors differ: The precision of transcendentals like `cos(x)` and `sin(x)`, the implementation of AlphaToCoverage (AMD uses dithering), subtle differences in rasterizer output, especially with conservative rasterization, etc. This is unfortunately a big source of pain when doing image-based/golden-image testing for anything involving the graphics pipeline, and is one of the big reasons such test setups often have per-platform reference images, and use fuzzy comparisons.
 
 My next instinct was to determine which vendors *actually* differ in their implementation, and to what extent. I asked a bunch of friends to try it on their hardware and collected the results. I'm only rendering the quadrant with positive derivatives here, since the shape is symmetric anyway:
-![](assets/VendorTable.png)
+![](/assets/VendorTable.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
 A few notes on my findings:
 
@@ -160,11 +164,11 @@ And with this, I present perhaps the first-ever GPU tier list ranked in order of
 ## Exploring the full 4D mapping function
 
 In the previous visualizations of the derivative-to-mipmap-level mapping function, I've only visualized the influence of X-axis derivatives and have left the Y-axis derivatives at (0, 0). Next, I'd like to visualize the influence of both axes simultaneously. The easiest way I found to visualize this 4-dimensional function is using a grid. In each grid cell, we will have an image where the X-axis derivatives vary. Each grid cell will use fixed values for the Y-derivative, the values depending on the location of the cell. This way, we can see 2-dimensional "slices" of the full function. I whipped up a Unity script to render that out, which produced this image:
-![](assets/NvidiaTable.png)
+![](/assets/NvidiaTable.png){:style="display:block; margin-left:auto; margin-right:auto"}
 > Note: This kind of visualization will pop up several times throughout the post, so it's worth hammering in what we are looking at: The bottom left grid cell has constant Y-derivatives (0, 0), while the top left grid cell has constant Y-derivatives (1,1), all the cells between have constant Y-derivatives somewhere between 0 and 1. Within each grid cell, the local X and Y coordinates determine the X-derivatives. I'm only visualizing positive Y-derivatives, because the images for negative derivatives are just the same, but mirrored. The color once again indicates the selected mipmap level. Of course, this image is very vendor-specific - these images were all generated on an RTX 4070 Super.
 
-With this setup, we can easily compare what the hardware does to the proposed software implementation from the [[#What does the mapping look like conceptually?]] section, using `Texture2D.SampleLevel()` to explicitly sample the mipmap level we have selected. Here's the same image, but using the software implementation:
-![](assets/WeirdMips 1.png)
+With this setup, we can easily compare what the hardware does to the proposed software implementation from the [What does the mapping look like conceptually?](#a) section, using `Texture2D.SampleLevel()` to explicitly sample the mipmap level we have selected. Here's the same image, but using the software implementation:
+![](/assets/WeirdMips 1.png){:style="display:block; margin-left:auto; margin-right:auto"}
 That looks... _surprisingly_ different from the hardware implementation. As expected, the software implementation produces perfect circle patterns, while the hardware implementation approximates them. But additionally, the hardware implementation produces some kind of ellipsoid shape whenever both the X- and Y-derivatives have nonzero components, while the software implementation _only_ ever produces perfect circles. The surprised me a bit when I first saw it, since I found no mention of this behavior during my initial research. This piqued my interest and drove me to attempt to reverse engineer the behavior. It turns out I had to dig a little bit deeper to find my answer...
 
 # Reverse engineering the hardware implementation
@@ -219,49 +223,53 @@ Phew, that's a bit of a mouthful... In the snippets from the spec, `dX` and `dY`
 
 ### Side quest: Texture filtering theory and vector calculus
 
-Before we can describe the transformation that the DirectX 11 spec mentions, we need to visit a few ideas from the theory of texture filtering and from vector calculus. If you are already familiar with jacobians and the concept of pixel footprint, you can probably skip to the next section [[#Understanding the elliptical transformation]].
+Before we can describe the transformation that the DirectX 11 spec mentions, we need to visit a few ideas from the theory of texture filtering and from vector calculus. If you are already familiar with jacobians and the concept of pixel footprint, you can probably skip to the next section [Understanding the elliptical transformation](#b).
 
 A naïve approach to rendering a texture surface is this: For each screen pixel, determine the corresponding point on the surface, find its corresponding point in texture space, then read the value of the texture at this point (without any filtering). As we've established earlier, this approach causes aliasing; when a screen pixel covers too many texels, and only one texel is sampled, the contribution from most of the covered texels is lost. A better approach would be to _integrate_ over the area covered by each screen pixel, gathering contribution from all the covered texels. Mipmapping is a cheap way to approximate this integral using precomputed tables.
 
 Ideally, we'd like to integrate over the projection of the screen pixel onto the texture. This projection is called the "footprint" of the pixel. To do this, we want to know how a unit area in screen space (i.e., a pixel) is transformed when projecting into texture space. The typical mathematical tool for describing changes in area due to mappings between spaces, such as projection, is called "the [jacobian matrix](https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant)" or just "the jacobian". When used to transform a point, the jacobian of the mapping provides the best linear approximation of the mapping at that point. When the jacobian is a square matrix, its [determinant](https://en.wikipedia.org/wiki/Determinant) describes how much space is 'stretched' at that point. The jacobian is constructed from first-order partial derivatives of coordinates in the input space with respect to coordinates in the output space. In our case, the input space is screen space, and the output space is texture space. The jacobian looks like this:
+
 $$
-\Huge
-\begin{bmatrix}
+\Large \begin{bmatrix}
 \frac{\partial u}{\partial x} & \frac{\partial u}{\partial y} \\
 \frac{\partial v}{\partial x} & \frac{\partial v}{\partial y}
 \end{bmatrix}
 $$
-Where $(u, v)$ are coordinates in texture space, and $(x, y)$ are coordinates in screen space. If you've paid attention so far, this might ring a few bells - these partial derivatives can be calculated in HLSL using `ddx()` and `ddy()`. In other words, we can view the derivatives passed to `Texture2D.SampleGrad()` as forming a jacobian which describes the projective mapping involved in rendering the textured surface.
+
+Where $$(u, v)$$ are coordinates in texture space, and $$(x, y)$$ are coordinates in screen space. If you've paid attention so far, this might ring a few bells - these partial derivatives can be calculated in HLSL using `ddx()` and `ddy()`. In other words, we can view the derivatives passed to `Texture2D.SampleGrad()` as forming a jacobian which describes the projective mapping involved in rendering the textured surface.
 
 In reality, it is impractical to integrate over the *actual* footprint of a screen pixel, as it will in general be a [curvilinear](https://en.wikipedia.org/wiki/Curvilinear_coordinates) quadrilateral (a quadrilateral with curved edges) - quite an unpleasant shape. Therefore, most approaches approximate it as either a regular quadrilateral or an ellipse, as illustrated in the figure below ([Image source](https://resources.mpi-inf.mpg.de/departments/d4/teaching/ws200708/cg/slides/CG09-Textures+Filtering.pdf)).
-![](assets/TextureMappingExplainer.png)
+![](/assets/TextureMappingExplainer.png){:style="display:block; margin-left:auto; margin-right:auto"}
 When using mipmapping, we are mostly interested in the _size_ of the footprint. The larger the area, the larger mipmap level we need to use, as higher mipmap levels correspond to approximations of integrals over larger regions of the texture.
 
-### Understanding the elliptical transformation
+### Understanding the elliptical transformation {#b}
 
 With these concepts in mind, let us dissect the elliptical transformation described in the DirectX 11 spec. The first paragraph reads:
 > "Given a pair of partial derivative vectors **representing an elliptical transform**, it is important to calculate LOD using a **proper orthogonal Jacobian matrix**, as described by [Heckbert 89](https://www2.eecs.berkeley.edu/Pubs/TechRpts/1989/CSD-89-516.pdf)."
 
-I've highlighted the 2 important concepts with bold text. We have the partial derivatives of our texture sampling coordinates, but in what sense do these represent an elliptical transform? Imagine representing each screen pixel with a unit circle described by an angle $\theta$, such that $s(\theta)$ returns all the points on the perimeter of the unit circle:
+I've highlighted the 2 important concepts with bold text. We have the partial derivatives of our texture sampling coordinates, but in what sense do these represent an elliptical transform? Imagine representing each screen pixel with a unit circle described by an angle $$\theta$$, such that $$s(\theta)$$ returns all the points on the perimeter of the unit circle:
+
 $$
-\Huge s(\theta)=
+\Large s(\theta)=
 \begin{bmatrix}
 cos(\theta) \\
 sin(\theta)
 \end{bmatrix}
 $$
+
 If we additionally construct the jacobian described in the previous section:
+
 $$
-\Huge
-\begin{bmatrix}
+\Large \begin{bmatrix}
 \frac{\partial u}{\partial x} & \frac{\partial u}{\partial y} \\
 \frac{\partial v}{\partial x} & \frac{\partial v}{\partial y}
 \end{bmatrix}
 $$
+
 ... And transform the unit circle with the jacobian via matrix multiplication:
+
 $$
-\Huge
-p(\theta) =
+\Large p(\theta) =
 \begin{bmatrix}
 \frac{\partial u}{\partial x} & \frac{\partial u}{\partial y} \\
 \frac{\partial v}{\partial x} & \frac{\partial v}{\partial y}
@@ -271,7 +279,8 @@ cos(\theta) \\
 sin(\theta)
 \end{bmatrix}
 $$
-The resulting function $p(\theta)$ will describe _an ellipse_, where the 2 column vectors of the jacobian (i.e., the X- and Y-axis derivatives) are on the perimeter of the ellipse. In the special case where the column vectors are perpendicular and have the same length, the result is still just a (potentially scaled) circle. When the column vectors are perpendicular, but have different lengths, the result is an ellipse where the column vectors are the [semi-major and semi-minor axes](https://en.wikipedia.org/wiki/Semi-major_and_semi-minor_axes) of the ellipse. If vectors are not perpendicular, this doesn't apply.
+
+The resulting function $$p(\theta)$$ will describe _an ellipse_, where the 2 column vectors of the jacobian (i.e., the X- and Y-axis derivatives) are on the perimeter of the ellipse. In the special case where the column vectors are perpendicular and have the same length, the result is still just a (potentially scaled) circle. When the column vectors are perpendicular, but have different lengths, the result is an ellipse where the column vectors are the [semi-major and semi-minor axes](https://en.wikipedia.org/wiki/Semi-major_and_semi-minor_axes) of the ellipse. If vectors are not perpendicular, this doesn't apply.
 
 That explains the first part of the paragraph, so what is the "proper orthogonal Jacobian matrix" about? When the column vectors of the jacobian are not perpendicular, the jacobian does not form an orthogonal basis - shapes transformed by the jacobian will be [sheared](https://en.wikipedia.org/wiki/Shear_mapping). Recall that selecting a mipmap level involves calculating 2 lengths - in our software implementation from earlier, this was done like so:
 
@@ -286,23 +295,23 @@ Diagonalizing an ellipse means finding a coordinate system in which the ellipse 
 > Note: For the curious reader, this 'diagonalization' is closely related to [matrix diagonalization](https://en.wikipedia.org/wiki/Diagonalizable_matrix#Diagonalization), which decomposes a matrix into its [eigenvectors and eigenvalues](https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors). In fact, ellipses can be represented as a 2x2 matrix whose eigenvectors give the direction of the major and minor semi-axes, and whose eigenvalues are related to the length of the axes.
 
 The next few paragraphs of the DirectX 11 spec describe an algorithm for performing this diagonalization, taken from [Heckbert 89](https://www2.eecs.berkeley.edu/Pubs/TechRpts/1989/CSD-89-516.pdf). The details of this algorithm are not so important, so I won't describe them. Instead, to build intuition, I have implemented the algorithm in a graphing calculator, which lets us easily see what is going on:
-![](assets/EllipseFootprint.png)
+![](/assets/EllipseFootprint.png){:style="display:block; margin-left:auto; margin-right:auto"}
 > Note: You can play with this interactive demo [here](https://www.geogebra.org/classic/msau3zqx).
 
-The image shows an elliptical footprint corresponding to a case where the X- and Y-axis derivatives (labelled $d_x$, $d_y$) are not perpendicular. Notice how their length no longer describes the stretch of the ellipse. The outputs of the algorithm (labelled $n_x$, $n_y$) are a set of new basis vectors describing the transformation to a coordinate space in which the ellipse is axis-aligned. These new basis vectors are the column vectors of our "proper orthogonal Jacobian matrix". This new jacobian describes almost the same mapping as the original one, and would produce the exact same ellipse as the original when used to transform the unit circle. The only difference is the rotation of the basis vectors.
+The image shows an elliptical footprint corresponding to a case where the X- and Y-axis derivatives (labelled $$d_x$$, $$d_y$$) are not perpendicular. Notice how their length no longer describes the stretch of the ellipse. The outputs of the algorithm (labelled $$n_x$$, $$n_y$$) are a set of new basis vectors describing the transformation to a coordinate space in which the ellipse is axis-aligned. These new basis vectors are the column vectors of our "proper orthogonal Jacobian matrix". This new jacobian describes almost the same mapping as the original one, and would produce the exact same ellipse as the original when used to transform the unit circle. The only difference is the rotation of the basis vectors.
 
 This visualization also shows why the DirectX spec provides a bunch of corner cases where the diagonalization should not be applied:
 >The following caveats also apply:
-    - if either of dX or dY are of zero length, an implementation should skip these transformations.
-    - if dX and dY are parallel, an implementation should skip these transformations.
-    - if dX and dY are perpendicular, an implementation should skip these transformations.
-    - if any component of dX or dY is inf or NaN, an implementation should skip these transformations.
-    - if components of dX and dY are large or small enough to cause NaNs in these calculations, an implementation should skip these transformations.
+>   - if either of dX or dY are of zero length, an implementation should skip these transformations.
+>   - if dX and dY are parallel, an implementation should skip these transformations.
+>   - if dX and dY are perpendicular, an implementation should skip these transformations.
+>   - if any component of dX or dY is inf or NaN, an implementation should skip these transformations.
+>   - if components of dX and dY are large or small enough to cause NaNs in these calculations, an implementation should skip these transformations.
 
 If either derivative is zero length, the coordinate would be flattened to a line.
-![](assets/ParallelEllipse.png)
+![](/assets/ParallelEllipse.png){:style="display:block; margin-left:auto; margin-right:auto"}
 The same happens if the derivatives are parallel:
-![](assets/ParallelEllipse2.png)
+![](/assets/ParallelEllipse2.png){:style="display:block; margin-left:auto; margin-right:auto"}
 If the derivatives are perpendicular, there is no shearing, so performing the diagonalization is a waste of effort. Other than that, the final 2 points about inf and NaN are pretty self-explanatory.
 
 With the elliptical transformation under our belt, let's try adding it to our software implementation of mipmap level selection from earlier:
@@ -339,15 +348,15 @@ void EllipsoidTransformDerivatives(inout float2 dx, inout float2 dy)
 ```
 
 Rendering out the same visualization we used before:
-![](assets/WeirdMips 4.png)
+![](/assets/WeirdMips 4.png){:style="display:block; margin-left:auto; margin-right:auto"}
 This looks a lot more similar to what the hardware implementation was doing!
 
 ## Trilinear filtering
 
 All the visualizations I've made thus far have been without any kind of hardware texture filtering, and just use simple [nearest-neighbor interpolation](https://en.wikipedia.org/wiki/Nearest-neighbor_interpolation). Enabling [bilinear filtering](https://learn.microsoft.com/en-us/windows/uwp/graphics-concepts/bilinear-texture-filtering) makes no difference, as it doesn't affect how the mipmap level is used. Enable trilinear filtering, however, does make a difference. Rendered with the correct software implementation:
-![](assets/WeirdMips 7.png)
+![](/assets/WeirdMips 7.png){:style="display:block; margin-left:auto; margin-right:auto"}
 And with hardware mipmap level selection:
-![](assets/WeirdMips 8.png)
+![](/assets/WeirdMips 8.png){:style="display:block; margin-left:auto; margin-right:auto"}
 Trilinear filtering is just like bilinear filtering, but where we additionally interpolate between 2 mipmap levels. Without trilinear filtering, the selected mipmap level is just rounded to the nearest integer, and only one mipmap is sampled. With trilinear filtering, the floor and ceiling of the mipmap level are calculated, then the 2 corresponding mipmaps are sampled, and the results are linearly interpolated using the fractional part of the mipmap level. This is why we've been calculating it is a `float` all along.
 
 With that, harsh transitions between mipmap levels from the previous images are changed to smooth gradients. This is not very surprising, but I wanted to show that the software implementation continues to hold up when using trilinear filtering.
@@ -355,21 +364,21 @@ With that, harsh transitions between mipmap levels from the previous images are 
 ## Anisotropic filtering
 
 In addition to bilinear and trilinear filtering, most GPUs also support [anisotropic filtering](https://en.wikipedia.org/wiki/Anisotropic_filtering). Anisotropic filtering aims to alleviate one of the main issues with mipmapping. Mipmapping reduces aliasing from texture samples, but also introduces blurring, especially at shallow viewing angles. Anisotropic filtering effectively removes the blur by taking multiple more texture samples of a higher resolution mipmap when the footprint of a pixel is stretched:
-![](assets/TrilinearFilteringVsAniso.png)
+![](/assets/TrilinearFilteringVsAniso.png){:style="display:block; margin-left:auto; margin-right:auto"}
 The typical algorithm for anisotropic filtering works like this:
 
 1. Determine the elliptical footprint of the screen pixel using the X- and Y-axis derivatives of the sampling location in texture space.
 2. Determine the semi-major and semi-minor axes of the ellipse. The semi-major (longer) axis is called the "axis of anisotropy".
 3. Calculate the ratio of the lengths of the semi-major and semi-minor axes. This is called the "degree of anisotropy".
 4. Clamp the degree of anisotropy to the maximum degree of anisotropy - this is typically a setting on the texture, with possible values ranging from 0 to 16.
-5. Calculate $log_2(semiMinorAxisLength)$. This is the mipmap level to sample.
+5. Calculate $$log_2(semiMinorAxisLength)$$. This is the mipmap level to sample.
 6. Distribute sample points along the axis of anisotropy. The number of sample points depends on the clamped degree of anisotropy.
 7. Sample the texture at each of the sample points and average their values.
 
 Notice that, unlike with regular mipmapping, where we use the length of the semi-major axis to select the mipmap level, we now use the length of the _semi-minor_ axis. This is what mitigates the blurring caused by mipmapping - we sample a higher resolution texture when the pixel's footprint is anisotropic (stretched). That _alone_ would just reintroduce aliasing, so to mitigate this, we take more samples along the axis where they are needed most, effectively mitigating the added aliasing by supersampling, rather than blurring.
 
 So, how does enabling anisotropic filtering change the visualization of mipmap level selection from before? To visualize this, I've upgraded our previous visualization to an animation. Since anisotropic filtering is parameterized by a maximum degree of anisotropy setting, the visualization is now an animation. Each maximum degree produces a different image:
-![](assets/AnisoHW.gif)
+![](/assets/AnisoHW.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 When the degree of anisotropy exceeds 0, the image no longer matches what our software implementation produced. This makes sense - anisotropic filtering affects mipmap level selection, but our implementation isn't accounting for it.
 
 Returning to the DirectX 11 spec, recall that the paragraph about the elliptical transform read: "\[...\] it is important to calculate LOD using a proper orthogonal Jacobian matrix, as described by [Heckbert 89]. **When performing anisotropic filtering, it is also important to use these modified vectors to calculate the proper filtering footprint.**". I skipped over this part earlier, but it is exactly what we are missing. The spec further elaborates: "if(ComputeAnisotropicLOD), the LOD calculation is:"
@@ -420,11 +429,11 @@ output.LOD = log2(lengthMinor);
 I've omitted some comments for brevity. The spec states that this code should run _after_ applying the elliptical transformation from earlier. This is a pseudocode implementation of (part of) the algorithm for anisotropic filtering described earlier. It produces the ratio of anisotropy (`ratioOfAnisotropy`), the axis of anisotropy (`anisoLineDirection`), and the mipmap level (`LOD`).
 
 To illustrate this, I've extended my interactive ellipse diagram from earlier with an implementation of the algorithm. As the derivative vectors move around, the axis of anisotropy remains the major axis of the ellipse, and the selected mipmap level depends on the size of the minor axis.
-![](assets/AnisotropyGraphViz.gif)
+![](/assets/AnisotropyGraphViz.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 > Note: You can play with the updated version of the diagram [here](https://www.geogebra.org/classic/uyjgqzjj).
 
 For this post, only the portions of the pseudocode from the DirectX spec relating to mipmap level calculation are relevant. This pseudocode is straightforward to [translate into real shader code](https://gist.github.com/pema99/9a2cd933332106915a970b96ce05e286). Doing so yields the following:
-![](assets/AnisoSW.gif)
+![](/assets/AnisoSW.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 Nice - we seem to have a pretty decent match with the hardware implementation...
 
 There is one noteworthy difference, however. On my GPU, every other value for the max degree of anisotropy barely looks different from the previous one. For example, Degree=5 and Degree=6 look very similar, though there is a slight difference. Then Degree=6 and Degree=7 look completely different. In the software implementation, we don't have any such behavior. I'm not quite sure what is going on here, and it is probably extremely vendor-specific.
@@ -432,16 +441,16 @@ There is one noteworthy difference, however. On my GPU, every other value for th
 ## Bonus: More visualizations
 
 To get a better feel for how the final software implementation of mipmap level selection compares to the hardware, I wrote a [small shader](https://gist.github.com/pema99/b0d046a30afb0ca1b2fdc3e14b6c2920) that uses the software implementation on the left half of the screen, and the hardware implementation on the right. First, it can visualize which mipmap levels are chosen. Here's with no filtering:
-![](assets/MipSelectionComparison.gif)
+![](/assets/MipSelectionComparison.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 And here is with 16x anisotropic filtering:
-![](assets/AnisoMipComparison.gif)
+![](/assets/AnisoMipComparison.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 Looks pretty good to me! Finally, we can visualize the actual effect of using these implementations on a typical textured surface:
-![](assets/MipMapStrategyComparison.gif)
+![](/assets/MipMapStrategyComparison.gif){:style="display:block; margin-left:auto; margin-right:auto"}
 The halves are barely distinguishable to me! This is without anisotropic filtering, though. Unfortunately, we can't visualize the difference with anisotropic filtering, as there is no way to manually specify the axis and ratio of anisotropy in shader code.
 
 ## Bonus: Nvidia's approximation
 
-I noted in the section [[#What does the hardware actually do?]] that Nvidia uses a particularly crude approximation for their mipmap level selection. I can only assume they do this for performance reasons. I found their approximation quite intriguing, so I attempted to reverse engineer it. I believe they are doing something _similar_ to this:
+I noted in the section [What does the hardware actually do?](#c) that Nvidia uses a particularly crude approximation for their mipmap level selection. I can only assume they do this for performance reasons. I found their approximation quite intriguing, so I attempted to reverse engineer it. I believe they are doing something _similar_ to this:
 
 ```glsl
 // Scale input derivatives to texture size  
@@ -476,9 +485,9 @@ mad o0.xy, r0.xyxx, r0.zwzz, r1.xzxx
 ```
 
 And in particular, has no square roots or exponents. Rendered out:
-![](assets/WeirdMips 5.png)
+![](/assets/WeirdMips 5.png){:style="display:block; margin-left:auto; margin-right:auto"}
 It doesn't quite match the hardware implementation, but it's pretty close. Close enough that I think I am on to something. If you think you have a better idea, let me know! For completeness, here is the diff between the hardware and my attempt rendered out:
-![](assets/WeirdMips 6.png)
+![](/assets/WeirdMips 6.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
 # Closing words
 
