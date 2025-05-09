@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Mipmap selection in entirely too much detail
-published: false
+published: true
 ---
 In this post, I want to shed some light on something I've been wondering about for quite a while: How exactly are mipmap/LOD levels selected when sampling textures on the GPU? If you already know what mipmapping is, why we use it, and what pixel derivatives (`ddx()` / `ddy()`) are, you can skip to the section [[#Derivatives to mipmap levels]]. The post does, however, assume some knowledge of graphics programming.
 
