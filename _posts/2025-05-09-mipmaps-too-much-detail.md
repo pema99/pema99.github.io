@@ -365,7 +365,7 @@ With that, harsh transitions between mipmap levels from the previous images are 
 
 ## Anisotropic filtering
 
-In addition to bilinear and trilinear filtering, most GPUs also support [anisotropic filtering](https://en.wikipedia.org/wiki/Anisotropic_filtering). Anisotropic filtering aims to alleviate one of the main issues with mipmapping. Mipmapping reduces aliasing from texture samples, but also introduces blurring, especially at shallow viewing angles. Anisotropic filtering effectively removes the blur by taking multiple texture samples from a higher resolution mipmap when the footprint of a pixel is unevenly stretched:
+In addition to bilinear and trilinear filtering, most GPUs also support [anisotropic filtering](https://en.wikipedia.org/wiki/Anisotropic_filtering). Anisotropic filtering aims to alleviate one of the main issues with mipmapping. Mipmapping reduces aliasing from texture samples, but also introduces blurring, especially at shallow viewing angles. Anisotropic filtering effectively removes the blur by taking multiple texture samples from a higher resolution mipmap when the footprint of a pixel is unevenly stretched ([Image source](https://en.wikipedia.org/wiki/Anisotropic_filtering#/media/File:Anisotropic_filtering_en.png)):
 ![](/assets/TrilinearFilteringVsAniso.png){:style="display:block; margin-left:auto; margin-right:auto"}
 The typical algorithm for anisotropic filtering works like this:
 
