@@ -14,6 +14,8 @@ I also run a [blog](archive.md) and host my [personal notes](https://pema.dev/ob
 # Socials
 GitHub: [pema99](https://github.com/pema99)
 
+Bluesky: [pema99.bsky.social](https://bsky.app/profile/pema99.bsky.social)
+
 Twitter: [@pemathedev](https://twitter.com/pemathedev)
 
 Discord: pema99
