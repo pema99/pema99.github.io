@@ -35,7 +35,7 @@ The more shallow the viewing angle, the more [texels](https://en.wikipedia.org/w
 
 The typical solution to this is [mipmapping](https://en.wikipedia.org/wiki/Mipmap) - we first generate a bunch of smaller versions of our texture, called *mipmaps*, by averaging texels from the higher resolution texture. As the mipmaps get smaller, their contents get more blurry. We are effectively applying a series of [low-pass filters](https://en.wikipedia.org/wiki/Low-pass_filter) to the texture. We typically name the mipmaps using numbers, where 0 is the full resolution texture, and each subsequent number corresponds to a lower resolution texture. I'll call these numbers 'mipmap levels'.
 ![](/assets/BrickMips.gif){:style="display:block; margin-left:auto; margin-right:auto"}
-In cases where texture sampling would result in aliasing, because too many texels are covered by the screen pixel, we instead sample a lower resolution mipmap to mitigate it. That way, we get an approximate average of the texels in the covered area. Here's the same setup before, but now with mipmapping enabled:
+In cases where texture sampling would result in aliasing, because too many texels are covered by the screen pixel, we instead sample a lower resolution mipmap to mitigate it. That way, we get an approximate average of the texels in the covered area. Here's the same setup as before, but now with mipmapping enabled:
 ![](/assets/MipmapExample.png){:style="display:block; margin-left:auto; margin-right:auto"}
 I didn't have to change the shader at all to achieve this - when `Texture2D.Sample()` is used, and the input texture contains mipmaps, the GPU will automatically select an appropriate mipmap level for each sample!
 
@@ -281,7 +281,7 @@ sin(\theta)
 \end{bmatrix}
 $$
 
-The resulting function $$p(\theta)$$ will describe _an ellipse_, where the 2 column vectors of the jacobian (i.e., the X- and Y-axis partial derivatives) are on the perimeter of the ellipse. In the special case where the column vectors are perpendicular and have the same length, the result is still just a (potentially scaled) circle. When the column vectors are perpendicular, but have different lengths, the result is an ellipse where the column vectors are the [semi-major and semi-minor axes](https://en.wikipedia.org/wiki/Semi-major_and_semi-minor_axes) of the ellipse. If vectors are not perpendicular, this doesn't apply.
+The resulting function $$p(\theta)$$ will describe _an ellipse_, where the 2 column vectors of the jacobian (i.e., the X- and Y-axis partial derivatives) are on the perimeter of the ellipse. In the special case where the column vectors are perpendicular and have the same length, the result is still just a (potentially scaled) circle. When the column vectors are perpendicular, but have different lengths, the result is an ellipse where the column vectors are the [semi-major and semi-minor axes](https://en.wikipedia.org/wiki/Semi-major_and_semi-minor_axes) of the ellipse. If the vectors are not perpendicular, this doesn't apply.
 
 That explains the first part of the paragraph, so what is the "proper orthogonal Jacobian matrix" part about? When the column vectors of the jacobian are not perpendicular, the jacobian does not form an orthogonal basis - shapes transformed by the jacobian will be [sheared](https://en.wikipedia.org/wiki/Shear_mapping). Recall that selecting a mipmap level involves calculating 2 lengths - in our software implementation from earlier, this was done like so:
 
