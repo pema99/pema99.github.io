@@ -183,26 +183,10 @@
     flex-shrink: 0;
 }
 
-
-/* Monaco editor container */
-.editor-container {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-}
-
 .panel-header-actions {
     display: flex;
     align-items: center;
     gap: 6px;
-}
-
-.footer-label {
-    font-size: 11px;
-    color: #888;
-    font-weight: 400;
-    letter-spacing: 0;
-    text-transform: none;
 }
 
 .footer-select {
@@ -219,6 +203,14 @@
 .footer-select:focus {
     outline: none;
     border-color: #007acc;
+}
+
+
+/* Monaco editor container */
+.editor-container {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* Output body */
