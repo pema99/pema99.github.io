@@ -32,6 +32,7 @@ jobs:
 
       - name: Copy Blazor _framework folders (excluded by Jekyll)
         run: |
+          sudo chmod -R 777 ./_site
           find . -type d -name "_framework" -not -path "./_site/*" -not -path "./.git/*" | while read dir; do
             dest="./_site/${dir#./}"
             mkdir -p "$dest"
