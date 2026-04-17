@@ -30,14 +30,16 @@ jobs:
           source: ./
           destination: ./_site
 
-      - name: Copy Blazor _framework folders (excluded by Jekyll)
+      - name: Copy Blazor _framework and _content folders (excluded by Jekyll)
         run: |
           sudo chmod -R 777 ./_site
-          find . -type d -name "_framework" -not -path "./_site/*" -not -path "./.git/*" | while read dir; do
-            dest="./_site/${dir#./}"
-            mkdir -p "$dest"
-            cp -r "$dir/." "$dest/"
-            echo "Copied $dir -> $dest"
+          for folder in _framework _content; do
+            find . -type d -name "$folder" -not -path "./_site/*" -not -path "./.git/*" | while read dir; do
+              dest="./_site/${dir#./}"
+              mkdir -p "$dest"
+              cp -r "$dir/." "$dest/"
+              echo "Copied $dir -> $dest"
+            done
           done
 
       - name: Upload artifact
