@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "HLSLInterpreter.Debugger.Web",
   "resources": {
-    "hash": "sha256-K7LS/0GbEGEds8EgBy9wdjAjBTbrzzcUP6aT+ej2U7U=",
+    "hash": "sha256-2gCL/qtnbMeNjTdIL72UUluyElL91cNHBclahF9FdAY=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-A16ka545FHaB+QXjyJ4exXh7XpBAAIFnX8YkC4xAng8="
     },
@@ -50,10 +50,10 @@
       "System.Threading.Thread.wasm": "sha256-LjT7Kl/MJbnL25J1rsNK9pjR/E7Q3DUvSUoSXxarcKA=",
       "netstandard.wasm": "sha256-R/MZzyYaXrQfkdxn8YFpoemn/bUaBKcLjnKtLN4tGQI=",
       "System.Private.CoreLib.wasm": "sha256-kJsI+y1D5/P8UzMCMH1ePQyL2Msn76wcvd36CG/Q004=",
-      "HLSLInterpreter.Debugger.wasm": "sha256-/CADAOS2wqeWyUTOwB/h5e+3Q5zIbYXp2Y/tMfivwyg=",
-      "HLSLInterpreter.wasm": "sha256-qUMhgyBBl57jXfWT06aR0dZyCGgAspDwNdy8bKyVG4c=",
+      "HLSLInterpreter.Debugger.wasm": "sha256-OQP4kJdVqdnDaBF4WZ3jXc7S2bEsGh/QUO2bf+zpARw=",
+      "HLSLInterpreter.wasm": "sha256-bwmKaIuDVieb3vmHNXZ7/oGkSQFp4itKoQttSoviAyA=",
       "UnityShaderParser.wasm": "sha256-t1eK6rYNNS+OTc/Wq/6pPh1WHszfl5lQF+Yp3zemVJE=",
-      "HLSLInterpreter.Debugger.Web.wasm": "sha256-NWIXJN7ZHY/RJFQh+EyssaCGgID8lmbDzpCeua3AKTQ="
+      "HLSLInterpreter.Debugger.Web.wasm": "sha256-/VvgaKlbQ+A7X8BkZhnRZdjvsyHGEInUt6bY1hvSKyM="
     }
   },
   "cacheBootResources": true,
