@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "HLSLInterpreter.Debugger.Web",
   "resources": {
-    "hash": "sha256-NyGNnmXKzYV4fLHy4wSi9MeyayBv+oXJ0TWcdSRhT/o=",
+    "hash": "sha256-K7LS/0GbEGEds8EgBy9wdjAjBTbrzzcUP6aT+ej2U7U=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-A16ka545FHaB+QXjyJ4exXh7XpBAAIFnX8YkC4xAng8="
     },
@@ -18,7 +18,7 @@
     },
     "coreAssembly": {},
     "assembly": {
-      "Microsoft.AspNetCore.Components.wasm": "sha256-jwPIPyHocUr8D6at2hNG8DkQ9+Ye1e6soNVGYyriqlA=",
+      "Microsoft.AspNetCore.Components.wasm": "sha256-ihZt7RDRDz1vBfXsqJCQ2WOt1m+9vqntFg1PD5bux3M=",
       "Microsoft.AspNetCore.Components.Web.wasm": "sha256-yAmM52DgYCUST2MugyjeCvP7DTcw+yYNtMnjOvO/J/I=",
       "Microsoft.AspNetCore.Components.WebAssembly.wasm": "sha256-9BvHREQWEIdW8gRIV5ZXtGyaHdxZw8eOrWJ1OqWrLT8=",
       "Microsoft.Extensions.Configuration.wasm": "sha256-od574rRtVVRJj+24jbl8j3GdQFpxlJOpSx+pEMw1Q18=",
@@ -50,10 +50,10 @@
       "System.Threading.Thread.wasm": "sha256-LjT7Kl/MJbnL25J1rsNK9pjR/E7Q3DUvSUoSXxarcKA=",
       "netstandard.wasm": "sha256-R/MZzyYaXrQfkdxn8YFpoemn/bUaBKcLjnKtLN4tGQI=",
       "System.Private.CoreLib.wasm": "sha256-kJsI+y1D5/P8UzMCMH1ePQyL2Msn76wcvd36CG/Q004=",
-      "HLSLInterpreter.Debugger.wasm": "sha256-r2/5zYXmsumluQejwzDU2qtFHJAlwYrELroHO99b8EI=",
-      "HLSLInterpreter.wasm": "sha256-HxQG9pd+xVF7rnlKUkkd+fsudBxjkn9tOxu4ku+C2lA=",
+      "HLSLInterpreter.Debugger.wasm": "sha256-/CADAOS2wqeWyUTOwB/h5e+3Q5zIbYXp2Y/tMfivwyg=",
+      "HLSLInterpreter.wasm": "sha256-qUMhgyBBl57jXfWT06aR0dZyCGgAspDwNdy8bKyVG4c=",
       "UnityShaderParser.wasm": "sha256-t1eK6rYNNS+OTc/Wq/6pPh1WHszfl5lQF+Yp3zemVJE=",
-      "HLSLInterpreter.Debugger.Web.wasm": "sha256-9kwMZRWY//LPzU8sH+n+c2HCl7wd6NLpaivUceQbgso="
+      "HLSLInterpreter.Debugger.Web.wasm": "sha256-NWIXJN7ZHY/RJFQh+EyssaCGgID8lmbDzpCeua3AKTQ="
     }
   },
   "cacheBootResources": true,
