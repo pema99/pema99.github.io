@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FXC HLSL Compiler</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1e1e1e;
+      color: #ccc;
+    }
+    #toolbar {
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      background: #2d2d2d;
+      border-bottom: 1px solid #444;
+      flex-shrink: 0;
+    }
+    #toolbar h1 { font-size: 20px; font-weight: 600; color: #e0e0e0; white-space: nowrap; }
+    #toolbar-left { display: flex; align-items: center; gap: 10px; }
+    #toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    label { font-size: 15px; color: #aaa; }
+    select, input[type=text] {
+      background: #3c3c3c;
+      color: #ccc;
+      border: 1px solid #555;
+      padding: 0 6px;
+      font-size: 15px;
+      border-radius: 2px;
+      height: 30px;
+    }
+    select:focus, input:focus { outline: 1px solid #0e639c; }
+    #permalink-btn {
+      background: #3c3c3c;
+      color: #ccc;
+      border: 1px solid #555;
+      padding: 0 12px;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 2px;
+      white-space: nowrap;
+      height: 30px;
+      min-width: 130px;
+    }
+    #permalink-btn:hover:not(:disabled) { background: #4c4c4c; color: #fff; }
+    #permalink-btn:disabled { opacity: 0.4; cursor: default; }
+    #licenses-btn {
+      background: #3c3c3c;
+      color: #ccc;
+      border: 1px solid #555;
+      padding: 0 12px;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 2px;
+      white-space: nowrap;
+      height: 30px;
+    }
+    #licenses-btn:hover { background: #4c4c4c; color: #fff; }
+    #status { font-size: 14px; color: #888; }
+    /* Licenses modal */
+    #licenses-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    #licenses-overlay.open { display: flex; }
+    #licenses-dialog {
+      background: #252526;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 24px 28px;
+      max-width: 640px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      color: #ccc;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    #licenses-dialog h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e0e0e0;
+      margin-bottom: 18px;
+    }
+    .lic-entry { margin-bottom: 20px; }
+    .lic-entry:last-child { margin-bottom: 0; }
+    .lic-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e0e0e0;
+      margin-bottom: 4px;
+    }
+    .lic-meta { color: #aaa; margin-bottom: 4px; }
+    .lic-entry a { color: #4ec9b0; text-decoration: none; }
+    .lic-entry a:hover { text-decoration: underline; }
+    .lic-close {
+      display: block;
+      margin-top: 22px;
+      margin-left: auto;
+      background: #3c3c3c;
+      color: #ccc;
+      border: 1px solid #555;
+      padding: 5px 18px;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+    .lic-close:hover { background: #4c4c4c; color: #fff; }
+    hr.lic-divider { border: none; border-top: 1px solid #3a3a3a; margin: 16px 0; }
+    #licenses-dialog code { font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.9em; color: #9cdcfe; }
+    #editors {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .pane {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+    #editor-pane { border-right: 1px solid #444; }
+    .pane-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #777;
+      padding: 3px 10px;
+      background: #252526;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+    }
+    #compile-spinner {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: #888;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .spinner-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #888;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    .spinner-dot:nth-child(2) { animation-delay: 0.2s; }
+    .spinner-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+    #monaco-container { flex: 1; overflow: hidden; }
+    #output {
+      flex: 1;
+      overflow: auto;
+      padding: 12px 14px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 18px;
+      white-space: pre;
+      color: #e0e0e0;
+      background: #000000;
+      line-height: 1.5;
+    }
+    #output.error { color: #f48771; }
+    #output.placeholder { color: #555; font-style: italic; }
+    /* FXC /Cc color scheme */
+    #output .asm-comment  { color: #a0a0a0; }
+    #output .asm-op       { color: #ffff40; }
+    #output .asm-lit      { color: #00ffff; }
+    #output .asm-reg      { color: #e0e0e0; }
+  </style>
+</head>
+<body>
+  <div id="toolbar">
+    <div id="toolbar-left">
+      <h1>FXC Compiler</h1>
+      <label for="profile">Profile:</label>
+      <select id="profile">
+        <option value="ps_2_0">ps_2_0</option>
+        <option value="ps_3_0">ps_3_0</option>
+        <option value="ps_4_0">ps_4_0</option>
+        <option value="ps_5_0" selected>ps_5_0</option>
+        <option value="vs_2_0">vs_2_0</option>
+        <option value="vs_3_0">vs_3_0</option>
+        <option value="vs_4_0">vs_4_0</option>
+        <option value="vs_5_0">vs_5_0</option>
+        <option value="cs_4_0">cs_4_0</option>
+        <option value="cs_5_0">cs_5_0</option>
+      </select>
+      <label for="entry">Entry:</label>
+      <input type="text" id="entry" value="main" size="10">
+      <label for="opt">Opt:</label>
+      <select id="opt">
+        <option value="0">/O0</option>
+        <option value="1">/O1</option>
+        <option value="2">/O2</option>
+        <option value="3" selected>/O3</option>
+      </select>
+      <span id="status">Loading...</span>
+    </div>
+    <div id="toolbar-right">
+      <button id="permalink-btn" disabled>Copy permalink</button>
+      <button id="licenses-btn" onclick="document.getElementById('licenses-overlay').classList.add('open')">Licenses</button>
+    </div>
+  </div>
+  <div id="editors">
+    <div class="pane" id="editor-pane">
+      <div class="pane-label">HLSL Input</div>
+      <div id="monaco-container"></div>
+    </div>
+    <div class="pane" id="output-pane">
+      <div class="pane-label">
+        <span>Disassembly Output</span>
+        <span id="compile-spinner">
+          <span class="spinner-dot"></span>
+          <span class="spinner-dot"></span>
+          <span class="spinner-dot"></span>
+          Compiling...
+        </span>
+      </div>
+      <div id="output" class="placeholder">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Licenses modal -->
+  <div id="licenses-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+    <div id="licenses-dialog">
+      <h2>Open Source Licenses</h2>
+
+      <div class="lic-entry">
+        <div class="lic-name">retrowin32</div>
+        <div class="lic-meta">Copyright Evan Martin &mdash; Apache License 2.0</div>
+        <div>x86 Windows emulator used to run the HLSL compiler in the browser via WebAssembly.</div>
+        <div><a href="https://github.com/evmar/retrowin32" target="_blank" rel="noopener">github.com/evmar/retrowin32</a> &mdash; <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a></div>
+        <div style="margin-top:8px;color:#aaa;">
+          <strong style="color:#ccc;">Changes made to the original work:</strong>
+          <ul style="margin:4px 0 0 18px;line-height:1.7;">
+            <li>Implemented <code>o___stdio_common_vsprintf</code> and related ucrtbase formatting functions required by D3DCOMPILER_47</li>
+            <li>Fixed <code>sprintf</code>, <code>_snprintf</code> stubs in ucrtbase</li>
+            <li>Fixed <code>_fpclass</code> to return correct IEEE 754 classifications</li>
+            <li>Added <code>InitializeSRWLock</code>; fixed <code>TryAcquireSRWLockShared/Exclusive</code> return values</li>
+            <li>Added <code>InitializeConditionVariable</code>, <code>SleepConditionVariableCS/SRW</code>, <code>WakeAllConditionVariable</code> stubs</li>
+            <li>Zero-initialize allocated memory and stack before exe entry</li>
+            <li>Changed heap base address to avoid denormal floats in D3DCOMPILER</li>
+            <li>Added DAZ (flush subnormals to zero) on x87 FPU 32-bit loads</li>
+            <li>Added various SSE/XMM instruction implementations to the x86 emulator</li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="lic-divider">
+
+      <div class="lic-entry">
+        <div class="lic-name">D3DCOMPILER_47.dll</div>
+        <div class="lic-meta">Copyright Microsoft Corporation &mdash; Microsoft Windows SDK License</div>
+        <div>
+          Microsoft HLSL compiler DLL, redistributed unmodified from the Windows SDK under the
+          <a href="https://learn.microsoft.com/en-us/legal/windows-sdk/redist" target="_blank" rel="noopener">Windows SDK Redistribution Terms</a>.
+          See the <a href="https://aka.ms/WinSDKLicenseURL" target="_blank" rel="noopener">Windows SDK License Agreement</a> for full terms.
+        </div>
+      </div>
+
+      <hr class="lic-divider">
+
+      <div class="lic-entry">
+        <div class="lic-name">Monaco Editor</div>
+        <div class="lic-meta">Copyright (c) 2016 &ndash; present Microsoft Corporation &mdash; MIT License</div>
+        <div>
+          Code editor component used for HLSL input.
+          <a href="https://github.com/microsoft/monaco-editor" target="_blank" rel="noopener">github.com/microsoft/monaco-editor</a>
+        </div>
+      </div>
+
+      <button class="lic-close" onclick="document.getElementById('licenses-overlay').classList.remove('open')">Close</button>
+    </div>
+  </div>
+
+  <!-- Monaco Editor from CDN -->
+  <script>var require = { paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs' } };</script>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs/loader.js"></script>
+  <script type="module" src="bundle-fxc.js"></script>
+</body>
+</html>
