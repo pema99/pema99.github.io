@@ -1153,38 +1153,42 @@ function highlightAsm(text) {
 async function compile(files, hlsl, profile, entry, optLevel) {
   const host = new FxcHost(files, hlsl);
   const emu = new_emulator(host);
-  emu.set_external_dlls(["d3dcompiler_47.dll", "D3DCOMPILER_47.dll", "d3dcompiler_43.dll", "D3DCOMPILER_43.dll"]);
-  emu.start_exe(`d3d_compile.exe ${profile} ${entry} ${optLevel} 1`, false);
-  await new Promise((resolve, reject) => {
-    const ch = new MessageChannel();
-    ch.port2.onmessage = () => {
-      emu.unblock();
-      let status;
-      try {
-        status = emu.run(1e6);
-      } catch (e) {
-        host.flushOutput();
-        const wasmMsg = e?.message ?? String(e);
-        const detail = host.output ? `${host.output}
-[wasm] ${wasmMsg}` : wasmMsg;
-        reject(new Error(detail));
-        return;
-      }
-      switch (status) {
-        case Status.Running:
-        case Status.Blocked:
-          ch.port1.postMessage(null);
-          break;
-        case Status.Exit:
+  try {
+    emu.set_external_dlls(["d3dcompiler_47.dll", "D3DCOMPILER_47.dll", "d3dcompiler_43.dll", "D3DCOMPILER_43.dll"]);
+    emu.start_exe(`d3d_compile.exe ${profile} ${entry} ${optLevel} 1`, false);
+    await new Promise((resolve, reject) => {
+      const ch = new MessageChannel();
+      ch.port2.onmessage = () => {
+        emu.unblock();
+        let status;
+        try {
+          status = emu.run(1e6);
+        } catch (e) {
           host.flushOutput();
-          resolve();
-          break;
-        default:
-          reject(new Error(`emulator stopped unexpectedly: ${status}`));
-      }
-    };
-    ch.port1.postMessage(null);
-  });
+          const wasmMsg = e?.message ?? String(e);
+          const detail = host.output ? `${host.output}
+[wasm] ${wasmMsg}` : wasmMsg;
+          reject(new Error(detail));
+          return;
+        }
+        switch (status) {
+          case Status.Running:
+          case Status.Blocked:
+            ch.port1.postMessage(null);
+            break;
+          case Status.Exit:
+            host.flushOutput();
+            resolve();
+            break;
+          default:
+            reject(new Error(`emulator stopped unexpectedly: ${status}`));
+        }
+      };
+      ch.port1.postMessage(null);
+    });
+  } finally {
+    emu.free();
+  }
   return host.output;
 }
 function registerHlslLanguage() {
