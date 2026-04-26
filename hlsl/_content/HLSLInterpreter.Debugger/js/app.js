@@ -6,6 +6,7 @@ window.initMonaco = function (containerId, initialCode, dotNetRef) {
     require.config({
         paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs' }
     });
+    return new Promise(function (resolve) {
     require(['vs/editor/editor.main'], function () {
         monaco.languages.register({ id: 'hlsl' });
         monaco.languages.setMonarchTokensProvider('hlsl', {
@@ -346,17 +347,26 @@ window.initMonaco = function (containerId, initialCode, dotNetRef) {
                 },
             });
 
-            // Debug hover: show variable value under cursor
             monaco.languages.registerHoverProvider('hlsl', {
                 provideHover: async function (model, position) {
                     if (!window._dotNetDebugRef) return null;
                     var word = model.getWordAtPosition(position);
                     if (!word) return null;
-                    var result = await window._dotNetDebugRef.invokeMethodAsync('GetHoverValue', word.word);
-                    if (result == null) return null;
+                    var info = await window._dotNetDebugRef.invokeMethodAsync('GetHoverInfo', word.word);
+                    if (info == null) return null;
+                    var contents = [{ value: '```\n' + word.word + ' = ' + info.value + '\n```' }];
+                    if (info.rgba && info.width > 0 && info.height > 0) {
+                        var dst = document.createElement('canvas');
+                        paintScaledRgbaToCanvas(dst, info.rgba, info.width, info.height, info.inspectedX, info.inspectedY);
+                        contents.push({
+                            value: `<img src="${dst.toDataURL('image/png')}" width="${dst.width}" height="${dst.height}" />`,
+                            supportHtml: true,
+                            isTrusted: true,
+                        });
+                    }
                     return {
                         range: new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn),
-                        contents: [{ value: '```\n' + word.word + ' = ' + result + '\n```' }]
+                        contents: contents,
                     };
                 }
             });
@@ -476,6 +486,8 @@ window.initMonaco = function (containerId, initialCode, dotNetRef) {
         });
 
         window.monacoEditorInitialized = true;
+        resolve();
+    });
     });
 };
 
@@ -561,33 +573,50 @@ window.highlightDebugLine = function (lineNumber) {
     if (lineNumber > 0) window._monacoEditor.revealLineInCenter(lineNumber);
 };
 
-window.renderPixels = function (canvasId, rgbaData, width, height) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    const imageData = new ImageData(new Uint8ClampedArray(rgbaData), width, height);
-    ctx.putImageData(imageData, 0, 0);
-    window.fitCanvas(canvas, width, height);
-};
-
-window.fitCanvas = function (canvas, width, height) {
-    const container = canvas.parentElement;
-    if (!container) return;
-    const cw = container.clientWidth;
-    const ch = container.clientHeight;
-    const ar = width / height;
-    let cssW, cssH;
-    if (cw / ch > ar) {
-        cssH = ch;
-        cssW = ch * ar;
-    } else {
-        cssW = cw;
-        cssH = cw / ar;
+// Paints a per-thread rgba grid onto `canvas`, upscaled with no smoothing,
+// with a black-red-black ring around the inspected thread. Shared by the
+// hover provider and the Immediate window's per-entry image. sizeScale
+// shrinks both the target output size and the per-cell minimum together,
+// so the ring stays at a proportionally crisp pixel width.
+function paintScaledRgbaToCanvas(canvas, rgbaBytes, width, height, inspectedX, inspectedY, sizeScale) {
+    var s = sizeScale || 1;
+    var bytes = rgbaBytes;
+    // Blazor delivers byte[] as a base64 string over JS interop.
+    if (typeof bytes === 'string') {
+        var bin = atob(bytes);
+        var arr = new Uint8ClampedArray(bin.length);
+        for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        bytes = arr;
     }
-    canvas.style.width = Math.floor(cssW) + 'px';
-    canvas.style.height = Math.floor(cssH) + 'px';
+    var src = document.createElement('canvas');
+    src.width = width;
+    src.height = height;
+    src.getContext('2d').putImageData(
+        new ImageData(new Uint8ClampedArray(bytes), width, height), 0, 0);
+    var pxScale = Math.max(Math.round(8 * s), Math.floor(192 * s / Math.max(width, height)));
+    canvas.width = width * pxScale;
+    canvas.height = height * pxScale;
+    var dctx = canvas.getContext('2d');
+    dctx.imageSmoothingEnabled = false;
+    dctx.drawImage(src, 0, 0, canvas.width, canvas.height);
+    var ix = inspectedX * pxScale;
+    var iy = inspectedY * pxScale;
+    var ringDraw = function (x, y, w, h, color) {
+        dctx.fillStyle = color;
+        dctx.fillRect(x, y, w, 1);
+        dctx.fillRect(x, y + h - 1, w, 1);
+        dctx.fillRect(x, y, 1, h);
+        dctx.fillRect(x + w - 1, y, 1, h);
+    };
+    ringDraw(ix - 1, iy - 1, pxScale + 2, pxScale + 2, '#000');
+    ringDraw(ix - 2, iy - 2, pxScale + 4, pxScale + 4, '#f00');
+    ringDraw(ix - 3, iy - 3, pxScale + 6, pxScale + 6, '#000');
+}
+
+window.rgbaToDataUrl = function (rgbaBytes, width, height, inspectedX, inspectedY, sizeScale) {
+    var dst = document.createElement('canvas');
+    paintScaledRgbaToCanvas(dst, rgbaBytes, width, height, inspectedX, inspectedY, sizeScale);
+    return dst.toDataURL('image/png');
 };
 
 window.restoreImageSectionHeight = function () {
@@ -766,21 +795,12 @@ window.setMonacoReadOnly = function (readOnly) {
         if (activeHandle === 'horizontal') {
             const newWidth = Math.max(160, startSize - (e.clientX - startPos));
             document.querySelector('.output-panel').style.width = newWidth + 'px';
-            const canvas = document.getElementById('color-canvas');
-            if (canvas && canvas.width && canvas.height)
-                window.fitCanvas(canvas, canvas.width, canvas.height);
             // Thread grid reacts via ResizeObserver automatically
         } else if (activeHandle && activeHandle.type === 'vertical') {
             // Handle is at the bottom of the section: drag down = grow
             const newHeight = Math.max(60, Math.min(800, startSize + (e.clientY - startPos)));
             // Use CSS custom property so .section-collapsed { height: auto } can still override
             activeHandle.section.style.setProperty('--section-h', newHeight + 'px');
-            if (activeHandle.section.classList.contains('image-section') ||
-                activeHandle.section.classList.contains('debug-section-image')) {
-                const canvas = document.getElementById('color-canvas');
-                if (canvas && canvas.width && canvas.height)
-                    window.fitCanvas(canvas, canvas.width, canvas.height);
-            }
             // exec-state / thread-grid: ResizeObserver on exec-state-body handles it
         }
         e.preventDefault();
