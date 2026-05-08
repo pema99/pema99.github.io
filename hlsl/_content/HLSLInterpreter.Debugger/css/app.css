@@ -13,8 +13,8 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 0 9px;
-    min-height: 48px;
+    padding: 0 6px;
+    min-height: 42px;
     background: #252526;
     border-bottom: 1px solid #3c3c3c;
     flex-shrink: 0;
@@ -24,23 +24,23 @@
 .topbar-left {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
     gap: 9px;
+    min-width: 0;
 }
 
 .topbar-center {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
+    min-width: 0;
 }
 
 .topbar-right {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 9px;
+    gap: 4px;
+    min-width: 0;
 }
 
 @media (max-width: 600px) {
@@ -120,23 +120,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
     height: 30px;
-    width: 100px;
-    padding: 0 16px;
-    background: #0e639c;
+    width: 30px;
+    padding: 0;
+    background: #1a7a3a;
     color: white;
     border: none;
     border-radius: 3px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
     cursor: pointer;
     transition: background 0.15s;
     box-sizing: border-box;
 }
 
 .btn-run:hover:not(:disabled) {
-    background: #1177bb;
+    background: #22964a;
 }
 
 .btn-run:disabled {
@@ -199,6 +198,36 @@
     flex-shrink: 0;
     background: #252526;
     overflow-y: auto;
+}
+
+/* In wide mode, ignore any leftover inline height from a prior narrow-mode drag. */
+@media (min-width: 769px) {
+    .output-panel {
+        height: auto !important;
+    }
+}
+
+/* Narrow viewports: stack editor on top and output panel on the bottom. */
+@media (max-width: 768px) {
+    .main-split {
+        flex-direction: column;
+    }
+    .editor-panel {
+        flex: 1 1 auto;
+        min-height: 120px;
+        width: 100%;
+    }
+    .resize-h-handle {
+        width: auto;
+        height: 4px;
+        cursor: row-resize;
+    }
+    .output-panel {
+        width: auto !important;
+        min-width: 0;
+        height: 40vh;
+        flex-shrink: 0;
+    }
 }
 
 /* VS Code-style thin scrollbars throughout the output panel. */
@@ -286,11 +315,11 @@
 }
 .editor-tabs::-webkit-scrollbar { display: none; }
 .editor-tab {
-    padding: 0 16px;
-    height: 35px;
+    padding: 0 12px;
+    height: 28px;
     display: flex;
     align-items: center;
-    font-size: 13px;
+    font-size: 12px;
     color: #969696;
     cursor: pointer;
     white-space: nowrap;
@@ -314,6 +343,69 @@
 }
 .editor-tab:hover .editor-tab-close,
 .editor-tab.active .editor-tab-close { opacity: 0.6; }
+
+.panel-header-tabs {
+    border-bottom: 1px solid #3c3c3c;
+}
+
+.editor-tabs-rest {
+    flex: 1 1 auto;
+    align-self: stretch;
+}
+
+/* Bonzomatic mode: rendered output sits behind a transparent code editor. */
+.app-shell.bonzomatic .main-split {
+    position: relative;
+}
+.app-shell.bonzomatic .resize-h-handle {
+    display: none;
+}
+.app-shell.bonzomatic .editor-panel {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 2;
+}
+.app-shell.bonzomatic .editor-panel .panel-header,
+.app-shell.bonzomatic .editor-panel .editor-tabs,
+.app-shell.bonzomatic .editor-panel .editor-tab.active {
+    background: transparent;
+}
+.app-shell.bonzomatic .editor-container {
+    background: transparent !important;
+}
+.app-shell.bonzomatic .output-panel {
+    position: absolute !important;
+    inset: 0;
+    width: auto !important;
+    height: auto !important;
+    z-index: 1;
+    background: transparent;
+    overflow: hidden;
+    pointer-events: none;
+}
+.app-shell.bonzomatic .output-panel > *:not(.debug-section-image),
+.app-shell.bonzomatic .output-panel .panel-header,
+.app-shell.bonzomatic .output-panel .resize-v-handle {
+    display: none !important;
+}
+.app-shell.bonzomatic .output-panel .debug-section-image {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+.app-shell.bonzomatic .image-container {
+    height: 100% !important;
+    width: 100% !important;
+}
+.app-shell.bonzomatic.editor-hidden .editor-panel {
+    display: none;
+}
+.app-shell.bonzomatic.editor-hidden .output-panel {
+    pointer-events: auto;
+}
+.app-shell.bonzomatic:not(.editor-hidden) .image-overlay {
+    display: none;
+}
 .editor-tab-close:hover { opacity: 1 !important; background: rgba(255,255,255,0.1); }
 
 .editor-toolbar-group {
@@ -530,15 +622,18 @@
 .icon-step-out-back  { display: inline-block; transform: scaleX(-1) rotate(45deg); }
 
 .btn-stop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 30px;
-    width: 100px;
-    padding: 0 12px;
+    width: 30px;
+    padding: 0;
     background: #6b1414;
     color: #f48771;
     border: 1px solid #8b2020;
     border-radius: 3px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
     cursor: pointer;
     transition: background 0.15s;
     box-sizing: border-box;
@@ -562,48 +657,204 @@
     font-variant-numeric: tabular-nums;
 }
 
-.btn-permalink {
+.btn-menu {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
     height: 30px;
-    padding: 0 12px;
+    width: 30px;
+    padding: 0;
     background: #3c3c3c;
     color: #d4d4d4;
     border: 1px solid #555;
     border-radius: 3px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
     cursor: pointer;
-    white-space: nowrap;
     transition: background 0.15s;
-    text-decoration: none;
     box-sizing: border-box;
 }
 
-.btn-permalink:hover {
+.btn-menu:hover {
     background: #4e4e4e;
-    border-color: #777;
 }
 
-.btn-settings {
+.menu-button-wrap {
+    position: relative;
+    display: flex;
+}
+
+.topbar-title {
+    font-size: 15px;
+    color: #d4d4d4;
+    letter-spacing: 0.3px;
+    user-select: none;
+    white-space: nowrap;
+    padding: 0 2px;
+}
+
+a.topbar-title {
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+a.topbar-title:hover,
+a.topbar-title:focus-visible {
+    color: #ffffff;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+    outline: none;
+}
+
+.menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: transparent;
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: #2d2d2d;
+    border: 1px solid #555;
+    border-radius: 3px;
+    min-width: 180px;
+    padding: 4px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 101;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-item {
+    display: block;
+    padding: 6px 14px;
+    background: transparent;
+    color: #d4d4d4;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.menu-item:hover:not(:disabled) {
+    background: #094771;
+    color: #ffffff;
+}
+
+.menu-item:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.menu-divider {
+    height: 1px;
+    background: #3c3c3c;
+    margin: 4px 0;
+}
+
+.menu-item-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    width: 100%;
+}
+
+.menu-item-check {
+    color: #d4d4d4;
+    min-width: 10px;
+    text-align: right;
+}
+
+.example-list {
+    gap: 4px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.example-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 12px;
+    background: #2d2d2d;
+    color: #d4d4d4;
+    border: 1px solid #3c3c3c;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.example-item:hover {
+    background: #094771;
+    border-color: #0e639c;
+}
+
+.example-name {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.example-mode {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.btn-share {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
     height: 30px;
-    width: 100px;
-    padding: 0 12px;
+    width: 30px;
+    padding: 0;
     background: #3c3c3c;
     color: #d4d4d4;
     border: 1px solid #555;
     border-radius: 3px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
     cursor: pointer;
     transition: background 0.15s;
     box-sizing: border-box;
+}
+
+.btn-share:hover {
+    background: #4e4e4e;
+}
+
+.share-button-wrap {
+    position: relative;
+    display: flex;
+}
+
+.permalink-toast {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: #1a7a3a;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+    animation: permalink-toast-fade 1.5s ease-out forwards;
+}
+
+@keyframes permalink-toast-fade {
+    0%   { opacity: 0; transform: translateY(-4px); }
+    15%  { opacity: 1; transform: translateY(0); }
+    80%  { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(0); }
 }
 
 .btn-settings:hover {
@@ -785,28 +1036,56 @@
     opacity: 0.5;
 }
 
+textarea.settings-text-input {
+    height: auto;
+    padding: 8px;
+    resize: none;
+    line-height: 1.4;
+    scrollbar-width: thin;
+    scrollbar-color: #4f4f4f transparent;
+}
+textarea.settings-text-input::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+textarea.settings-text-input::-webkit-scrollbar-track {
+    background: transparent;
+}
+textarea.settings-text-input::-webkit-scrollbar-thumb {
+    background: #4f4f4f;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 6px;
+}
+textarea.settings-text-input::-webkit-scrollbar-thumb:hover {
+    background: #6f6f6f;
+    background-clip: padding-box;
+}
+textarea.settings-text-input::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
 .btn-debug-start {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
     height: 30px;
-    width: 100px;
-    padding: 0 12px;
-    background: #3c3c3c;
-    color: #d4d4d4;
-    border: 1px solid #555;
+    width: 30px;
+    padding: 0;
+    background: #0e639c;
+    color: #ffffff;
+    border: 1px solid #0e639c;
     border-radius: 3px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
     cursor: pointer;
     transition: background 0.15s;
     box-sizing: border-box;
 }
 
 .btn-debug-start:hover:not(:disabled) {
-    background: #4e4e4e;
-    border-color: #777;
+    background: #1177bd;
+    border-color: #1177bd;
 }
 
 .btn-debug-start:disabled {

@@ -9,6 +9,14 @@ window.dbgFetchText = async function (url) {
     return await r.text();
 };
 
+window.dbgIsTabDropAfter = function (tabIndex, clientX) {
+    const tabs = document.querySelectorAll('.editor-tab');
+    const el = tabs[tabIndex];
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    return clientX > r.left + r.width / 2;
+};
+
 window.dbgPickObj = function () {
     const input = document.createElement('input');
     input.type = 'file';
@@ -438,6 +446,37 @@ window.initMonaco = function (containerId, initialCode, editorRef) {
             colors: {}
         });
 
+        monaco.editor.defineTheme('hlsl-bonzomatic', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+                { token: 'keyword.control',   foreground: 'c586c0' },
+                { token: 'keyword.modifier',  foreground: '569cd6' },
+                { token: 'keyword.type',      foreground: '4ec9b0' },
+                { token: 'keyword.literal',   foreground: '569cd6' },
+                { token: 'keyword.directive', foreground: '9b9b9b' },
+                { token: 'support.function',  foreground: 'dcdcaa' },
+                { token: 'annotation',        foreground: 'c8c8c8' },
+                { token: 'annotation.bracket',foreground: 'c8c8c8' },
+                { token: 'number',            foreground: 'b5cea8' },
+                { token: 'number.float',      foreground: 'b5cea8' },
+                { token: 'number.hex',        foreground: 'b5cea8' },
+                { token: 'string',            foreground: 'ce9178' },
+                { token: 'comment',           foreground: '6a9955' },
+                { token: 'identifier',        foreground: '9cdcfe' },
+                { token: 'operator',          foreground: 'd4d4d4' },
+            ],
+            colors: {
+                'editor.background': '#00000000',
+                'editorGutter.background': '#00000000',
+                'editor.lineHighlightBackground': '#ffffff14',
+                'editor.lineHighlightBorder': '#00000000',
+                'minimap.background': '#00000000',
+                'scrollbarSlider.background': '#80808060',
+                'editorOverviewRuler.background': '#00000000',
+            }
+        });
+
         window._monacoEditor = monaco.editor.create(document.getElementById(containerId), {
             value: initialCode,
             language: 'hlsl',
@@ -454,6 +493,7 @@ window.initMonaco = function (containerId, initialCode, editorRef) {
             wordWrap: 'off',
             tabSize: 4,
             insertSpaces: true,
+            stickyScroll: { enabled: false },
         });
 
         window._monacoEditor.addCommand(
@@ -503,6 +543,12 @@ window.initMonaco = function (containerId, initialCode, editorRef) {
             var btn = document.querySelector('[data-dbg="' + action + '"]');
             if (btn && !btn.disabled) btn.click();
         }
+        function clickDbgOrToggleBonzomaticEditor(action) {
+            var btn = document.querySelector('[data-dbg="' + action + '"]');
+            if (btn && !btn.disabled) { btn.click(); return; }
+            var shell = document.querySelector('.app-shell.bonzomatic');
+            if (shell) shell.classList.toggle('editor-hidden');
+        }
         function toggleBreakpointAtCursor() {
             if (window._dotNetEditorRef) {
                 var pos = window._monacoEditor.getPosition();
@@ -511,13 +557,13 @@ window.initMonaco = function (containerId, initialCode, editorRef) {
         }
         window._monacoEditor.addCommand(monaco.KeyCode.F5, function () {
             var cont = document.querySelector('[data-dbg="continue"]');
-            var start = document.querySelector('.btn-debug-start');
+            var run = document.querySelector('.btn-run');
             if (cont && !cont.disabled) cont.click();
-            else if (start && !start.disabled) start.click();
+            else if (run && !run.disabled) run.click();
         });
         window._monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.F5, function () { clickDbg('continue-back'); });
         window._monacoEditor.addCommand(monaco.KeyCode.F9, function () { toggleBreakpointAtCursor(); });
-        window._monacoEditor.addCommand(monaco.KeyCode.F10, function () { clickDbg('step-over'); });
+        window._monacoEditor.addCommand(monaco.KeyCode.F10, function () { clickDbgOrToggleBonzomaticEditor('step-over'); });
         window._monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.F10, function () { clickDbg('step-over-back'); });
         window._monacoEditor.addCommand(monaco.KeyCode.F11, function () { clickDbg('step-in'); });
         window._monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.F11, function () { clickDbg('step-in-back'); });
@@ -547,9 +593,9 @@ document.addEventListener('keydown', function (e) {
     if (e.key === 'F5' && !e.shiftKey) {
         e.preventDefault();
         var cont = document.querySelector('[data-dbg="continue"]');
-        var start = document.querySelector('.btn-debug-start');
+        var run = document.querySelector('.btn-run');
         if (cont && !cont.disabled) cont.click();
-        else if (start && !start.disabled) start.click();
+        else if (run && !run.disabled) run.click();
     } else if (e.key === 'F5' && e.shiftKey) {
         e.preventDefault();
         clickDbgGlobal('continue-back');
@@ -561,7 +607,13 @@ document.addEventListener('keydown', function (e) {
         }
     } else if (e.key === 'F10' && !e.shiftKey) {
         e.preventDefault();
-        clickDbgGlobal('step-over');
+        var stepOver = document.querySelector('[data-dbg="step-over"]');
+        if (stepOver && !stepOver.disabled) {
+            stepOver.click();
+        } else {
+            var shell = document.querySelector('.app-shell.bonzomatic');
+            if (shell) shell.classList.toggle('editor-hidden');
+        }
     } else if (e.key === 'F10' && e.shiftKey) {
         e.preventDefault();
         clickDbgGlobal('step-over-back');
@@ -796,6 +848,10 @@ window.setMonacoValue = function (value) {
     }
 };
 
+window.setMonacoTheme = function (theme) {
+    if (window._monacoEditor) monaco.editor.setTheme(theme);
+};
+
 window.setMonacoFontSize = function (size) {
     if (window._monacoEditor) {
         window._monacoEditor.updateOptions({ fontSize: size });
@@ -811,6 +867,36 @@ window.setMonacoReadOnly = function (readOnly) {
     }
 };
 
+window._glsl2hlslPromise = null;
+async function loadGlsl2Hlsl() {
+    if (!window._glsl2hlslPromise) {
+        window._glsl2hlslPromise = (async () => {
+            const base = new URL('/_content/HLSLInterpreter.Debugger/lib/glsl2hlsl/', document.baseURI).href;
+            const mod = await import(base + 'glsl2hlsl_wasm.js');
+            await mod.default(base + 'glsl2hlsl_wasm_bg.wasm');
+            return mod;
+        })();
+    }
+    return window._glsl2hlslPromise;
+}
+
+window.glsl2hlslTranspile = async function (glsl) {
+    const mod = await loadGlsl2Hlsl();
+    return mod.transpile(glsl);
+};
+
+window.downloadTextFile = function (filename, content) {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+};
+
 // Outer resize: horizontal panel + vertical sections
 (function () {
     let activeHandle = null;  // null | 'horizontal' | { type: 'vertical', section: Element }
@@ -818,9 +904,16 @@ window.setMonacoReadOnly = function (readOnly) {
 
     document.addEventListener('mousedown', function (e) {
         if (e.target.classList.contains('resize-h-handle')) {
-            activeHandle = 'horizontal';
-            startPos = e.clientX;
-            startSize = document.querySelector('.output-panel').getBoundingClientRect().width;
+            const panel = document.querySelector('.output-panel');
+            if (window.innerWidth <= 768) {
+                activeHandle = 'horizontal-narrow';
+                startPos = e.clientY;
+                startSize = panel.getBoundingClientRect().height;
+            } else {
+                activeHandle = 'horizontal';
+                startPos = e.clientX;
+                startSize = panel.getBoundingClientRect().width;
+            }
             e.preventDefault();
         } else if (e.target.classList.contains('resize-v-handle')) {
             const section = e.target.closest('.image-section, .debug-section-image, .debug-section-console, .debug-section-vars, .debug-section-callstack, .debug-section-immediate');
@@ -839,6 +932,9 @@ window.setMonacoReadOnly = function (readOnly) {
             const newWidth = Math.max(160, startSize - (e.clientX - startPos));
             document.querySelector('.output-panel').style.width = newWidth + 'px';
             // Thread grid reacts via ResizeObserver automatically
+        } else if (activeHandle === 'horizontal-narrow') {
+            const newHeight = Math.max(120, startSize - (e.clientY - startPos));
+            document.querySelector('.output-panel').style.height = newHeight + 'px';
         } else if (activeHandle && activeHandle.type === 'vertical') {
             // Handle is at the bottom of the section: drag down = grow
             const newHeight = Math.max(60, Math.min(800, startSize + (e.clientY - startPos)));
