@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "HLSLDebugger.Web",
   "resources": {
-    "hash": "sha256-vki0M8qGsiDn39eDS70YpKGlOcVZf/7mFl958Ct6D7s=",
+    "hash": "sha256-kCjo/qkA7dy2HowhGxGKbCuUcwGGEutS4FcKozzTdo8=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-2IOfl28nXG03/DM3gE4RxN9fXZ+xZaksO1aSTlMvl0o="
     },
@@ -9,7 +9,7 @@
       "dotnet.runtime.js": "sha256-HuKpYzsYoQBMbqMPjy15HX+ShsypvOKN9uGvoA7P/+o="
     },
     "wasmNative": {
-      "dotnet.native.wasm": "sha256-mNllEfnDyZzsUbVH94ec2ZV63MaQVkDF60XdQbWVVmQ="
+      "dotnet.native.wasm": "sha256-qu/meYEsHBfpbiUiOI7mjkep7mbgEwIPARo0kAT5Qb8="
     },
     "icu": {
       "icudt_CJK.dat": "sha256-SZLtQnRc0JkwqHab0VUVP7T3uBPSeYzxzDnpxPpUnHk=",
