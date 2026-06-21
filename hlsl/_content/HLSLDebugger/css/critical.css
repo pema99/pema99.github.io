@@ -1,0 +1,72 @@
+/* Boot styles for the static host page in index.html: the loading screen and
+   the error UI. Application component styles belong in app.css. */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+button, input, select, textarea { font-family: inherit; }
+
+html, body {
+    height: 100%;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    overflow: hidden;
+}
+
+#app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.loading-progress {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: #007acc;
+    stroke-width: 0.6rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: #333;
+    animation: loading-progress-spin 1.5s linear infinite;
+}
+
+@keyframes loading-progress-spin {
+    100% { transform: rotate(270deg); }
+}
+
+.loading-progress-text {
+    position: fixed;
+    top: calc(50% + 3.5rem);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #888;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+#blazor-error-ui {
+    background: #c00;
+    bottom: 0;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    color: white;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
