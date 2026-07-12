@@ -1,0 +1,239 @@
+/* Standalone C64 disk browser — its own look, independent of the rest of pema.dev */
+
+/* Authentic C64 charset. PetMe64 by Kreative Software (Rebecca Bettencourt),
+   used unmodified under the Kreative Software Relay Fonts Free Use License
+   (see fonts/FreeLicense.txt). */
+@font-face {
+  font-family: "PetMe64";
+  src: url("fonts/PetMe64.ttf") format("truetype");
+  font-display: swap;
+}
+
+:root {
+  --c64-bg:      #40318d; /* dark blue background   */
+  --c64-border:  #7869c4; /* light blue border      */
+  --c64-fg:      #b0a4e3; /* light blue text        */
+  --c64-fg-dim:  #7869c4;
+  --c64-black:   #191338;
+  --c64-accent:  #a1ffb0; /* green, for "run" bits  */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--c64-black);
+  color: var(--c64-fg);
+  font-family: "PetMe64", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  -webkit-font-smoothing: none;
+}
+
+a { color: var(--c64-accent); }
+
+.wrap {
+  max-width: none;
+  margin: 0 auto;
+  padding: 12px 20px 40px;
+}
+
+/* Stacked by default (mobile): emulator on top, disks below in one column.
+   On wider screens: emulator left (fills the space), disk list right. */
+.layout { display: flex; flex-direction: column; gap: 24px; }
+@media (min-width: 768px) {
+  /* Lock the whole page to one viewport height so only the disk list scrolls. */
+  html, body { height: 100%; }
+  body { overflow: hidden; }
+  .wrap {
+    height: 100vh; box-sizing: border-box;
+    display: flex; flex-direction: column;
+    padding-bottom: 8px;
+  }
+  .boot, .credit { flex: 0 0 auto; }
+  .credit { margin-top: 12px; }
+
+  .layout {
+    flex: 1 1 auto; min-height: 0;   /* fill the space between header and footer */
+    flex-direction: row; align-items: stretch; gap: 12px;
+  }
+  .layout #emu-panel {
+    flex: 0 1 auto; min-width: 0;    /* hug the emulator, but allow it to shrink */
+    position: static; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .layout .grid {
+    flex: 1 1 400px; min-width: 400px;  /* fill remaining width, but stay readable */
+    height: 100%; overflow-y: auto;
+    align-content: start;
+  }
+}
+
+/* Header styled like a C64 boot screen */
+.boot {
+  background: var(--c64-bg);
+  border: 3px solid var(--c64-border);
+  border-radius: 4px;
+  padding: 4px 12px 4px 16px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.boot h1 { font-size: 15px; margin: 0; font-weight: bold; }
+
+/* Title-bar nav — plain clickable text with literal [ ] brackets */
+.topnav { display: flex; gap: 10px; flex-shrink: 0; }
+.navbtn {
+  font: inherit; font-size: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+  cursor: pointer; background: none; border: none; padding: 0;
+  color: var(--c64-fg);
+}
+.navbtn:hover { color: #fff; }
+.boot p  { margin: 4px 0; font-size: 14px; }
+.boot .ready { color: var(--c64-fg); }
+.boot .cursor {
+  display: inline-block; width: 9px; height: 16px; vertical-align: -3px;
+  background: var(--c64-fg); animation: blink 1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Disk grid */
+.grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+/* C64-themed scrollbar for the (scrolling) disk list */
+.grid { scrollbar-width: thin; scrollbar-color: var(--c64-border) transparent; }
+.grid::-webkit-scrollbar { width: 10px; }
+.grid::-webkit-scrollbar-track { background: transparent; }
+.grid::-webkit-scrollbar-thumb {
+  background: var(--c64-border); border-radius: 5px;
+  border: 2px solid var(--c64-black);
+}
+.grid::-webkit-scrollbar-thumb:hover { background: var(--c64-fg); }
+
+.disk {
+  background: var(--c64-bg);
+  border: 3px solid var(--c64-border);
+  border-radius: 4px;
+  padding: 9px 16px;
+  display: flex; flex-direction: column;
+}
+.disk h2 { font-size: 12px; margin: 0 0 2px; text-transform: uppercase; }
+.disk .note { font-size: 11px; color: var(--c64-fg-dim); margin: 2px 0 0; }
+.disk .tag {
+  display: inline-block; font-size: 10px; padding: 1px 6px; border: 1px solid var(--c64-border);
+  border-radius: 2px; margin-left: 6px; vertical-align: 2px; text-transform: uppercase; color: var(--c64-fg-dim);
+}
+
+.btnrow { display: flex; gap: 8px; margin-top: auto; padding-top: 2px; flex-wrap: wrap; }
+button.act, a.act {
+  font: inherit; font-size: 11px; text-transform: uppercase; cursor: pointer;
+  background: var(--c64-black); color: var(--c64-accent);
+  border: 2px solid var(--c64-accent); border-radius: 3px; padding: 6px 12px;
+  text-decoration: none;
+}
+button.act.ghost, a.act.ghost { color: var(--c64-fg); border-color: var(--c64-border); }
+button.act:hover, a.act:hover { background: var(--c64-accent); color: var(--c64-black); }
+button.act.ghost:hover { background: var(--c64-border); color: var(--c64-black); }
+
+/* Directory listing (parsed from the D64) */
+.dir { margin-top: 12px; border-top: 1px dashed var(--c64-border); padding-top: 10px; font-size: 11px; }
+.dir .diskname { color: var(--c64-fg); margin-bottom: 6px; }
+.dir ul { list-style: none; margin: 0; padding: 0; }
+.dir li {
+  display: flex; justify-content: space-between; gap: 10px; padding: 1px 0; cursor: pointer;
+  white-space: pre; font-family: inherit;
+}
+.dir li:hover { background: var(--c64-border); color: var(--c64-black); }
+.dir li .sz { color: var(--c64-fg-dim); }
+.dir li:hover .sz { color: var(--c64-black); }
+.dir .loading, .dir .err { color: var(--c64-fg-dim); font-style: italic; }
+.dir .err { color: #ff8f8f; }
+
+/* Modal dialogs (Help / FAQ / Licenses) */
+.modal {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0, 0, 0, 0.75);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal.on { display: flex; }
+.modal-box {
+  position: relative; background: var(--c64-bg);
+  border: 3px solid var(--c64-border); border-radius: 4px;
+  width: min(560px, 100%); max-height: 82vh; overflow-y: auto;
+  padding: 22px 26px 26px; color: var(--c64-fg); line-height: 1.6;
+}
+.modal-box h2 {
+  font-size: 15px; text-transform: uppercase; letter-spacing: 1px;
+  margin: 0 0 14px; padding-right: 24px; color: #fff;
+}
+.modal-box h3 {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+  margin: 18px 0 6px; color: var(--c64-fg);
+}
+.modal-box p, .modal-box li { font-size: 12px; }
+.modal-box ul { padding-left: 18px; margin: 6px 0; }
+.modal-box li { margin: 4px 0; }
+.modal-box a { color: var(--c64-accent); }
+.modal-box code {
+  background: var(--c64-black); color: var(--c64-accent);
+  padding: 0 3px; border-radius: 2px;
+}
+.modal-close {
+  position: absolute; top: 22px; right: 26px;
+  font: inherit; font-size: 15px; line-height: 1; cursor: pointer;
+  background: transparent; border: none; color: var(--c64-fg);
+}
+.modal-close:hover { color: #fff; }
+/* Themed scrollbar inside modals */
+.modal-box { scrollbar-width: thin; scrollbar-color: var(--c64-border) transparent; }
+.modal-box::-webkit-scrollbar { width: 10px; }
+.modal-box::-webkit-scrollbar-thumb {
+  background: var(--c64-border); border-radius: 5px; border: 2px solid var(--c64-bg);
+}
+
+/* Persistent emulator, pinned to the top while you browse the disk list */
+#emu-panel {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--c64-black);
+  padding: 6px 0 12px;
+}
+#emu-host { width: 100%; margin: 0 auto; }
+#emu-host > #emu-mount {
+  width: 100%; aspect-ratio: 4 / 3; background: #000;
+  border: 3px solid var(--c64-border); border-radius: 4px; box-sizing: border-box;
+}
+
+/* Once the player swaps in its <iframe>, keep the emulator centered and let it
+   shrink with the viewport — override the fixed pixel width the player sets. */
+#player_container {
+  width: 100% !important; max-width: 100% !important; margin: 0 auto !important;
+}
+#vc64web {
+  width: 100% !important; height: auto !important;
+  aspect-ratio: 4 / 3; display: block; box-sizing: border-box;
+  border: 3px solid var(--c64-border); border-radius: 4px;
+}
+
+/* On desktop the emulator fills its pane: the largest 320:212 box that fits the
+   available height and width, centered by the flex parent. */
+@media (min-width: 768px) {
+  #emu-host {
+    aspect-ratio: 4 / 3;
+    height: 100%; width: auto; max-width: 100%; margin: 0;
+  }
+  #emu-host > #emu-mount,
+  #player_container,
+  #vc64web {
+    width: 100% !important; height: 100% !important;
+    max-width: 100% !important; aspect-ratio: auto !important;
+  }
+}
+
+/* Hide the player's own control bar under the iframe — the emulator's built-in
+   menu already provides these controls, so they'd just be redundant. */
+#player_container > div { display: none !important; }

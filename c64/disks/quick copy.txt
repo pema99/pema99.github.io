@@ -1,0 +1,1 @@
+Contains a program for copying floppy disk. Hadn't seen this one before, seems Danish.

@@ -1,0 +1,1 @@
+Contains a tool for making intros on the C64. Also contains a copy of the "Scene press" magazine.

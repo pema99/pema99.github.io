@@ -1,0 +1,1 @@
+Contains software for drawing sprites in the "SIP-IMAGE" program.

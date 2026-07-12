@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C64 Disk Archive &middot; pema.dev</title>
+  <meta name="description" content="Browse and run my dumped Commodore 64 floppy disks in an in-browser emulator.">
+  <link rel="stylesheet" href="style.css">
+  <!-- vc64web embeddable player (vendored locally; loads the WASM emulator from emu/) -->
+  <script src="emu/js/vc64web_player.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="boot">
+      <h1>PEMA's C64 DISK DUMPS</h1>
+      <nav class="topnav">
+        <button class="navbtn" data-modal="about">[About]</button>
+        <button class="navbtn" data-modal="licenses">[Licenses]</button>
+      </nav>
+    </div>
+
+    <div class="layout">
+      <div id="emu-panel">
+        <div id="emu-host"><div id="emu-mount"></div></div>
+      </div>
+
+      <div id="grid" class="grid"></div>
+    </div>
+  </div>
+
+  <!-- Modal panels opened by the title-bar buttons -->
+  <div id="modals">
+    <div class="modal" id="modal-about">
+      <div class="modal-box">
+        <button class="modal-close" aria-label="Close">&times;</button>
+        <h2>About</h2>
+        <p>Around 2015, I inherited a Commodore 64 along with around 500 floppy
+           disks. This page is an archive of some of the more interesting disks I
+           found. Most of these are compilation disks, containing a variety of
+           demos, games, warez, danish software, and even some porn. For anyone
+           interested, I used a
+           <a href="https://github.com/tebl/C64-XUM1541-II">XUM1541-II</a> board
+           alongside <a href="https://github.com/OpenCBM/OpenCBM">OpenCBM</a> to
+           dump these disk images.</p>
+        <p>The simplest way to run a program is to press the "Files" button on the
+           disk image you are interested in, then click on the program in the list
+           that you want to run. The emulator will do the rest for you.
+           Alternatively, you can mount the entire disk image with the "Attach"
+           button, then enter <code>LOAD"$",8</code> followed by <code>LIST</code>
+           to view the contents. To load a specific program, type
+           <code>LOAD"&lt;program name&gt;",8,1</code> followed by <code>RUN</code>.</p>
+      </div>
+    </div>
+
+    <div class="modal" id="modal-licenses">
+      <div class="modal-box">
+        <button class="modal-close" aria-label="Close">&times;</button>
+        <h2>Licenses &amp; credits</h2>
+        <ul>
+          <li><strong>Emulator</strong> — vc64web / VirtualC64, &copy; Dirk Hoffmann,
+              under the <strong>GPL-3.0</strong>.
+              <a href="emu/LICENSE">license</a> &middot;
+              <a href="https://github.com/dirkwhoffmann/virtualc64">source</a></li>
+          <li><strong>Font</strong> — PetMe64, &copy; Kreative Software
+              (Rebecca Bettencourt), under its
+              <a href="fonts/FreeLicense.txt">Free Use License</a>.</li>
+          <li><strong>Libraries</strong> — jQuery, Bootstrap, Popper, CodeMirror,
+              JSHint, JSZip, virtualjoystick.js (all MIT).</li>
+        </ul>
+        <p>Full attribution and license texts:
+           <a href="THIRD-PARTY-NOTICES.md">THIRD-PARTY-NOTICES</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="c64.js"></script>
+</body>
+</html>
