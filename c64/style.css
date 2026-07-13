@@ -219,12 +219,18 @@ button.act.ghost:hover { background: var(--c64-border); color: var(--c64-black);
   border: 3px solid var(--c64-border); border-radius: 4px;
 }
 
-/* On desktop the emulator fills its pane: the largest 320:212 box that fits the
-   available height and width, centered by the flex parent. */
+/* On desktop the emulator is the largest 4:3 box that fits the available height
+   and width, centered by the flex parent. Its height comes from the viewport
+   (not `height: 100%`) so the width is resolvable without a circular dependency
+   on the flex parent — that made it collapse on some viewport sizes. */
 @media (min-width: 768px) {
   #emu-host {
     aspect-ratio: 4 / 3;
-    height: 100%; width: auto; max-width: 100%; margin: 0;
+    height: calc(100vh - 72px);   /* viewport minus title bar + page padding */
+    width: auto;
+    max-height: 100%;             /* never overflow the row */
+    max-width: 100%;              /* shrink (keeping 4:3) if width is the limit */
+    margin: 0;
   }
   #emu-host > #emu-mount,
   #player_container,
